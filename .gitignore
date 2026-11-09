@@ -11,3 +11,10 @@ runs/
 .DS_Store
 evals/reports/*.json
 *-output.txt
+
+# Node / engine gate
+node_modules/
+test-results/
+results/raw/
+build/
+*.tsbuildinfo

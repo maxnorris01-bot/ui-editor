@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test eval-fast eval-fast-live eval-standard eval-nightly
+.PHONY: install lint format typecheck test eval-fast eval-fast-live eval-standard eval-nightly node-install node-test gate
  
 install:
 	uv sync
@@ -35,3 +35,16 @@ eval-standard:
  
 eval-nightly:
 	uv run python -m evals.run --tier nightly
+
+# --- Engine gate (Node/TypeScript; nothing here calls an LLM or any paid service) ---
+node-install:
+	npm install
+	npx playwright install chromium
+
+node-test:
+	npx tsc --noEmit
+	npx vitest run
+
+# Runs the locked scoring harness over fixtures/edits.json. See docs/gate-rules.md.
+gate:
+	npx tsx harness/run-gate.ts

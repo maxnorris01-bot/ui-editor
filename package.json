@@ -1,0 +1,29 @@
+{
+  "name": "ui-editor-engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Engine gate: browser-side HTML/SVG edit round-trip (work in progress)",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "bundle": "node harness/bundle.mjs",
+    "speed": "tsx harness/speed.ts",
+    "gate": "tsx harness/run-gate.ts"
+  },
+  "dependencies": {
+    "parse5": "^8.1.1",
+    "postcss": "^8.5.32"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
+    "diff": "^9.0.0",
+    "esbuild": "^0.28.2",
+    "jsdom": "^31.0.0",
+    "playwright": "^1.65.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
