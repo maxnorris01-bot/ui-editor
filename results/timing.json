@@ -1,0 +1,227 @@
+{
+  "measuredAt": "2026-11-09T05:51:45.177Z",
+  "runsPerFile": 20,
+  "machine": {
+    "model": "Mac17,4",
+    "cpu": "Apple M5",
+    "cores": 10,
+    "ramGiB": 32,
+    "os": "darwin 25.6.0",
+    "arch": "arm64"
+  },
+  "versions": {
+    "node": "v24.21.0",
+    "chromium": "158.0.8127.18",
+    "playwright": "1.65.0"
+  },
+  "bundle": {
+    "rawBytes": 252897,
+    "gzipBytes": 71239
+  },
+  "largestFixture": {
+    "file": "large-page.html",
+    "bytes": 14712,
+    "elements": 251,
+    "previewMs": {
+      "median": 2.5,
+      "min": 2.199999988079071,
+      "max": 5,
+      "first": 5
+    },
+    "applyMs": {
+      "median": 0.03375,
+      "min": 0.0325,
+      "max": 0.0630000001192093
+    },
+    "applyStatus": "ok",
+    "applyRefusal": ""
+  },
+  "perFile": [
+    {
+      "file": "flex-layout.html",
+      "bytes": 2054,
+      "elements": 29,
+      "previewMs": {
+        "median": 1.5,
+        "min": 1.300000011920929,
+        "max": 7.399999976158142,
+        "first": 7.399999976158142
+      },
+      "applyMs": {
+        "median": 0.0044999998807907105,
+        "min": 0.003499999940395355,
+        "max": 0.01699999988079071
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "grid-table.html",
+      "bytes": 1547,
+      "elements": 34,
+      "previewMs": {
+        "median": 1.2999999821186066,
+        "min": 1.100000023841858,
+        "max": 2.100000023841858,
+        "first": 2.100000023841858
+      },
+      "applyMs": {
+        "median": 0.003499999940395355,
+        "min": 0.0025,
+        "max": 0.005999999940395355
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "grouped-transforms.svg",
+      "bytes": 1253,
+      "elements": 18,
+      "previewMs": {
+        "median": 1.899999976158142,
+        "min": 1.699999988079071,
+        "max": 3.300000011920929,
+        "first": 3.300000011920929
+      },
+      "applyMs": {
+        "median": 0.0007500000298023224,
+        "min": 0,
+        "max": 0.0019999998807907105
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "inline-styles.html",
+      "bytes": 1584,
+      "elements": 15,
+      "previewMs": {
+        "median": 1.100000023841858,
+        "min": 0.8999999761581421,
+        "max": 1.699999988079071,
+        "first": 1.699999988079071
+      },
+      "applyMs": {
+        "median": 0.0027499999105930328,
+        "min": 0.0014999997615814209,
+        "max": 0.007999999821186066
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "large-page.html",
+      "bytes": 14712,
+      "elements": 251,
+      "previewMs": {
+        "median": 2.5,
+        "min": 2.199999988079071,
+        "max": 5,
+        "first": 5
+      },
+      "applyMs": {
+        "median": 0.03375,
+        "min": 0.0325,
+        "max": 0.0630000001192093
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "linked-css.html",
+      "bytes": 744,
+      "elements": 19,
+      "previewMs": {
+        "median": 1.199999988079071,
+        "min": 1,
+        "max": 5.5,
+        "first": 2.100000023841858
+      },
+      "applyMs": {
+        "median": 0.0025,
+        "min": 0.0019999998807907105,
+        "max": 0.0035000002384185792
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "messy.html",
+      "bytes": 1219,
+      "elements": 18,
+      "previewMs": {
+        "median": 1.100000023841858,
+        "min": 1,
+        "max": 1.899999976158142,
+        "first": 1.899999976158142
+      },
+      "applyMs": {
+        "median": 0.0025,
+        "min": 0.0019999998807907105,
+        "max": 0.004000000059604645
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "shapes-text.svg",
+      "bytes": 917,
+      "elements": 9,
+      "previewMs": {
+        "median": 1.800000011920929,
+        "min": 1.5999999642372131,
+        "max": 3.100000023841858,
+        "first": 2.300000011920929
+      },
+      "applyMs": {
+        "median": 0.0004999999701976776,
+        "min": 0,
+        "max": 0.0009999999403953552
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "shared-classes.html",
+      "bytes": 1257,
+      "elements": 19,
+      "previewMs": {
+        "median": 1.0999999642372131,
+        "min": 1,
+        "max": 1.300000011920929,
+        "first": 1.300000011920929
+      },
+      "applyMs": {
+        "median": 0.002000000029802322,
+        "min": 0.0015000000596046448,
+        "max": 0.0030000001192092896
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    },
+    {
+      "file": "style-block.html",
+      "bytes": 1275,
+      "elements": 14,
+      "previewMs": {
+        "median": 1.100000023841858,
+        "min": 1,
+        "max": 3.899999976158142,
+        "first": 1.699999988079071
+      },
+      "applyMs": {
+        "median": 0.0019999998807907105,
+        "min": 0.0014999997615814209,
+        "max": 0.0025
+      },
+      "applyStatus": "ok",
+      "applyRefusal": ""
+    }
+  ],
+  "overall": {
+    "medianOfMedians_previewMs": 1.2499999850988388,
+    "worstMedian_previewMs": 2.5,
+    "medianOfMedians_applyMs": 0.0025,
+    "worstMedian_applyMs": 0.03375
+  }
+}
