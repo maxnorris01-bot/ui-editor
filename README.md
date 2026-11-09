@@ -1,5 +1,7 @@
 # PROJECT_NAME
 
+> **Work in progress.** This repo is currently running an engine gate (can HTML/SVG edits round-trip into the visitor's own source text?); see `docs/gate-rules.md` and `docs/checkpoint.md`. A real README comes after the gate is decided.
+
 > One-sentence pitch: what it does and for whom.
 
 ![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)
