@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plainsight - clear pages for busy teams</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #1c2430; background: #ffffff; line-height: 1.5; }
+a { color: #1d4ed8; text-decoration: none; }
+h1, h2, h3 { margin: 0; line-height: 1.2; }
+p { margin: 0; }
+
+/* navigation */
+.nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 48px; border-bottom: 1px solid #e5e9ef; background: #ffffff; }
+.nav .logo { font-size: 22px; font-weight: 700; color: #0f172a; }
+.nav ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+.nav li { font-size: 15px; }
+.nav .signup { padding: 8px 18px; background: #1d4ed8; color: #ffffff; border-radius: 6px; font-size: 15px; }
+
+/* hero */
+.hero { padding: 80px 48px 72px; background: #f1f5fb; text-align: center; }
+.hero h1 { font-size: 52px; font-weight: 800; color: #0f172a; margin-bottom: 16px; }
+.hero p { max-width: 640px; margin: 0 auto 28px; font-size: 19px; color: #475467; }
+.hero .actions { display: flex; justify-content: center; gap: 14px; }
+.hero .primary { padding: 12px 26px; background: #1d4ed8; color: #ffffff; border-radius: 6px; font-weight: 600; }
+.hero .secondary { padding: 12px 26px; border: 1px solid #1d4ed8; border-radius: 6px; font-weight: 600; }
+
+/* features */
+.features { padding: 64px 48px; }
+.features h2 { font-size: 32px; text-align: center; margin-bottom: 36px; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1040px; margin: 0 auto; }
+.feature { padding: 22px; border: 1px solid #e5e9ef; border-radius: 8px; background: #ffffff; }
+.feature h3 { font-size: 18px; margin-bottom: 8px; }
+.feature p { font-size: 15px; color: #475467; }
+
+/* pricing */
+.pricing { padding: 64px 48px; background: #f8fafc; }
+.pricing h2 { font-size: 32px; text-align: center; margin-bottom: 36px; }
+.plans { display: flex; justify-content: center; align-items: flex-start; gap: 24px; }
+.plan { flex: none; width: 300px; padding: 24px; background: #ffffff; border: 1px solid #dbe2ea; border-radius: 10px; }
+.plan h3 { font-size: 20px; margin-bottom: 6px; }
+.plan .price { font-size: 34px; font-weight: 700; margin: 8px 0 14px; }
+.plan ul { margin: 0 0 18px; padding-left: 18px; font-size: 15px; color: #475467; }
+.plan .choose { display: block; padding: 10px 0; text-align: center; background: #1d4ed8; color: #ffffff; border-radius: 6px; }
+.plan.featured { border: 2px solid #1d4ed8; }
+
+/* logo strip */
+.logos { padding: 28px 48px; text-align: center; border-bottom: 1px solid #e5e9ef; }
+.logos p { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #667085; margin-bottom: 14px; }
+.logo-row { display: flex; justify-content: center; gap: 40px; font-size: 18px; font-weight: 700; color: #98a2b3; }
+
+/* how it works */
+.steps { padding: 64px 48px; }
+.steps h2 { font-size: 32px; text-align: center; margin-bottom: 32px; }
+.step-row { display: flex; gap: 20px; max-width: 1040px; margin: 0 auto; }
+.step { flex: 1; padding: 18px; border-top: 3px solid #1d4ed8; background: #f8fafc; }
+.step .num { font-size: 13px; font-weight: 700; color: #1d4ed8; margin-bottom: 6px; }
+.step h3 { font-size: 17px; margin-bottom: 6px; }
+.step p { font-size: 14px; color: #475467; }
+
+/* comparison */
+.compare { padding: 56px 48px; background: #f8fafc; }
+.compare h2 { font-size: 32px; text-align: center; margin-bottom: 28px; }
+.compare table { border-collapse: collapse; margin: 0 auto; width: 760px; font-size: 15px; background: #ffffff; }
+.compare th, .compare td { padding: 10px 14px; border: 1px solid #dbe2ea; text-align: left; }
+.compare th { background: #eef2f7; }
+.compare .yes { color: #087443; font-weight: 600; }
+.compare .no { color: #b42318; }
+
+/* newsletter */
+.newsletter { padding: 56px 48px; background: #1d4ed8; color: #ffffff; text-align: center; }
+.newsletter h2 { font-size: 28px; margin-bottom: 8px; }
+.newsletter p { margin-bottom: 18px; color: #dbe7ff; }
+.newsletter form { display: flex; justify-content: center; gap: 10px; }
+.newsletter input { width: 280px; padding: 10px 12px; border: 0; border-radius: 6px; font-size: 15px; }
+.newsletter button { padding: 10px 20px; border: 0; border-radius: 6px; background: #0f172a; color: #ffffff; font-size: 15px; }
+
+/* testimonials */
+.quotes { padding: 56px 48px; }
+.quote-row { display: flex; gap: 24px; max-width: 1040px; margin: 0 auto; }
+.quote { flex: 1; padding: 20px; background: #f1f5fb; border-radius: 8px; font-size: 16px; }
+.quote .who { margin-top: 10px; font-size: 13px; color: #667085; }
+
+/* faq */
+.faq { padding: 64px 48px; max-width: 820px; margin: 0 auto; }
+.faq h2 { font-size: 32px; text-align: center; margin-bottom: 28px; }
+.qa { padding: 16px 0; border-bottom: 1px solid #e5e9ef; }
+.qa h3 { font-size: 17px; margin-bottom: 6px; }
+.qa p { font-size: 15px; color: #475467; }
+
+/* footer */
+.footer { padding: 40px 48px; background: #0f172a; color: #cbd5e1; font-size: 14px; }
+.footer .cols { display: flex; justify-content: space-between; gap: 32px; max-width: 1040px; margin: 0 auto 24px; }
+.footer h4 { margin: 0 0 10px; color: #ffffff; font-size: 15px; }
+.footer ul { list-style: none; margin: 0; padding: 0; }
+.footer li { margin-bottom: 6px; }
+.footer .legal { text-align: center; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<!-- navigation -->
+<header class="nav">
+  <div class="logo">Plainsight</div>
+  <ul>
+    <li><a href="#product">Product</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#customers">Customers</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#blog">Blog</a></li>
+  </ul>
+  <a class="signup" href="#signup">Start free</a>
+</header>
+
+<!-- hero -->
+<section class="hero">
+  <h1 id="hero-title">Clear pages for busy teams</h1>
+  <p>Plainsight helps you write, review and publish pages without the usual back and forth. Everyone sees the same thing, and nothing gets lost.</p>
+  <div class="actions">
+    <a class="primary" href="#signup">Start your free trial</a>
+    <a class="secondary" href="#tour">Take the tour</a>
+  </div>
+</section>
+
+<!-- logo strip -->
+<section class="logos">
+  <p>Trusted by teams at</p>
+  <div class="logo-row">
+    <span>Fernwood</span>
+    <span>Brightline</span>
+    <span>Ostrava Labs</span>
+    <span>Kiln &amp; Co</span>
+    <span>Harbor</span>
+    <span>Lumen</span>
+  </div>
+</section>
+
+<!-- features -->
+<section class="features" id="product">
+  <h2>Everything your team needs</h2>
+  <div class="feature-grid">
+    <div class="feature" id="feature-1">
+      <h3>Live collaboration</h3>
+      <p>Edit together in real time and see who is where on the page.</p>
+    </div>
+    <div class="feature" id="feature-2">
+      <h3>Version history</h3>
+      <p>Roll back any change from the last 90 days with a single click.</p>
+    </div>
+    <div class="feature" id="feature-3">
+      <h3>Smart templates</h3>
+      <p>Start from a layout that already follows your brand rules.</p>
+    </div>
+    <div class="feature" id="feature-4">
+      <h3>Review links</h3>
+      <p>Share a read-only link and collect comments without accounts.</p>
+    </div>
+    <div class="feature" id="feature-5">
+      <h3>Export anywhere</h3>
+      <p>Download clean HTML, PDF or images whenever you need them.</p>
+    </div>
+    <div class="feature" id="feature-6">
+      <h3>Usage insights</h3>
+      <p>See which pages people open and where they stop reading.</p>
+    </div>
+  </div>
+</section>
+
+<!-- how it works -->
+<section class="steps">
+  <h2>How it works</h2>
+  <div class="step-row">
+    <div class="step" id="step-1">
+      <div class="num">Step 1</div>
+      <h3>Draft</h3>
+      <p>Write in a clean editor with blocks for text, images and tables.</p>
+    </div>
+    <div class="step" id="step-2">
+      <div class="num">Step 2</div>
+      <h3>Review</h3>
+      <p>Invite teammates and clients to comment right on the page.</p>
+    </div>
+    <div class="step" id="step-3">
+      <div class="num">Step 3</div>
+      <h3>Approve</h3>
+      <p>Lock a version once everyone has signed off on it.</p>
+    </div>
+    <div class="step" id="step-4">
+      <div class="num">Step 4</div>
+      <h3>Publish</h3>
+      <p>Push to your domain or export the files in one click.</p>
+    </div>
+  </div>
+</section>
+
+<!-- pricing -->
+<section class="pricing" id="pricing">
+  <h2>Simple pricing</h2>
+  <div class="plans">
+    <div class="plan" id="plan-basic">
+      <h3>Starter</h3>
+      <div class="price">$9<span> / month</span></div>
+      <ul>
+        <li>1 workspace</li>
+        <li>3 collaborators</li>
+        <li>Community support</li>
+      </ul>
+      <a class="choose" href="#signup-basic">Choose Starter</a>
+    </div>
+    <div class="plan featured" id="plan-pro">
+      <h3>Team</h3>
+      <div class="price">$29<span> / month</span></div>
+      <ul>
+        <li>5 workspaces</li>
+        <li>Unlimited collaborators</li>
+        <li>Email support</li>
+        <li>Review links</li>
+      </ul>
+      <a class="choose" href="#signup-pro">Choose Team</a>
+    </div>
+    <div class="plan" id="plan-team">
+      <h3>Studio</h3>
+      <div class="price">$79<span> / month</span></div>
+      <ul>
+        <li>Unlimited workspaces</li>
+        <li>Priority support</li>
+        <li>API access</li>
+        <li>Single sign-on</li>
+      </ul>
+      <a class="choose" href="#signup-team">Choose Studio</a>
+    </div>
+  </div>
+</section>
+
+<!-- comparison -->
+<section class="compare">
+  <h2>How we compare</h2>
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Plainsight</th><th>Tool A</th><th>Tool B</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Real-time editing</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Version history</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+      </tr>
+      <tr>
+        <td>Review links</td>
+        <td class="yes">Yes</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Custom domains</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Single sign-on</td>
+        <td class="yes">Yes</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>API access</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Data export</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+      </tr>
+      <tr>
+        <td>Offline mode</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="yes">Yes</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- testimonials -->
+<section class="quotes">
+  <div class="quote-row">
+    <div class="quote" id="quote-1">
+      <p>&ldquo;We moved our whole docs site in a weekend.&rdquo;</p>
+      <div class="who">Priya N., Operations</div>
+    </div>
+    <div class="quote" id="quote-2">
+      <p>&ldquo;The review links alone saved us hours every sprint.&rdquo;</p>
+      <div class="who">Tom A., Design lead</div>
+    </div>
+    <div class="quote" id="quote-3">
+      <p>&ldquo;Finally a tool the whole team actually opens.&rdquo;</p>
+      <div class="who">Lena K., Founder</div>
+    </div>
+  </div>
+</section>
+
+<!-- newsletter -->
+<section class="newsletter">
+  <h2>Get the monthly digest</h2>
+  <p>One short email with product updates and a few good reads.</p>
+  <form action="#" method="post">
+    <input type="email" name="email" placeholder="you@example.com">
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+<!-- faq -->
+<section class="faq">
+  <h2>Questions, answered</h2>
+  <div id="faq-list">
+    <div class="qa" id="faq-1">
+      <h3>How long is the free trial?</h3>
+      <p>Every plan starts with a 14 day trial. No card is needed until you decide to keep going, and you can export your data at any time.</p>
+    </div>
+    <div class="qa" id="faq-2">
+      <h3>Can I switch plans later?</h3>
+      <p>Yes. Upgrades apply immediately and downgrades apply at the end of the current billing period, so you never pay twice.</p>
+    </div>
+    <div class="qa" id="faq-3">
+      <h3>Do you offer discounts for students?</h3>
+      <p>Students and teachers get 50 percent off any plan. Send us a message from your school address and we will set it up.</p>
+    </div>
+    <div class="qa" id="faq-4">
+      <h3>Where is my data stored?</h3>
+      <p>Your projects live in data centres in the EU and the US. You can choose a region when you create your workspace.</p>
+    </div>
+    <div class="qa" id="faq-5">
+      <h3>Is there an API?</h3>
+      <p>There is a REST API on the Team and Studio plans, with webhooks for the events you are most likely to care about.</p>
+    </div>
+    <div class="qa" id="faq-6">
+      <h3>How do I cancel?</h3>
+      <p>Open Billing in your account settings and choose Cancel. Your workspace stays readable for 30 days afterwards.</p>
+    </div>
+  </div>
+</section>
+
+<!-- footer -->
+<footer class="footer">
+  <div class="cols">
+    <div>
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#templates">Templates</a></li>
+        <li><a href="#integrations">Integrations</a></li>
+        <li><a href="#changelog">Changelog</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#careers">Careers</a></li>
+        <li><a href="#press">Press</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#partners">Partners</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#docs">Docs</a></li>
+        <li><a href="#guides">Guides</a></li>
+        <li><a href="#community">Community</a></li>
+        <li><a href="#status">Status</a></li>
+        <li><a href="#security">Security</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#terms">Terms</a></li>
+        <li><a href="#cookies">Cookies</a></li>
+        <li><a href="#licences">Licences</a></li>
+        <li><a href="#accessibility">Accessibility</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="legal">&copy; 2026 Plainsight Ltd. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

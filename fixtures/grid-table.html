@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gallery and prices</title>
+<style>
+body { margin: 0; padding: 24px; font-family: Arial, sans-serif; color: #222; background: #fff; }
+h2 { font-size: 20px; margin: 0 0 12px; }
+#gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; margin-bottom: 32px; max-width: 720px; }
+.g-item { background: #e8eef7; border: 1px solid #b9c7dd; padding: 10px; min-height: 60px; font-size: 14px; }
+#prices { border-collapse: collapse; width: 480px; font-size: 14px; }
+#prices th, #prices td { border: 1px solid #c7c7c7; padding: 8px 12px; text-align: left; }
+#prices th { background: #f0f0f0; }
+.amt { text-align: right; font-weight: 600; color: #333; }
+</style>
+</head>
+<body>
+<h2>Gallery</h2>
+<div id="gallery">
+  <div class="g-item" id="g-item-1">Harbour at dawn</div>
+  <div class="g-item" id="g-item-2">Market stalls</div>
+  <div class="g-item" id="g-item-3">Old tram line</div>
+  <div class="g-item" id="g-item-4">Rooftop garden</div>
+  <div class="g-item" id="g-item-5">Night ferry crossing</div>
+  <div class="g-item" id="g-item-6">Paper lanterns</div>
+</div>
+<h2>Prices</h2>
+<table id="prices">
+  <thead>
+    <tr><th>Plan</th><th>Seats</th><th>Monthly</th></tr>
+  </thead>
+  <tbody>
+    <tr id="row-basic"><td>Basic</td><td>1</td><td class="amt">$9</td></tr>
+    <tr id="row-pro"><td>Pro</td><td>5</td><td class="amt">$29</td></tr>
+    <tr id="row-team"><td>Team</td><td>20</td><td class="amt">$79</td></tr>
+  </tbody>
+</table>
+</body>
+</html>

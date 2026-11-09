@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <!-- background and card -->
+  <rect id="r-back" x="0" y="0" width="800" height="500" fill="#f5f0e6"/>
+  <rect id="r-card" x="40" y="60" width="300" height="180" rx="10" fill="#ffffff" stroke="#c9bfa8" stroke-width="2"/>
+  <circle id="c-big" cx="330" cy="70" r="40" fill="#e07a5f"/>
+  <circle id="c-dot" cx="680" cy="300" r="14" style="fill:#3d405b;stroke:#222;stroke-width:2"/>
+  <path d="M 60 400 L 200 340 L 340 400 Z" fill="#81b29a"/>
+  <text id="t-title" x="60" y="110" font-family="Georgia, serif" font-size="30" fill="#222222">Seasonal report</text>
+  <text id="t-sub" x="60" y="145" font-size="16" fill="#6b6b6b">Prepared for the board</text>
+  <text id="t-note" x="60" y="450" style="font-size:14px;fill:#555;font-family:Arial, sans-serif">Figures are provisional.</text>
+</svg>

@@ -1,0 +1,1120 @@
+{
+  "version": 1,
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "tolerance_px": 1,
+  "edits": [
+    {
+      "id": "E01",
+      "file": "inline-styles.html",
+      "type": "T1",
+      "target": "#title",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "color": "#c0392b"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#title",
+            "property": "color",
+            "value": "rgb(192, 57, 43)"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "inline-styles.html"
+      ]
+    },
+    {
+      "id": "E02",
+      "file": "inline-styles.html",
+      "type": "T2",
+      "target": "#photo",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "width": "260px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#photo",
+            "property": "width",
+            "value": "260px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "#photo",
+          "dw": 60,
+          "dh": 0
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "inline-styles.html"
+      ]
+    },
+    {
+      "id": "E03",
+      "file": "inline-styles.html",
+      "type": "T3",
+      "target": "#b-save",
+      "edit": {
+        "op": "reorder",
+        "move": "#b-save",
+        "placement": "before",
+        "sibling": "#b-cancel"
+      },
+      "expected": {
+        "order": {
+          "parent": "#actions",
+          "ids": [
+            "b-save",
+            "b-cancel",
+            "b-help"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "inline-styles.html"
+      ]
+    },
+    {
+      "id": "E04",
+      "file": "inline-styles.html",
+      "type": "T4",
+      "target": "#badge",
+      "edit": {
+        "op": "offset",
+        "dx": 24,
+        "dy": -10
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#badge",
+          "dx": 24,
+          "dy": -10,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "inline-styles.html"
+      ]
+    },
+    {
+      "id": "E05",
+      "file": "style-block.html",
+      "type": "T1",
+      "target": "#cta",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "20px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#cta",
+            "property": "font-size",
+            "value": "20px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "style-block.html"
+      ],
+      "note": "Target has its own id rule in the style block."
+    },
+    {
+      "id": "E06",
+      "file": "style-block.html",
+      "type": "T2",
+      "target": ".lead",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "padding": "18px 24px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": ".lead",
+            "property": "padding-top",
+            "value": "18px"
+          },
+          {
+            "selector": ".lead",
+            "property": "padding-right",
+            "value": "24px"
+          },
+          {
+            "selector": ".lead",
+            "property": "padding-bottom",
+            "value": "18px"
+          },
+          {
+            "selector": ".lead",
+            "property": "padding-left",
+            "value": "24px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "style-block.html"
+      ],
+      "note": "Target has a class rule used by this element only."
+    },
+    {
+      "id": "E07",
+      "file": "style-block.html",
+      "type": "T3",
+      "target": "#about-title",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "text-align": "center"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#about-title",
+            "property": "text-align",
+            "value": "center"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "style-block.html"
+      ],
+      "note": "Target shares the h2.section-title rule with #work-title; the sibling heading must stay left aligned."
+    },
+    {
+      "id": "E08",
+      "file": "style-block.html",
+      "type": "T4",
+      "target": "#promo",
+      "edit": {
+        "op": "offset",
+        "dx": -16,
+        "dy": 8
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#promo",
+          "dx": -16,
+          "dy": 8,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "style-block.html"
+      ],
+      "note": "Target already has a transform (scale 1.1) set in a style block rule; the shift must compose with it."
+    },
+    {
+      "id": "E09",
+      "file": "shared-classes.html",
+      "type": "T1",
+      "target": "#card-2 .title",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-weight": "800"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#card-2 .title",
+            "property": "font-weight",
+            "value": "800"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "shared-classes.html"
+      ],
+      "note": "Class .title is shared by three cards; only this one may change."
+    },
+    {
+      "id": "E10",
+      "file": "shared-classes.html",
+      "type": "T2",
+      "target": "#card-3",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "width": "300px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#card-3",
+            "property": "width",
+            "value": "300px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "#card-3",
+          "dw": 80
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "shared-classes.html"
+      ]
+    },
+    {
+      "id": "E11",
+      "file": "shared-classes.html",
+      "type": "T3",
+      "target": "#card-3",
+      "edit": {
+        "op": "reorder",
+        "move": "#card-3",
+        "placement": "before",
+        "sibling": "#card-1"
+      },
+      "expected": {
+        "order": {
+          "parent": "#grid",
+          "ids": [
+            "card-3",
+            "card-1",
+            "card-2"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "shared-classes.html"
+      ]
+    },
+    {
+      "id": "E12",
+      "file": "shared-classes.html",
+      "type": "T4",
+      "target": "#card-1 .price",
+      "edit": {
+        "op": "offset",
+        "dx": 6,
+        "dy": 14
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#card-1 .price",
+          "dx": 6,
+          "dy": 14,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "shared-classes.html"
+      ],
+      "note": "Class .price is shared by three cards; only this one may move."
+    },
+    {
+      "id": "E13",
+      "file": "flex-layout.html",
+      "type": "T1",
+      "target": "#brand",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-family": "Georgia, serif"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#brand",
+            "property": "font-family",
+            "value": "Georgia, serif"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "flex-layout.html"
+      ]
+    },
+    {
+      "id": "E14",
+      "file": "flex-layout.html",
+      "type": "T2",
+      "target": "#sidebar",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "width": "300px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#sidebar",
+            "property": "width",
+            "value": "300px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "#sidebar",
+          "dw": 60
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "flex-layout.html"
+      ],
+      "note": "Target is a flex item with flex: 0 0 240px, so a plain width declaration does not take effect on its own."
+    },
+    {
+      "id": "E15",
+      "file": "flex-layout.html",
+      "type": "T3",
+      "target": "#cta-row",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "justify-content": "flex-end"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#cta-row",
+            "property": "justify-content",
+            "value": "flex-end"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "flex-layout.html"
+      ]
+    },
+    {
+      "id": "E16",
+      "file": "flex-layout.html",
+      "type": "T4",
+      "target": "#stat-2",
+      "edit": {
+        "op": "offset",
+        "dx": -12,
+        "dy": 20
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#stat-2",
+          "dx": -12,
+          "dy": 20,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "flex-layout.html"
+      ],
+      "note": "Target already has an inline transform (translateY(4px)); the shift must compose with it."
+    },
+    {
+      "id": "E17",
+      "file": "grid-table.html",
+      "type": "T1",
+      "target": "#row-pro .amt",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "color": "#0a7d32"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#row-pro .amt",
+            "property": "color",
+            "value": "rgb(10, 125, 50)"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "grid-table.html"
+      ],
+      "note": "Class .amt is shared by three table cells; only this one may change."
+    },
+    {
+      "id": "E18",
+      "file": "grid-table.html",
+      "type": "T2",
+      "target": "#g-item-5",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "width": "150px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#g-item-5",
+            "property": "width",
+            "value": "150px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "#g-item-5",
+          "dw": -60
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "grid-table.html"
+      ]
+    },
+    {
+      "id": "E19",
+      "file": "grid-table.html",
+      "type": "T3",
+      "target": "#g-item-1",
+      "edit": {
+        "op": "reorder",
+        "move": "#g-item-1",
+        "placement": "after",
+        "sibling": "#g-item-3"
+      },
+      "expected": {
+        "order": {
+          "parent": "#gallery",
+          "ids": [
+            "g-item-2",
+            "g-item-3",
+            "g-item-1",
+            "g-item-4",
+            "g-item-5",
+            "g-item-6"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "grid-table.html"
+      ]
+    },
+    {
+      "id": "E20",
+      "file": "grid-table.html",
+      "type": "T4",
+      "target": "#g-item-6",
+      "edit": {
+        "op": "offset",
+        "dx": -14,
+        "dy": 6
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#g-item-6",
+          "dx": -14,
+          "dy": 6,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "grid-table.html"
+      ]
+    },
+    {
+      "id": "E21",
+      "file": "messy.html",
+      "type": "T1",
+      "target": "#intro",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "18px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#intro",
+            "property": "font-size",
+            "value": "18px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "messy.html"
+      ],
+      "note": "Uppercase tag and attribute names, unquoted attribute values, existing STYLE attribute."
+    },
+    {
+      "id": "E22",
+      "file": "messy.html",
+      "type": "T2",
+      "target": "#lead",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "padding": "10px 16px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#lead",
+            "property": "padding-top",
+            "value": "10px"
+          },
+          {
+            "selector": "#lead",
+            "property": "padding-right",
+            "value": "16px"
+          },
+          {
+            "selector": "#lead",
+            "property": "padding-bottom",
+            "value": "10px"
+          },
+          {
+            "selector": "#lead",
+            "property": "padding-left",
+            "value": "16px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "messy.html"
+      ],
+      "note": "Unclosed p element with unquoted attributes and no style attribute yet."
+    },
+    {
+      "id": "E23",
+      "file": "messy.html",
+      "type": "T3",
+      "target": "#s3",
+      "edit": {
+        "op": "reorder",
+        "move": "#s3",
+        "placement": "before",
+        "sibling": "#s1"
+      },
+      "expected": {
+        "order": {
+          "parent": "#steps",
+          "ids": [
+            "s3",
+            "s1",
+            "s2"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "messy.html"
+      ],
+      "note": "List items without end tags, mixed tab and space indentation."
+    },
+    {
+      "id": "E24",
+      "file": "messy.html",
+      "type": "T4",
+      "target": "#footer-note",
+      "edit": {
+        "op": "offset",
+        "dx": 30,
+        "dy": -8
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#footer-note",
+          "dx": 30,
+          "dy": -8,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "messy.html"
+      ]
+    },
+    {
+      "id": "E25",
+      "file": "linked-css.html",
+      "type": "T1",
+      "target": "#hero-title",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "color": "#b5451b"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#hero-title",
+            "property": "color",
+            "value": "rgb(181, 69, 27)"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "linked-css.css"
+      ],
+      "note": "Target has an id rule in the companion CSS file; the edit belongs in the CSS file and the HTML must stay byte-identical."
+    },
+    {
+      "id": "E26",
+      "file": "linked-css.html",
+      "type": "T2",
+      "target": "#sidebar-box",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "padding": "28px 20px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#sidebar-box",
+            "property": "padding-top",
+            "value": "28px"
+          },
+          {
+            "selector": "#sidebar-box",
+            "property": "padding-right",
+            "value": "20px"
+          },
+          {
+            "selector": "#sidebar-box",
+            "property": "padding-bottom",
+            "value": "28px"
+          },
+          {
+            "selector": "#sidebar-box",
+            "property": "padding-left",
+            "value": "20px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "linked-css.css"
+      ],
+      "note": "Target has an id rule in the companion CSS file; the edit belongs in the CSS file."
+    },
+    {
+      "id": "E27",
+      "file": "linked-css.html",
+      "type": "T3",
+      "target": "#menu-about",
+      "edit": {
+        "op": "reorder",
+        "move": "#menu-about",
+        "placement": "after",
+        "sibling": "#menu-contact"
+      },
+      "expected": {
+        "order": {
+          "parent": "ul.menu",
+          "ids": [
+            "menu-work",
+            "menu-contact",
+            "menu-about"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "linked-css.html"
+      ],
+      "note": "Markup change only; the CSS file must stay byte-identical."
+    },
+    {
+      "id": "E28",
+      "file": "linked-css.html",
+      "type": "T4",
+      "target": "#avatar",
+      "edit": {
+        "op": "offset",
+        "dx": 18,
+        "dy": 12
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#avatar",
+          "dx": 18,
+          "dy": 12,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "linked-css.css"
+      ],
+      "note": "Target has an id rule in the CSS file that already sets transform: rotate(8deg); the shift must compose with it and belongs in the CSS file."
+    },
+    {
+      "id": "E29",
+      "file": "large-page.html",
+      "type": "T1",
+      "target": "#hero-title",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "60px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#hero-title",
+            "property": "font-size",
+            "value": "60px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "large-page.html"
+      ],
+      "note": "Only element matched by the .hero h1 rule."
+    },
+    {
+      "id": "E30",
+      "file": "large-page.html",
+      "type": "T2",
+      "target": "#plan-pro",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "padding": "36px 28px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#plan-pro",
+            "property": "padding-top",
+            "value": "36px"
+          },
+          {
+            "selector": "#plan-pro",
+            "property": "padding-right",
+            "value": "28px"
+          },
+          {
+            "selector": "#plan-pro",
+            "property": "padding-bottom",
+            "value": "36px"
+          },
+          {
+            "selector": "#plan-pro",
+            "property": "padding-left",
+            "value": "28px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "large-page.html"
+      ],
+      "note": "Class .plan is shared by three pricing cards; only this one may change."
+    },
+    {
+      "id": "E31",
+      "file": "large-page.html",
+      "type": "T3",
+      "target": "#faq-3",
+      "edit": {
+        "op": "reorder",
+        "move": "#faq-3",
+        "placement": "before",
+        "sibling": "#faq-1"
+      },
+      "expected": {
+        "order": {
+          "parent": "#faq-list",
+          "ids": [
+            "faq-3",
+            "faq-1",
+            "faq-2",
+            "faq-4",
+            "faq-5",
+            "faq-6"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "large-page.html"
+      ]
+    },
+    {
+      "id": "E32",
+      "file": "large-page.html",
+      "type": "T4",
+      "target": "#feature-4",
+      "edit": {
+        "op": "offset",
+        "dx": 8,
+        "dy": -12
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#feature-4",
+          "dx": 8,
+          "dy": -12,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "large-page.html"
+      ]
+    },
+    {
+      "id": "E33",
+      "file": "shapes-text.svg",
+      "type": "T1",
+      "target": "#t-sub",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "fill": "#b5451b"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#t-sub",
+            "property": "fill",
+            "value": "rgb(181, 69, 27)"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "shapes-text.svg"
+      ],
+      "note": "Element uses presentation attributes; the edit should follow that."
+    },
+    {
+      "id": "E34",
+      "file": "shapes-text.svg",
+      "type": "T2",
+      "target": "#t-note",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "20px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#t-note",
+            "property": "font-size",
+            "value": "20px"
+          }
+        ]
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "shapes-text.svg"
+      ],
+      "note": "Element uses a style attribute; the edit should follow that."
+    },
+    {
+      "id": "E35",
+      "file": "shapes-text.svg",
+      "type": "T3",
+      "target": "#c-big",
+      "edit": {
+        "op": "reorder",
+        "move": "#c-big",
+        "placement": "before",
+        "sibling": "#r-card"
+      },
+      "expected": {
+        "order": {
+          "parent": "svg",
+          "ids": [
+            "r-back",
+            "c-big",
+            "r-card",
+            "c-dot",
+            "t-title",
+            "t-sub",
+            "t-note"
+          ]
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "shapes-text.svg"
+      ],
+      "note": "Paint order change: the circle moves behind the card."
+    },
+    {
+      "id": "E36",
+      "file": "shapes-text.svg",
+      "type": "T4",
+      "target": "#c-dot",
+      "edit": {
+        "op": "offset",
+        "dx": 25,
+        "dy": -10
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#c-dot",
+          "dx": 25,
+          "dy": -10,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "shapes-text.svg"
+      ],
+      "note": "Circle with cx/cy; viewBox maps 1 user unit to 1 px."
+    },
+    {
+      "id": "E37",
+      "file": "grouped-transforms.svg",
+      "type": "T1",
+      "target": "#g-label",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-family": "Georgia, serif"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#g-label",
+            "property": "font-family",
+            "value": "Georgia, serif"
+          }
+        ]
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "grouped-transforms.svg"
+      ],
+      "note": "Text inside a rotated group inside a scaled group."
+    },
+    {
+      "id": "E38",
+      "file": "grouped-transforms.svg",
+      "type": "T2",
+      "target": "#g-circle",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "r": "16"
+        }
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#g-circle",
+          "dx": -18,
+          "dy": -18,
+          "dw": 36,
+          "dh": 36
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "grouped-transforms.svg"
+      ],
+      "note": "r is in the circle's own units; total scale is 3 (outer group 1.5 times viewBox 2), so 6 units of radius is 18 px per side."
+    },
+    {
+      "id": "E39",
+      "file": "grouped-transforms.svg",
+      "type": "T3",
+      "target": "#g-circle",
+      "edit": {
+        "op": "reorder",
+        "move": "#g-circle",
+        "placement": "before",
+        "sibling": "#inner"
+      },
+      "expected": {
+        "order": {
+          "parent": "#outer",
+          "ids": [
+            "g-circle",
+            "inner",
+            "u1"
+          ]
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "grouped-transforms.svg"
+      ]
+    },
+    {
+      "id": "E40",
+      "file": "grouped-transforms.svg",
+      "type": "T4",
+      "target": "#g-rect",
+      "edit": {
+        "op": "offset",
+        "dx": 30,
+        "dy": -20
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#g-rect",
+          "dx": 30,
+          "dy": -20,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "grouped-transforms.svg"
+      ],
+      "note": "Rect inside a group rotated 20 degrees, inside a group scaled 1.5, inside a viewBox scaled 2; the visible shift is (30, -20) px."
+    }
+  ]
+}

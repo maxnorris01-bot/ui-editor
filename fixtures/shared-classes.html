@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plans</title>
+<style>
+body { margin: 0; padding: 28px; font-family: Arial, sans-serif; background: #eef1f4; }
+#grid { display: flex; gap: 20px; align-items: flex-start; }
+.card { box-sizing: border-box; flex: none; width: 220px; padding: 16px; background: #fff; border: 1px solid #cfd6dd; border-radius: 6px; }
+.card .title { margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #1f2d3d; }
+.card .desc { margin: 0 0 12px; font-size: 14px; line-height: 1.4; color: #4d5b6a; }
+.card .price { margin: 0; font-size: 20px; color: #0b6e4f; }
+</style>
+</head>
+<body>
+<div id="grid">
+  <div class="card" id="card-1">
+    <h3 class="title">Starter</h3>
+    <p class="desc">For individuals trying things out on a side project.</p>
+    <p class="price">$9 / month</p>
+  </div>
+  <div class="card" id="card-2">
+    <h3 class="title">Team</h3>
+    <p class="desc">Shared workspaces, comments and a little more room to grow.</p>
+    <p class="price">$29 / month</p>
+  </div>
+  <div class="card" id="card-3">
+    <h3 class="title">Studio</h3>
+    <p class="desc">Everything in Team plus priority support for busy agencies.</p>
+    <p class="price">$79 / month</p>
+  </div>
+</div>
+</body>
+</html>
