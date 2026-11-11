@@ -223,5 +223,39 @@
     "worstMedian_previewMs": 2.5,
     "medianOfMedians_applyMs": 0.0025,
     "worstMedian_applyMs": 0.03375
+  },
+  "scaling": {
+    "measuredAt": "2026-11-11T05:40:29.327Z",
+    "runs": 20,
+    "1x": {
+      "bytes": 14712,
+      "elements": 251,
+      "previewMedianMs": 2.7999999821186066,
+      "applyMedianMs": 0.034500000029802316,
+      "applyStatus": "ok",
+      "threshold": "report only",
+      "pass": null
+    },
+    "10x": {
+      "bytes": 98410,
+      "elements": 2447,
+      "previewMedianMs": 7.9000000059604645,
+      "applyMedianMs": 0.27775000005960465,
+      "applyStatus": "ok",
+      "threshold": {
+        "previewMs": 250,
+        "applyMs": 50
+      },
+      "pass": true
+    },
+    "100x": {
+      "bytes": 937210,
+      "elements": 24407,
+      "previewMedianMs": 63.94999998807907,
+      "applyMedianMs": 3.8145000000298026,
+      "applyStatus": "ok",
+      "threshold": "report only",
+      "pass": null
+    }
   }
 }

@@ -43,13 +43,23 @@ can decide whether Step 4 should treat it as an iteration.
 0.034 ms, bundle 253 KB raw / 71 KB gzip, largest fixture 14.7 KB); proposals in
 `docs/checkpoint.md`; waiting for Max. Step 4 does not run until he approves.
 
+**2026-11-10 - Speed thresholds set by Max, plus a scaling check.** Proposed thresholds accepted
+(preview <= 100 ms, apply <= 10 ms, gzip <= 100 KB, raw <= 350 KB), with a 10x large-page copy
+(preview <= 250 ms, apply <= 50 ms) and a report-only 100x copy. Committed in `fd51815` before any
+scoring. The shorthand-mix fix is reported as "iteration 0" (pre-gate). See
+`docs/speed-thresholds.md`.
+
+**2026-11-10 - Gate run 1: 40/40, verdict PASS.** Details in `results/gate-summary.md` and
+`docs/sessions/2026-11-10-engine-gate-step4.md`. Scorer sanity-checked with three sabotaged
+exports (no-op, collateral change, reformat): all failed as they should. Interpretation choices
+the locked rules left open are listed in the session note.
+
 ## Open items / parking lot
 
 <!-- Things to revisit later - not urgent, not forgotten. -->
 
-- Speed thresholds: Max to set (proposals in `docs/checkpoint.md`).
-- Fixtures are small (largest 14.7 KB) and written by the same agent as the engine; a 10x and 100x
-  replicated large page would show whether the speed claims hold for real pasted pages.
+- Fixtures are hand-written by the same agent as the engine and are probably easier than real
+  pasted code; the 10x/100x copies only repeat one page. Real pasted pages are the open test.
 - Bundle is dominated by parse5 (140 KB, 33 KB of it the entity table) and postcss (57 KB);
   revisit only if the size threshold is missed.
 - SVG goes through parse5's HTML parser; SVG that is only valid as XML may be split differently.
