@@ -9,6 +9,7 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 ## Up next (in priority order)
 
 - [ ] Max: read the Step 4 report and decide what ships (`results/gate-summary.md`).
+- [ ] Max: decide which real-page run counts (run 1 FAIL with harness bugs, run 2 PASS with 2 true refusals) and what the README says about known limits.
 - [ ] After the verdict, Max asks for the real README.
 
 ## Later
@@ -23,6 +24,7 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 
 <!-- Move items here when done, newest first, with a one-line note on what happened. -->
 
+- [x] Real-page check (2026-11-10): rules and specs locked (`ad1c999`), harness `harness/run-realpage.ts`, run 1 and run 2 in `realpage-check/results/`.
 - [x] Step 4 (2026-11-10): thresholds committed (`fd51815`), `harness/run-gate.ts` written, no-op round
       trip 10/10, 40/40 edits pass in run 1, speed thresholds met. Verdict PASS.
 - [x] Step 3 (2026-11-08): speed measured, `docs/checkpoint.md` written. Worst preview median 2.5 ms,

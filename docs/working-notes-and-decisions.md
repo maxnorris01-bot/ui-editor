@@ -54,6 +54,18 @@ scoring. The shorthand-mix fix is reported as "iteration 0" (pre-gate). See
 exports (no-op, collateral change, reformat): all failed as they should. Interpretation choices
 the locked rules left open are listed in the session note.
 
+**2026-11-10 - Real-page check (`feat/real-page-check`).** Rules and 20 edit specs locked in
+`ad1c999` before the engine touched any real file; specs were checked against plain Chromium DOM
+edits (no engine) first. Run 1 (scored, as the brief says): 15 PASS, 2 REFUSED, 3 FAIL, so the
+check FAILED as computed. Two of those FAILs (R10, R12) and one more (R11) came from two harness
+bugs, not the engine: E4 compared computed styles by array index (Chromium lists custom
+properties in a different order per load), and E5 treated an `expectedFiles` entry that did not
+change as a problem although the entry only says the file may differ. Harness-only fix
+(`engine/` untouched), re-run as run 2: 18 PASS, 2 REFUSED, 0 FAIL, round trips 6/6. Both runs are
+in `realpage-check/results/`. Both refusals are `conditional-rule` and both reasons are true
+(checked by reading the files). Max decides which run counts. Details:
+`docs/sessions/2026-11-10-real-page-check.md`.
+
 ## Open items / parking lot
 
 <!-- Things to revisit later - not urgent, not forgotten. -->
@@ -62,6 +74,10 @@ the locked rules left open are listed in the session note.
   pasted code; the 10x/100x copies only repeat one page. Real pasted pages are the open test.
 - Bundle is dominated by parse5 (140 KB, 33 KB of it the entity table) and postcss (57 KB);
   revisit only if the size threshold is missed.
+- Known limit from the real-page check: any edit to a property that is also set inside any
+  `@media` rule is refused, even when that media query is inactive at the preview width (2 of 5
+  T1 edits). Cheapest test: reason about the media condition for the 1280 px preview, or write the
+  edit to a new inline style when the media rule cannot apply.
 - SVG goes through parse5's HTML parser; SVG that is only valid as XML may be split differently.
 
 ## See also
