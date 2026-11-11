@@ -18,3 +18,7 @@ test-results/
 results/raw/
 build/
 *.tsbuildinfo
+
+# Real-page check: gitignored temp dir and raw outputs (the real pages must never be committed)
+realpage-check/tmp/
+realpage-check/raw/
