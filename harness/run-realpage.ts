@@ -187,6 +187,7 @@ function e4(spec: Spec, orig: Dump, exp: Dump): { pass: boolean; detail: string 
   if (spec.legit === 'flow') layoutAllowed = flowSet(t);
   else if (spec.legit === 'reorder') { const p = orig.rows[t]!.parent; layoutAllowed = new Set([...anc(t), ...subtree(orig, p), ...flowSet(p)]); }
   else if (spec.legit === 'svg-ancestors') bboxOnly = new Set(anc(t));
+  const expIndex = new Map<string, number>(exp.names.map((nm, i) => [nm, i]));
   const bad: string[] = [];
   let compared = 0;
   for (let i = 0; i < n; i++) {
@@ -196,9 +197,13 @@ function e4(spec: Spec, orig: Dump, exp: Dump): { pass: boolean; detail: string 
     const lay = layoutAllowed.has(i), bb = lay || bboxOnly.has(i);
     const what: string[] = [];
     if (!bb && !a.rect.every((v, k) => near(v, b.rect[k]!))) what.push(`bbox [${a.rect.map((v) => +v.toFixed(2))}] -> [${b.rect.map((v) => +v.toFixed(2))}]`);
+    // Compare by property NAME: the order of custom properties in getComputedStyle differs between loads.
     for (let k = 0; k < a.props.length; k++) {
       if (lay && L.has(k)) continue;
-      if (norm(a.props[k]!) !== norm(b.props[k]!)) what.push(`${orig.names[k]}: ${norm(a.props[k]!).slice(0, 40)} -> ${norm(b.props[k]!).slice(0, 40)}`);
+      const name = orig.names[k]!;
+      const kb = expIndex.get(name);
+      const bv = kb === undefined ? '(missing)' : b.props[kb]!;
+      if (norm(a.props[k]!) !== norm(bv)) what.push(`${name}: ${norm(a.props[k]!).slice(0, 40)} -> ${norm(bv).slice(0, 40)}`);
     }
     if (what.length) bad.push(`el#${i} <${a.tag}${a.id ? '#' + a.id : ''}> ${what.slice(0, 3).join('; ')}${what.length > 3 ? ` (+${what.length - 3})` : ''}`);
   }
@@ -213,7 +218,7 @@ function e5(spec: Spec, f: Input, out: Record<string, string>, spans: Spans): { 
   for (const name of Object.keys(orig)) {
     const o = orig[name]!, x = out[name] ?? '';
     if (!spec.expectedFiles.includes(name)) { if (o !== x) problems.push(`${name} changed but is not in expectedFiles`); continue; }
-    if (o === x) { problems.push(`${name} is unchanged`); continue; }
+    if (o === x) { diffs.push(`${name}: unchanged`); continue; }
     const removed: string[] = [], added: string[] = [], removedAt: number[] = [], addedAt: number[] = [];
     let oldLine = 1, newLine = 1;
     for (const c of diffLines(o, x)) {
