@@ -48,3 +48,7 @@ node-test:
 # Runs the locked scoring harness over fixtures/edits.json. See docs/gate-rules.md.
 gate:
 	npx tsx harness/run-gate.ts
+
+# Real-page check (inputs live outside the repo; see docs/realpage-rules.md)
+realpage:
+	npx tsx harness/run-realpage.ts

@@ -9,7 +9,8 @@
     "test": "vitest run",
     "bundle": "node harness/bundle.mjs",
     "speed": "tsx harness/speed.ts",
-    "gate": "tsx harness/run-gate.ts"
+    "gate": "tsx harness/run-gate.ts",
+    "realpage": "tsx harness/run-realpage.ts"
   },
   "dependencies": {
     "parse5": "^8.1.1",
