@@ -245,6 +245,7 @@ for (const spec of edits) {
   }
   const origFiles: Record<string, string> = { [f.file]: f.source, ...f.companions };
   const files = out.refused ? origFiles : out.files!;
+  if (process.env.EXPORT_DIR) writeSet(join(process.env.EXPORT_DIR, 'gate', spec.id), files);
   const dirX = join(work, spec.id, 'exported');
   const dirO = join(work, spec.id, 'original');
   writeSet(dirX, files);

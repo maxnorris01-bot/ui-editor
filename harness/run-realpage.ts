@@ -18,7 +18,9 @@ import { writeRealSummary } from './summary-real';
 const RUN = process.env.GATE_RUN ?? '1';
 const INPUT = resolve(process.argv[2] ?? join(ROOT, '../ui-editor-realpages'));
 const SPEC = resolve(process.argv[3] ?? join(ROOT, 'realpage-check/edits.json'));
-const OUT = join(ROOT, 'realpage-check/results');
+// GATE_CONTROL=noop|collateral|reformat: scorer sanity check on deliberately broken exports (no results committed).
+const CONTROL = process.env.GATE_CONTROL ?? '';
+const OUT = CONTROL ? join(ROOT, 'realpage-check/raw', `control-${CONTROL}`) : join(ROOT, 'realpage-check/results');
 const CSV = join(OUT, 'realpage-results.csv');
 const TMP = join(ROOT, 'realpage-check/tmp', `run-${RUN}`);
 const RAW = join(ROOT, 'realpage-check/raw', `run-${RUN}`);
@@ -270,6 +272,16 @@ interface EngineOut {
   refused: { code: string; message: string } | null;
   patches?: unknown[]; files?: Record<string, string>; before?: Spec1; after?: Spec1; spans?: Spans; placement?: string; warnings: string[];
 }
+/** Deliberately broken exports for the scorer sanity check (GATE_CONTROL). */
+function sabotage(f: Input, files: Record<string, string>, mode: string): Record<string, string> {
+  const orig: Record<string, string> = { [f.file]: f.source, ...f.companions };
+  const main = files[f.file] ?? f.source;
+  if (mode === 'noop') return orig;
+  if (mode === 'reformat') return { ...files, [f.file]: main.replace('\n', '\n ') };
+  // collateral: extra CSS rules that change other elements
+  if (f.kind === 'html') return { ...files, [f.file]: main.replace('</head>', '<style>p,li,td,div,span,h1,h2,h3,a{color:#123456 !important}</style></head>') };
+  return { ...files, [f.file]: main.replace(/<svg[^>]*>/, (m) => `${m}<style>text,path,rect{fill:#123456 !important}</style>`) };
+}
 const outcomes = new Map<string, { outcome: Outcome; note: string }>();
 
 for (const spec of specs.edits) {
@@ -284,7 +296,9 @@ for (const spec of specs.edits) {
     out = { refused: { code: 'uncaught-exception', message: (e as Error).message }, warnings: [] };
     threw = true;
   }
-  const exported = out.refused ? origFiles : out.files!;
+  let exported = out.refused ? origFiles : out.files!;
+  if (CONTROL) exported = sabotage(f, exported, CONTROL);
+  if (process.env.EXPORT_DIR) writeSet(join(process.env.EXPORT_DIR, 'real', spec.id), exported);
   writeSet(join(TMP, spec.id, 'exported'), exported);
   writeSet(join(TMP, spec.id, 'original'), origFiles);
   const O = await load(join(TMP, spec.id, 'original'), f.file, spec.expected, spec.target);
@@ -336,6 +350,12 @@ const chromiumVersion = browser.version();
 await browser.close();
 server.close();
 
+if (CONTROL) {
+  const by = new Map<string, { pass: number; fail: number }>();
+  for (const r of rows.filter((x) => x.type !== 'ROUNDTRIP')) { const k = `${r.file.endsWith('.svg') ? 'svg' : 'html'} ${r.rule}`; const c = by.get(k) ?? { pass: 0, fail: 0 }; if (r.pass) c.pass++; else c.fail++; by.set(k, c); }
+  console.log(`CONTROL ${CONTROL}:`, JSON.stringify([...by.entries()].sort()));
+  process.exit(0);
+}
 const header = 'run,edit_id,file,type,rule,outcome,pass,detail';
 const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
 const lines = rows.map((r) => [r.run, r.edit_id, r.file, r.type, r.rule, r.outcome, r.pass ? 'true' : 'false', q(r.detail)].join(','));
