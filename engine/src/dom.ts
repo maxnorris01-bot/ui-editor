@@ -1,6 +1,8 @@
+import { applyEdit } from './edit';
 import { createModel, sources } from './model';
+import { emptyState } from './responsive';
 import { applyPatches, exportFiles } from './patch';
-import type { DomOp, Model, Patch, Probe } from './types';
+import type { DomOp, Edit, EditResult, EditState, Model, Patch, Probe } from './types';
 
 export interface Preview {
   iframe: HTMLIFrameElement;
@@ -9,6 +11,8 @@ export interface Preview {
   elements: Element[];
   probe: Probe;
   model: Model;
+  /** Resize the preview viewport (the iframe) so media queries re-evaluate at that width. */
+  setWidth(width: number): void;
   dispose(): void;
 }
 
@@ -76,7 +80,17 @@ export function domProbe(doc: Document, elements: Element[]): Probe {
         return [];
       }
     },
-    computed: (i, prop) => view.getComputedStyle(elements[i]!).getPropertyValue(prop),
+    computed(i, prop, width) {
+      const frame = view.frameElement as HTMLElement | null;
+      if (width === undefined || !frame) return view.getComputedStyle(elements[i]!).getPropertyValue(prop);
+      const old = frame.style.width;
+      frame.style.width = `${width}px`;
+      void doc.documentElement.offsetWidth; // force layout so media queries are re-evaluated
+      const v = view.getComputedStyle(elements[i]!).getPropertyValue(prop);
+      frame.style.width = old;
+      void doc.documentElement.offsetWidth;
+      return v;
+    },
     screenMatrix: (i) => matrixOf(elements[i]),
     parentScreenMatrix: (i) => matrixOf(elements[i]?.parentElement),
   };
@@ -121,6 +135,10 @@ export async function createPreview(model: Model, container: HTMLElement, opts: 
     elements,
     probe: domProbe(doc, elements),
     model,
+    setWidth(width) {
+      iframe.style.width = `${width}px`;
+      void doc.documentElement.offsetWidth;
+    },
     dispose() {
       iframe.remove();
       if (blobUrl) URL.revokeObjectURL(blobUrl);
@@ -143,6 +161,8 @@ export function applyDomOps(preview: Preview, ops: DomOp[]): void {
       for (const [p, v] of op.props) (el as HTMLElement).style.setProperty(p, v);
     } else if (op.type === 'attr') {
       el.setAttribute(op.name, op.value);
+    } else if (op.type === 'css') {
+      el.appendChild(el.ownerDocument.createTextNode(op.text));
     } else {
       el.innerHTML = op.html;
     }
@@ -162,4 +182,30 @@ export function commit(model: Model, patches: Patch[]): { files: Record<string, 
   for (const href of Object.keys(model.companions)) companions[href] = files[href] ?? '';
   const kind = model.primary.kind as 'html' | 'svg';
   return { files, model: createModel(files[model.primary.file] ?? '', kind, companions, model.primary.file) };
+}
+
+/**
+ * Apply an ordered list of edits to one live preview, the way the editor would: each edit is decided
+ * against the preview as it is after the earlier ones (so the scaling base is the current effective
+ * value), its DOM operations are applied to the preview and its patches are committed to the source,
+ * which is re-parsed for the next edit. Replaying the same list from the same start gives the same
+ * export; the pinned-value record travels in `state`. Stops at the first refusal.
+ */
+export function applyEditSteps(
+  preview: Preview,
+  edits: Edit[],
+  state: EditState = emptyState(),
+): { results: EditResult[]; state: EditState; files: Record<string, string>; model: Model } {
+  const results: EditResult[] = [];
+  let st = state;
+  for (const edit of edits) {
+    const r = applyEdit(preview.model, edit, preview.probe, st);
+    results.push(r);
+    if (!r.ok) break;
+    applyDomOps(preview, r.dom);
+    const c = commit(preview.model, r.patches);
+    retag(preview, c.model);
+    st = r.state ?? st;
+  }
+  return { results, state: st, files: sources(preview.model), model: preview.model };
 }

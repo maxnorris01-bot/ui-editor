@@ -48,12 +48,12 @@ export function parseRules(file: string, src: string, base = 0, startOrder = 0, 
   }
   const rules: RuleNode[] = [];
   let order = startOrder;
-  const visit = (parent: PCContainer, conditional: boolean) => {
+  const visit = (parent: PCContainer, conditional: boolean, chain: string[]) => {
     parent.each((n: ChildNode) => {
       if (n.type === 'atrule') {
         const a = n as AtRule;
         if (SKIPPED.test(a.name)) return;
-        visit(a, conditional || CONDITIONAL.test(a.name));
+        visit(a, conditional || CONDITIONAL.test(a.name), CONDITIONAL.test(a.name) ? [...chain, `@${a.name} ${a.params}`.replace(/\s+/g, ' ').trim()] : chain);
       } else if (n.type === 'rule') {
         const r = n as Rule;
         const s = base + r.source!.start!.offset;
@@ -77,13 +77,14 @@ export function parseRules(file: string, src: string, base = 0, startOrder = 0, 
           bodyEnd: e - 1,
           decls,
           conditional,
+          conditions: chain,
           order: order++,
         });
         // Nested rules (CSS nesting) are not indexed.
       }
     });
   };
-  visit(root, false);
+  visit(root, false, []);
   return { rules, next: order };
 }
 

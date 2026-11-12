@@ -57,7 +57,7 @@ describe('domProbe', () => {
 describe('applyDomOps', () => {
   const mk = (src: string): { e: ReturnType<typeof env>; preview: Preview } => {
     const e = env(src);
-    const preview = { doc: e.doc, elements: e.elements, probe: e.probe, model: e.model, iframe: null as never, dispose() {} } as Preview;
+    const preview = { doc: e.doc, elements: e.elements, probe: e.probe, model: e.model, iframe: null as never, setWidth() {}, dispose() {} } as Preview;
     return { e, preview };
   };
   it('applies style and attribute operations', () => {

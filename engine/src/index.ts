@@ -1,5 +1,7 @@
 export { applyEdit, blockOf } from './edit';
-export { applyDomOps, commit, createPreview, domProbe, previewSource, retag, tagDocument } from './dom';
+export { applyDomOps, applyEditSteps, commit, createPreview, domProbe, previewSource, retag, tagDocument } from './dom';
+export { breakpointOf, chainEnv, chainMatches, emptyState, envCondition, listUnlinked, scaleValue } from './responsive';
+export type { UnlinkedItem } from './responsive';
 export type { Preview, PreviewOptions } from './dom';
 export { createModel, describe, parse, select, sources } from './model';
 export { applyPatches, exportFiles } from './patch';

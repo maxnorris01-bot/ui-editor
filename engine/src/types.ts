@@ -88,6 +88,8 @@ export interface RuleNode extends Container {
   end: number;
   /** Inside a conditional at-rule (@media, @supports, @container...). Detected, never patched. */
   conditional: boolean;
+  /** The at-rule preludes wrapping this rule, outermost first, e.g. ["@media (max-width: 640px)"]. */
+  conditions: string[];
   /** Cascade order across all stylesheets of the model. */
   order: number;
 }
@@ -123,16 +125,51 @@ export interface Model {
   missingStylesheets: string[];
 }
 
+/** The view an edit was made in. Tablet is view-only and not an environment. */
+export type Environment = 'desktop' | 'phone';
+
+/** Fields every edit may carry. `environment` defaults to 'desktop', `link` to true. */
+export interface EditScope {
+  environment?: Environment;
+  /** true: scale/apply across environments; false: apply only inside `environment` and pin it. */
+  link?: boolean;
+}
+
 export type Edit =
-  | { op: 'set'; target: number; properties: Record<string, string> }
-  | { op: 'offset'; target: number; dx: number; dy: number }
-  | { op: 'reorder'; target: number; placement: 'before' | 'after'; sibling: number };
+  | ({ op: 'set'; target: number; properties: Record<string, string> } & EditScope)
+  | ({ op: 'offset'; target: number; dx: number; dy: number } & EditScope)
+  | ({ op: 'reorder'; target: number; placement: 'before' | 'after'; sibling: number } & EditScope);
+
+/** An unlinked value pinned in one environment (pure data; the review list is built from it). */
+export interface Pin {
+  /** Stable element path (see `describe`). */
+  selector: string;
+  property: string;
+  environment: Environment;
+  value: string;
+}
+
+/** Edit-list state: replaying the same ordered list from an empty state always gives the same export. */
+export interface EditState {
+  pins: Pin[];
+}
+
+/** A value the engine would not scale and left as the page wrote it (never guessed). */
+export interface ScaleNote {
+  property: string;
+  /** The media condition chain the value sits in, or "(base)" / "(all widths)". */
+  condition: string;
+  value: string;
+  reason: string;
+}
 
 export type DomOp =
   | { type: 'style'; index: number; props: [string, string][] }
   | { type: 'attr'; index: number; name: string; value: string }
   /** Replace the children of element `index` by parsing `html` (used for reorders). */
-  | { type: 'html'; index: number; html: string };
+  | { type: 'html'; index: number; html: string }
+  /** Append CSS text to the <style> element `index` (the preview's copy of a stylesheet). */
+  | { type: 'css'; index: number; text: string };
 
 export interface Refusal {
   code: string;
@@ -140,14 +177,15 @@ export interface Refusal {
 }
 
 export type EditResult =
-  | { ok: true; patches: Patch[]; dom: DomOp[]; warnings: string[]; placement: string }
+  | { ok: true; patches: Patch[]; dom: DomOp[]; warnings: string[]; placement: string; notes?: ScaleNote[]; state?: EditState }
   | { ok: false; refusal: Refusal; warnings: string[] };
 
 /** What the engine needs to know from a live document. Implemented over the preview iframe. */
 export interface Probe {
   /** Indexes of elements matching a CSS selector (empty on invalid/unsupported selectors). */
   matches(selector: string): number[];
-  computed(index: number, prop: string): string;
+  /** Computed value; with `width` (px) it is read as the page renders at that viewport width. */
+  computed(index: number, prop: string, width?: number): string;
   /** Screen matrix [a,b,c,d,e,f] of an SVG element's own user space, or null. */
   screenMatrix(index: number): [number, number, number, number, number, number] | null;
   /** Screen matrix of the element's parent user space, or null. */

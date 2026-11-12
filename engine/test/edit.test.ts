@@ -95,9 +95,10 @@ describe('HTML refusals', () => {
     const e = env('<html><head><style>#a { color: red !important }</style></head><body><p id="a">x</p></body></html>');
     expect(refusalCode(e.run({ op: 'set', target: e.at('#a'), properties: { color: 'blue' } }))).toBe('important-conflict');
   });
-  it('refuses when the property sits inside @media', () => {
+  it('a linked colour edit on a property that also has an @media rule is written inline so it wins at every width', () => {
     const e = env('<html><head><style>@media (min-width: 1px) { #a { color: red } }</style></head><body><p id="a">x</p></body></html>');
-    expect(refusalCode(e.run({ op: 'set', target: e.at('#a'), properties: { color: 'blue' } }))).toBe('conditional-rule');
+    const r = e.run({ op: 'set', target: e.at('#a'), properties: { color: 'blue' } });
+    expect(e.out(r)).toContain('<p id="a" style="color: blue">');
   });
   it('refuses to mix shorthand and longhand', () => {
     const e = env('<html><body><p id="a" style="padding-top:2px">x</p></body></html>');

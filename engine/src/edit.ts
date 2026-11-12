@@ -9,8 +9,9 @@ import {
   escapeForAttr,
   replaceDeclValue,
 } from './patch';
+import { emptyState, htmlSetResponsive, htmlUnlinkedOffset, htmlUnlinkedReorder } from './responsive';
 import { specificity } from './specificity';
-import type { Attr, Decl, DomOp, Edit, EditResult, ElementNode, Model, Patch, Probe, RuleNode } from './types';
+import type { Attr, Decl, DomOp, Edit, EditResult, EditState, ElementNode, Model, Patch, Probe, RuleNode } from './types';
 
 /**
  * applyEdit(model, edit, probe)
@@ -48,22 +49,33 @@ import type { Attr, Decl, DomOp, Edit, EditResult, ElementNode, Model, Patch, Pr
  * external fonts and stylesheets the visitor did not supply (reported as warnings), specificity is
  * approximated, individual transform properties (`translate`, `rotate`, `scale`) are not composed.
  */
-export function applyEdit(model: Model, edit: Edit, probe: Probe): EditResult {
+export function applyEdit(model: Model, edit: Edit, probe: Probe, state: EditState = emptyState()): EditResult {
   const warnings = collectWarnings(model);
   const el = model.primary.elements[edit.target];
   if (!el) return refuse('no-element', `no element with index ${edit.target}`, warnings);
   if (el.implied) return refuse('no-source', `<${el.tag}> is created by the parser and has no source text to edit`, warnings);
   try {
-    if (edit.op === 'reorder') return reorder(model, edit, el, warnings);
-    if (model.primary.kind === 'svg') return edit.op === 'set' ? svgSet(model, el, edit.properties, probe, warnings) : svgOffset(model, el, edit.dx, edit.dy, probe, warnings);
-    return edit.op === 'set' ? htmlSet(model, el, edit.properties, probe, warnings) : htmlOffset(model, el, edit.dx, edit.dy, probe, warnings);
+    const r = dispatch(model, edit, el, probe, state, warnings);
+    return r.ok && !r.state ? { ...r, state } : r;
   } catch (e) {
     if (e instanceof Refused) return refuse(e.code, e.message, warnings);
     throw e;
   }
 }
 
-class Refused extends Error {
+function dispatch(model: Model, edit: Edit, el: ElementNode, probe: Probe, state: EditState, warnings: string[]): EditResult {
+  const unlinked = edit.link === false;
+  if (model.primary.kind === 'svg') {
+    if (unlinked) no('svg-unlinked', 'unlinked (environment-only) edits are not supported for SVG in v1: SVG has no media-scoped attribute form');
+    if (edit.op === 'reorder') return reorder(model, edit, el, warnings);
+    return edit.op === 'set' ? svgSet(model, el, edit.properties, probe, warnings) : svgOffset(model, el, edit.dx, edit.dy, probe, warnings);
+  }
+  if (edit.op === 'reorder') return unlinked ? htmlUnlinkedReorder(model, edit, el, probe, state, warnings) : reorder(model, edit, el, warnings);
+  if (edit.op === 'offset') return unlinked ? htmlUnlinkedOffset(model, edit, el, probe, state, warnings) : htmlOffset(model, el, edit.dx, edit.dy, probe, warnings);
+  return htmlSetResponsive(model, edit, el, probe, state, warnings);
+}
+
+export class Refused extends Error {
   constructor(
     public code: string,
     message: string,
@@ -71,10 +83,10 @@ class Refused extends Error {
     super(message);
   }
 }
-const no = (code: string, message: string): never => {
+export const no = (code: string, message: string): never => {
   throw new Refused(code, message);
 };
-const refuse = (code: string, message: string, warnings: string[]): EditResult => ({ ok: false, refusal: { code, message }, warnings });
+export const refuse = (code: string, message: string, warnings: string[]): EditResult => ({ ok: false, refusal: { code, message }, warnings });
 
 function collectWarnings(model: Model): string[] {
   const w: string[] = [];
@@ -85,17 +97,17 @@ function collectWarnings(model: Model): string[] {
   return w;
 }
 
-const fmt = (n: number): string => {
+export const fmt = (n: number): string => {
   const v = +n.toFixed(4);
   return String(Object.is(v, -0) ? 0 : v);
 };
-const attrOf = (el: ElementNode, lname: string): Attr | undefined => el.attrs.find((a) => a.lname === lname);
+export const attrOf = (el: ElementNode, lname: string): Attr | undefined => el.attrs.find((a) => a.lname === lname);
 
 // ---------------------------------------------------------------------------------------------
 // HTML placement
 // ---------------------------------------------------------------------------------------------
 
-interface Matched {
+export interface Matched {
   rule: RuleNode;
   /** Highest specificity among this rule's selectors that match the target. */
   spec: number;
@@ -103,7 +115,7 @@ interface Matched {
   single: boolean;
 }
 
-function matchedRules(model: Model, target: ElementNode, probe: Probe): Matched[] {
+export function matchedRules(model: Model, target: ElementNode, probe: Probe): Matched[] {
   const cache = new Map<string, number[]>();
   const m = (sel: string) => {
     let r = cache.get(sel);
@@ -133,23 +145,23 @@ function matchedRules(model: Model, target: ElementNode, probe: Probe): Matched[
 /** Shorthands whose longhands must not be mixed with them (padding vs padding-top, font vs font-size). */
 const SHORTHANDS = new Set(['padding', 'margin', 'font']);
 /** True when one name is the shorthand and the other is one of its longhands. */
-function sameFamily(a: string, b: string): boolean {
+export function sameFamily(a: string, b: string): boolean {
   if (a === b) return false;
   return (SHORTHANDS.has(a) && b.startsWith(a + '-')) || (SHORTHANDS.has(b) && a.startsWith(b + '-'));
 }
 
-function lastDecl(decls: Decl[], lprop: string): Decl | undefined {
+export function lastDecl(decls: Decl[], lprop: string): Decl | undefined {
   for (let i = decls.length - 1; i >= 0; i--) if (decls[i]!.lprop === lprop) return decls[i];
   return undefined;
 }
 
-interface InlineInfo {
+export interface InlineInfo {
   attr: Attr;
   decls: Decl[];
   bodyStart: number;
   bodyEnd: number;
 }
-function inlineStyle(model: Model, el: ElementNode): InlineInfo | null {
+export function inlineStyle(model: Model, el: ElementNode): InlineInfo | null {
   const a = attrOf(el, 'style');
   if (!a) return null;
   if (a.value === null) no('style-valueless', 'the style attribute has no value; refusing to guess its format');
@@ -158,12 +170,13 @@ function inlineStyle(model: Model, el: ElementNode): InlineInfo | null {
   return { attr: a, ...p };
 }
 
-function checkConflicts(matched: Matched[], inline: InlineInfo | null, props: [string, string][]): void {
+function checkConflicts(matched: Matched[], inline: InlineInfo | null, props: [string, string][], allowConditional = false): void {
   for (const [p] of props) {
     for (const { rule } of matched) {
       for (const d of rule.decls) {
         const touches = d.lprop === p || sameFamily(p, d.lprop);
         if (!touches) continue;
+        if (rule.conditional && allowConditional) continue;
         if (rule.conditional) no('conditional-rule', `"${p}" is also set inside a conditional rule (${rule.selector}) such as @media; v1 does not patch or reason about those`);
         if (d.important) no('important-conflict', `"${p}" is set with !important in rule "${rule.selector}"; an inline or rule edit would not win`);
         if (d.lprop !== p) no('shorthand-mix', `"${p}" and "${d.lprop}" (rule "${rule.selector}") are the same property family; mixing shorthand and longhand is not supported in v1`);
@@ -213,12 +226,19 @@ function ruleWins(cand: Matched, matched: Matched[], props: [string, string][]):
   return true;
 }
 
-function placeHtml(model: Model, el: ElementNode, props: [string, string][], probe: Probe, warnings: string[]): EditResult {
+export interface PlaceOpts {
+  /** Write into the element's own style attribute even when a single-element rule exists (it must beat media rules). */
+  forceInline?: boolean;
+  /** Conditional (@media) rules for these properties are handled by the caller; do not refuse them. */
+  allowConditional?: boolean;
+}
+
+export function placeHtml(model: Model, el: ElementNode, props: [string, string][], probe: Probe, warnings: string[], opts: PlaceOpts = {}): EditResult {
   const src = model.primary.source;
   const file = model.primary.file;
   const matched = matchedRules(model, el, probe);
   const inline = inlineStyle(model, el);
-  checkConflicts(matched, inline, props);
+  checkConflicts(matched, inline, props, opts.allowConditional);
   const patches: Patch[] = [];
   let placement: string;
 
@@ -233,7 +253,7 @@ function placeHtml(model: Model, el: ElementNode, props: [string, string][], pro
     const ins = appendDecls(file, inline, add, 'inline', inline.attr.quote);
     if (ins) patches.push(ins);
   } else {
-    const cands = matched.filter((m) => m.single && !m.rule.conditional && ruleWins(m, matched, props));
+    const cands = opts.forceInline ? [] : matched.filter((m) => m.single && !m.rule.conditional && ruleWins(m, matched, props));
     cands.sort((a, b) => b.spec - a.spec || b.rule.order - a.rule.order);
     const pick = cands[0];
     if (pick) {
@@ -254,7 +274,7 @@ function placeHtml(model: Model, el: ElementNode, props: [string, string][], pro
   return { ok: true, patches, dom: [{ type: 'style', index: el.index, props }], warnings, placement };
 }
 
-function htmlSet(model: Model, el: ElementNode, properties: Record<string, string>, probe: Probe, warnings: string[]): EditResult {
+export function htmlSet(model: Model, el: ElementNode, properties: Record<string, string>, probe: Probe, warnings: string[]): EditResult {
   const props: [string, string][] = Object.entries(properties).map(([p, v]) => [p.toLowerCase(), v]);
   // A flex item's main-size property is overridden by a non-auto flex-basis; write both.
   const parent = el.parent;
@@ -475,7 +495,7 @@ export function blockOf(src: string, el: ElementNode): Block {
   return { start: s, end: e, line: false };
 }
 
-function reorder(model: Model, edit: Extract<Edit, { op: 'reorder' }>, el: ElementNode, warnings: string[]): EditResult {
+export function reorder(model: Model, edit: Extract<Edit, { op: 'reorder' }>, el: ElementNode, warnings: string[]): EditResult {
   const src = model.primary.source;
   const file = model.primary.file;
   const sib = model.primary.elements[edit.sibling];
