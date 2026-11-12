@@ -1,0 +1,1003 @@
+{
+ "version": 1,
+ "defaultBreakpoint": 767,
+ "tolerance": {
+  "px": 0.5,
+  "bboxPx": 1
+ },
+ "viewportHeight": 800,
+ "edits": [
+  {
+   "id": "S01",
+   "case": "a",
+   "kind": "linked",
+   "fixture": "text-scale.html",
+   "steps": [
+    {
+     "target": "#t1",
+     "op": "set",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#t1",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "48px",
+     "1024": "48px",
+     "768": "48px",
+     "641": "48px",
+     "640": "19.2px",
+     "390": "19.2px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "shared .title class: #t2 must not change"
+  },
+  {
+   "id": "S02",
+   "case": "b1",
+   "kind": "linked",
+   "fixture": "units.html",
+   "steps": [
+    {
+     "target": "#n1",
+     "op": "set",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#n1",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "30px",
+     "1024": "30px",
+     "768": "30px",
+     "641": "30px",
+     "640": "22.5px",
+     "390": "22.5px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "rem values: 1.5rem base, 1.125rem phone"
+  },
+  {
+   "id": "S03",
+   "case": "b2",
+   "kind": "linked",
+   "fixture": "units.html",
+   "steps": [
+    {
+     "target": "#lede",
+     "op": "set",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#lede",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "30px",
+     "1024": "30px",
+     "768": "30px",
+     "641": "30px",
+     "640": "22px",
+     "390": "22px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "em values: 1.5em base, 1.1em phone, parent 16px"
+  },
+  {
+   "id": "S04",
+   "case": "c",
+   "kind": "linked",
+   "fixture": "spacing.html",
+   "steps": [
+    {
+     "target": "#c1",
+     "op": "set",
+     "properties": {
+      "padding": "18px 30px",
+      "margin": "0 auto 24px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#c1",
+    "props": [
+     "padding-top",
+     "padding-right",
+     "padding-bottom",
+     "padding-left",
+     "margin-top",
+     "margin-bottom"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "padding-top": {
+     "1280": "18px",
+     "1024": "18px",
+     "768": "18px",
+     "641": "18px",
+     "640": "12px",
+     "390": "12px"
+    },
+    "padding-right": {
+     "1280": "30px",
+     "1024": "30px",
+     "768": "30px",
+     "641": "30px",
+     "640": "18px",
+     "390": "18px"
+    },
+    "padding-bottom": {
+     "1280": "18px",
+     "1024": "18px",
+     "768": "18px",
+     "641": "18px",
+     "640": "12px",
+     "390": "12px"
+    },
+    "padding-left": {
+     "1280": "30px",
+     "1024": "30px",
+     "768": "30px",
+     "641": "30px",
+     "640": "18px",
+     "390": "18px"
+    },
+    "margin-top": {
+     "1280": "0px",
+     "1024": "0px",
+     "768": "0px",
+     "641": "0px",
+     "640": "0px",
+     "390": "0px"
+    },
+    "margin-bottom": {
+     "1280": "24px",
+     "1024": "24px",
+     "768": "24px",
+     "641": "24px",
+     "640": "24px",
+     "390": "24px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "shorthand with several values; padding has a phone override, margin has none"
+  },
+  {
+   "id": "S05",
+   "case": "d",
+   "kind": "linked",
+   "fixture": "edge-values.html",
+   "steps": [
+    {
+     "target": "#promo",
+     "op": "set",
+     "properties": {
+      "font-size": "35px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#promo",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "35px",
+     "1024": "35px",
+     "768": "35px",
+     "641": "35px",
+     "640": "17.5px",
+     "390": "17.5px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "the page's phone rule uses !important"
+  },
+  {
+   "id": "S06",
+   "case": "e",
+   "kind": "linked",
+   "fixture": "edge-values.html",
+   "steps": [
+    {
+     "target": "#sub",
+     "op": "set",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#sub",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "40px",
+     "1024": "40px",
+     "768": "40px",
+     "641": "40px",
+     "640": "24px",
+     "390": "19.5px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "phone value is clamp(): not scaled, original value kept, structured note expected",
+   "expectNotScaled": [
+    "font-size"
+   ]
+  },
+  {
+   "id": "S07",
+   "case": "f",
+   "kind": "linked",
+   "fixture": "colour.html",
+   "steps": [
+    {
+     "target": "#tag1",
+     "op": "set",
+     "properties": {
+      "color": "#c0392b"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#tag1",
+    "props": [
+     "color"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "color": {
+     "1280": "rgb(192, 57, 43)",
+     "1024": "rgb(192, 57, 43)",
+     "768": "rgb(192, 57, 43)",
+     "641": "rgb(192, 57, 43)",
+     "640": "rgb(192, 57, 43)",
+     "390": "rgb(192, 57, 43)"
+    }
+   },
+   "legit": "descendants",
+   "expectedOutcome": "PASS",
+   "note": "page changes the colour at phone width; edit must apply everywhere"
+  },
+  {
+   "id": "S08",
+   "case": "g",
+   "kind": "linked",
+   "fixture": "two-conditions.html",
+   "steps": [
+    {
+     "target": "#b1",
+     "op": "set",
+     "properties": {
+      "font-size": "22.5px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#b1",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1201,
+    1200,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "22.5px",
+     "1201": "22.5px",
+     "1200": "22.5px",
+     "1024": "17.5px",
+     "768": "17.5px",
+     "641": "17.5px",
+     "640": "13.75px",
+     "390": "13.75px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "max-width and min-width rules on the same property; edit made at 1280 where the min-width rule (18px) wins"
+  },
+  {
+   "id": "S09",
+   "case": "h",
+   "kind": "linked",
+   "fixture": "text-scale.html",
+   "steps": [
+    {
+     "target": "#head",
+     "op": "set",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#head",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "50px",
+     "1024": "50px",
+     "768": "50px",
+     "641": "50px",
+     "640": "20px",
+     "390": "20px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "edit made at phone width (16px to 20px) must scale desktop (40px to 50px)"
+  },
+  {
+   "id": "S10",
+   "case": "i",
+   "kind": "linked",
+   "fixture": "two-conditions.html",
+   "steps": [
+    {
+     "target": "#p1",
+     "op": "set",
+     "properties": {
+      "font-size": "25px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#p1",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1201,
+    1200,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "25px",
+     "1201": "25px",
+     "1200": "25px",
+     "1024": "25px",
+     "768": "25px",
+     "641": "25px",
+     "640": "25px",
+     "390": "25px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "property with no media rule: behaves as before"
+  },
+  {
+   "id": "S11",
+   "case": "j",
+   "kind": "unlinked",
+   "fixture": "text-scale.html",
+   "steps": [
+    {
+     "target": "#hero",
+     "op": "set",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "target": "#hero",
+     "op": "set",
+     "properties": {
+      "font-size": "16px"
+     },
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#hero",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "48px",
+     "1024": "48px",
+     "768": "48px",
+     "641": "48px",
+     "640": "16px",
+     "390": "16px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS"
+  },
+  {
+   "id": "S12",
+   "case": "k",
+   "kind": "unlinked",
+   "fixture": "colour.html",
+   "steps": [
+    {
+     "target": "#chip1",
+     "op": "set",
+     "properties": {
+      "color": "#c0392b"
+     },
+     "environment": "desktop",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#chip1",
+    "props": [
+     "color"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "color": {
+     "1280": "rgb(192, 57, 43)",
+     "1024": "rgb(192, 57, 43)",
+     "768": "rgb(192, 57, 43)",
+     "641": "rgb(192, 57, 43)",
+     "640": "rgb(44, 62, 80)",
+     "390": "rgb(44, 62, 80)"
+    }
+   },
+   "legit": "descendants",
+   "expectedOutcome": "PASS",
+   "note": "page has the same colour at phone"
+  },
+  {
+   "id": "S13",
+   "case": "l",
+   "kind": "unlinked",
+   "fixture": "spacing.html",
+   "steps": [
+    {
+     "target": "#note-a",
+     "op": "set",
+     "properties": {
+      "margin": "0 0 20px"
+     },
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#note-a",
+    "props": [
+     "margin-top",
+     "margin-bottom"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "margin-top": {
+     "1280": "0px",
+     "1024": "0px",
+     "768": "0px",
+     "641": "0px",
+     "640": "0px",
+     "390": "0px"
+    },
+    "margin-bottom": {
+     "1280": "16px",
+     "1024": "16px",
+     "768": "16px",
+     "641": "16px",
+     "640": "20px",
+     "390": "20px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS"
+  },
+  {
+   "id": "S14",
+   "case": "m",
+   "kind": "pinned",
+   "fixture": "text-scale.html",
+   "steps": [
+    {
+     "target": "#hero",
+     "op": "set",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "target": "#hero",
+     "op": "set",
+     "properties": {
+      "font-size": "16px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "target": "#hero",
+     "op": "set",
+     "properties": {
+      "font-size": "60px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#hero",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "60px",
+     "1024": "60px",
+     "768": "60px",
+     "641": "60px",
+     "640": "16px",
+     "390": "16px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "pinned phone value survives a later linked desktop edit"
+  },
+  {
+   "id": "S15",
+   "case": "n",
+   "kind": "unlinked",
+   "fixture": "moves.html",
+   "steps": [
+    {
+     "target": "#chip",
+     "op": "offset",
+     "dx": 24,
+     "dy": 16,
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#chip",
+    "bbox": true
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "bboxDelta": {
+     "1280": {
+      "dx": 0,
+      "dy": 0
+     },
+     "1024": {
+      "dx": 0,
+      "dy": 0
+     },
+     "768": {
+      "dx": 0,
+      "dy": 0
+     },
+     "641": {
+      "dx": 0,
+      "dy": 0
+     },
+     "640": {
+      "dx": 24,
+      "dy": 16
+     },
+     "390": {
+      "dx": 24,
+      "dy": 16
+     }
+    }
+   },
+   "legit": "descendants",
+   "expectedOutcome": "PASS",
+   "note": "element has transform: rotate(3deg); translate is composed"
+  },
+  {
+   "id": "S16",
+   "case": "o",
+   "kind": "unlinked",
+   "fixture": "moves.html",
+   "steps": [
+    {
+     "target": "#i3",
+     "op": "reorder",
+     "placement": "before",
+     "sibling": "#i1",
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "parent": "#row",
+    "visualOrder": true
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "visualOrder": {
+     "1280": [
+      "i1",
+      "i2",
+      "i3"
+     ],
+     "1024": [
+      "i1",
+      "i2",
+      "i3"
+     ],
+     "768": [
+      "i1",
+      "i2",
+      "i3"
+     ],
+     "641": [
+      "i1",
+      "i2",
+      "i3"
+     ],
+     "640": [
+      "i3",
+      "i1",
+      "i2"
+     ],
+     "390": [
+      "i3",
+      "i1",
+      "i2"
+     ]
+    }
+   },
+   "legit": "reorder",
+   "expectedOutcome": "PASS",
+   "note": "flex parent: CSS order inside the phone condition"
+  },
+  {
+   "id": "S17",
+   "case": "p",
+   "kind": "unlinked",
+   "fixture": "moves.html",
+   "steps": [
+    {
+     "target": "#s3",
+     "op": "reorder",
+     "placement": "before",
+     "sibling": "#s1",
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "parent": "#stack",
+    "visualOrder": true
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {},
+   "legit": "reorder",
+   "expectedOutcome": "REFUSED",
+   "note": "block parent: CSS order does not apply, so the engine must refuse and say why"
+  },
+  {
+   "id": "S18",
+   "case": "q",
+   "kind": "unlinked",
+   "fixture": "moves.html",
+   "steps": [
+    {
+     "target": "#panel",
+     "op": "set",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#panel",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "480px",
+     "1024": "480px",
+     "768": "480px",
+     "641": "480px",
+     "640": "300px",
+     "390": "300px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS"
+  },
+  {
+   "id": "S19",
+   "case": "r",
+   "kind": "unlinked",
+   "fixture": "no-media.html",
+   "steps": [
+    {
+     "target": "#box1",
+     "op": "set",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#box1",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    767,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "30px",
+     "1024": "30px",
+     "768": "30px",
+     "767": "20px",
+     "390": "20px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "page has no media rules: default breakpoint B=767, desktop starts at 768"
+  },
+  {
+   "id": "S20",
+   "case": "s",
+   "kind": "unlinked",
+   "fixture": "boundary.html",
+   "steps": [
+    {
+     "target": "#l1",
+     "op": "set",
+     "properties": {
+      "font-size": "15px"
+     },
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#l1",
+    "props": [
+     "font-size"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    701,
+    700,
+    390
+   ],
+   "expected": {
+    "font-size": {
+     "1280": "18px",
+     "1024": "18px",
+     "768": "18px",
+     "701": "18px",
+     "700": "15px",
+     "390": "15px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "note": "page's own breakpoint is 700: B=700 is phone, 701 is desktop"
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moves and width</title>
+<style>
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.2; }
+.row { display: flex; margin: 0 0 16px; }
+.row > div { width: 100px; height: 40px; background: #dddddd; }
+.stack { display: block; margin: 0 0 16px; }
+.stack > div { height: 30px; background: #eeeeee; }
+#chip { display: inline-block; transform: rotate(3deg); padding: 4px 8px; background: #cce0ee; margin: 8px 0 16px; }
+.panel { width: 480px; background: #e8e8f8; margin: 0 0 16px; }
+@media (max-width: 640px) {
+  .panel { width: auto; }
+  .row { margin: 0 0 8px; }
+}
+</style>
+</head>
+<body>
+<div>
+  <span id="chip">Chip</span>
+</div>
+<div class="row" id="row">
+  <div id="i1">One</div>
+  <div id="i2">Two</div>
+  <div id="i3">Three</div>
+</div>
+<div class="stack" id="stack">
+  <div id="s1">Stack one</div>
+  <div id="s2">Stack two</div>
+  <div id="s3">Stack three</div>
+</div>
+<div class="panel" id="panel">Panel</div>
+<p id="tail">Tail</p>
+</body>
+</html>

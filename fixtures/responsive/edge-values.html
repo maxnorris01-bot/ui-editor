@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Important and unscalable values</title>
+<style>
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.2; }
+.promo { font-size: 28px; margin: 0 0 8px; }
+.sub { font-size: 32px; margin: 0 0 8px; }
+@media (max-width: 640px) {
+  .promo { font-size: 14px !important; }
+  .sub { font-size: clamp(18px, 5vw, 24px); }
+}
+</style>
+</head>
+<body>
+<p class="promo" id="promo">Promo line</p>
+<p class="promo" id="promo2">Second promo</p>
+<h2 class="sub" id="sub">Sub heading</h2>
+<h2 class="sub" id="sub2">Second sub</h2>
+</body>
+</html>
