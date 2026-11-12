@@ -22,3 +22,8 @@ build/
 # Real-page check: gitignored temp dir and raw outputs (the real pages must never be committed)
 realpage-check/tmp/
 realpage-check/raw/
+
+# Responsive iteration: exports of the baseline run and temp output (never committed)
+baseline-exports/
+responsive-check/tmp/
+responsive-check/raw/
