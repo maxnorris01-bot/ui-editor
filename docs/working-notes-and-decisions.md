@@ -66,6 +66,20 @@ in `realpage-check/results/`. Both refusals are `conditional-rule` and both reas
 (checked by reading the files). Max decides which run counts. Details:
 `docs/sessions/2026-11-10-real-page-check.md`.
 
+**2026-11-11 - Responsive edits (`feat/responsive-edits`).** Max's decision: an edit is a ratio, so a
+size changed at one width scales the page's own screen-specific values by the same ratio; linked by
+default, unlinked edits apply only inside their environment and pin it. Rules, 9 fixtures and 20
+specs locked in `51a861f` before any engine change; baseline exports saved with the old engine
+first; scorer control passed on HTML and SVG. Mechanism and limits: `docs/adr/0003-responsive-edits.md`.
+Run 1 (scored): the 20 new specs 19 PASS + 1 expected REFUSED (S17), regression 40/40 and 18/18,
+byte-identical 55/55, round trips 25/25, speed met. The iteration FAILS pass line item 1: R01 fails E4
+and R09 fails E5. Neither is a wrong value (E2 and E3 pass at 8 and 34 widths). R01: the spacer cell
+beside the edited cell stretches with the taller row, which the locked `flow` class (gate-rules 5.5)
+does not allow (it covers following siblings, not a preceding sibling in the same table row).
+R09: the stylesheet has no trailing newline, so appending a rule line changes its last line. Rules and
+specs were not tuned; Max decides. The old unit test that expected an `@media` refusal now expects the
+new behaviour (inline style for a linked colour edit).
+
 ## Open items / parking lot
 
 <!-- Things to revisit later - not urgent, not forgotten. -->
@@ -74,10 +88,9 @@ in `realpage-check/results/`. Both refusals are `conditional-rule` and both reas
   pasted code; the 10x/100x copies only repeat one page. Real pasted pages are the open test.
 - Bundle is dominated by parse5 (140 KB, 33 KB of it the entity table) and postcss (57 KB);
   revisit only if the size threshold is missed.
-- Known limit from the real-page check: any edit to a property that is also set inside any
-  `@media` rule is refused, even when that media query is inactive at the preview width (2 of 5
-  T1 edits). Cheapest test: reason about the media condition for the 1280 px preview, or write the
-  edit to a new inline style when the media rule cannot apply.
+- Responsive iteration (see above): decide whether to widen the `flow` class to cover a preceding
+  sibling in the same table or flex row (R01), and whether a file with no trailing newline may take
+  one changed last line when a rule is appended (R09). The old `@media` refusal is gone.
 - SVG goes through parse5's HTML parser; SVG that is only valid as XML may be split differently.
 
 ## See also
