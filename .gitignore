@@ -28,3 +28,7 @@ baseline-exports/
 responsive-check/tmp/
 responsive-check/raw/
 new-exports/
+
+# Size scaling check: temp and raw output (exports are never committed)
+size-check/tmp/
+size-check/raw/

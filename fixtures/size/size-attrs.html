@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Size attributes</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+table { border-collapse: collapse; margin: 0 0 8px; }
+td { padding: 4px; background: #dddddd; }
+img { display: block; }
+@media (max-width: 640px) {
+  .hero { width: 240px; }
+  td { padding: 2px; }
+}
+</style>
+</head>
+<body>
+<table id="tbl" width="600"><tr><td>Cell</td></tr></table>
+<img id="img" class="hero" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="400" height="200" alt="">
+</body>
+</html>

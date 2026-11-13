@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Size basic</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+.panel { width: 600px; height: 40px; margin: 0 0 8px; background: #dddddd; }
+#pct { width: 600px; height: 30px; margin: 0 0 8px; background: #cfe3f5; }
+#auto { height: 30px; margin: 0 0 8px; background: #f5e3cf; }
+@media (max-width: 640px) {
+  .panel { width: 300px; height: 30px; }
+  #pct { width: 80%; }
+}
+</style>
+</head>
+<body>
+<div class="panel" id="pa">Panel A</div>
+<div class="panel" id="pb">Panel B</div>
+<div class="panel" id="pc">Panel C</div>
+<div id="pct">Percent on phone</div>
+<div id="auto">Auto on phone</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Size height</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+#hauto { width: 400px; height: 120px; margin: 0 0 8px; background: #dddddd; white-space: nowrap; }
+#seq { width: 400px; height: 100px; margin: 0 0 8px; background: #cfe3f5; }
+@media (max-width: 640px) {
+  #hauto { height: auto; }
+  #seq { width: 200px; height: 50px; }
+}
+</style>
+</head>
+<body>
+<div id="hauto">One line</div>
+<div id="seq">Width then height</div>
+</body>
+</html>
