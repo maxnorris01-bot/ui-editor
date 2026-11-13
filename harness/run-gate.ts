@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { diffLines } from 'diff';
+import { normOrig } from './e5-amend';
 import { createModel, exportFiles, sources } from '../engine/src/index';
 import { loadEdits, loadFixtures, ROOT } from './fixtures';
 import type { EditSpec, Fixture } from './fixtures';
@@ -203,7 +204,7 @@ function e5(spec: EditSpec, f: Fixture, out: Record<string, string>, spans: NonN
       continue;
     }
     if (o === x) { problems.push(`${name} is unchanged`); continue; }
-    const changes = diffLines(o, x);
+    const changes = diffLines(normOrig(o, x), x);
     const removed: string[] = [], added: string[] = [], removedAt: number[] = [], addedAt: number[] = [];
     let oldLine = 1, newLine = 1;
     for (const c of changes) {

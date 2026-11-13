@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { cpus, totalmem, arch, release } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { diffLines } from 'diff';
+import { normOrig } from './e5-amend';
 import { createModel, exportFiles, sources } from '../engine/src/index';
 import { ROOT } from './fixtures';
 import { serve } from './serve';
@@ -225,7 +226,7 @@ function e5(spec: Spec, f: Input, out: Record<string, string>, spans: Spans): { 
     if (o === x) { diffs.push(`${name}: unchanged`); continue; }
     const removed: string[] = [], added: string[] = [], removedAt: number[] = [], addedAt: number[] = [];
     let oldLine = 1, newLine = 1;
-    for (const c of diffLines(o, x)) {
+    for (const c of diffLines(normOrig(o, x), x)) {
       const lines = c.value.split('\n');
       if (lines[lines.length - 1] === '') lines.pop();
       if (c.removed) lines.forEach((l) => { removed.push(l); removedAt.push(oldLine++); });
@@ -279,6 +280,7 @@ function sabotage(f: Input, files: Record<string, string>, mode: string): Record
   const orig: Record<string, string> = { [f.file]: f.source, ...f.companions };
   const main = files[f.file] ?? f.source;
   if (mode === 'noop') return orig;
+  if (mode === 'lastline') return { ...files, [f.file]: main.endsWith('\n') ? `${main.slice(0, -1)} \n` : `${main} ` };
   if (mode === 'reformat') return { ...files, [f.file]: main.replace('\n', '\n ') };
   // collateral: extra CSS rules that change other elements
   if (f.kind === 'html') return { ...files, [f.file]: main.replace('</head>', '<style>p,li,td,div,span,h1,h2,h3,a{color:#123456 !important}</style></head>') };

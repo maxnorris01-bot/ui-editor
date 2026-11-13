@@ -8,6 +8,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { diffLines } from 'diff';
+import { normOrig } from './e5-amend';
 import { createModel, exportFiles, sources } from '../engine/src/index';
 import { ROOT } from './fixtures';
 import { serve } from './serve';
@@ -161,7 +162,7 @@ function e4(spec: Spec, orig: Dump, exp: Dump, amended = true): string[] {
   return bad;
 }
 
-function e5(spec: Spec, inp: Input, out: Record<string, string>, startTag: number[]): { problems: string[]; diff: string } {
+function e5(spec: Spec, inp: Input, out: Record<string, string>, startTag: number[], amended = true): { problems: string[]; diff: string } {
   const orig: Record<string, string> = { [inp.file]: inp.source, ...inp.companions };
   const problems: string[] = [];
   let added = 0, mediaAdded = 0, removedTotal = 0;
@@ -171,7 +172,7 @@ function e5(spec: Spec, inp: Input, out: Record<string, string>, startTag: numbe
     let oldLine = 1;
     const lo = name === inp.file ? lineOf(inp.source, startTag[0]!) : -1;
     const hi = name === inp.file ? lineOf(inp.source, Math.max(startTag[0]!, startTag[1]! - 1)) : -1;
-    for (const c of diffLines(o, x)) {
+    for (const c of diffLines(amended ? normOrig(o, x) : o, x)) {
       const lines = c.value.split('\n');
       if (lines[lines.length - 1] === '') lines.pop();
       if (c.removed) {
@@ -205,6 +206,7 @@ for (const [n, file] of files9.entries()) {
 // ---- the specs --------------------------------------------------------------------------------
 const outcomes = new Map<string, { outcome: string; notes: unknown[]; diff: string }>();
 for (const spec of specs) {
+  if (process.env.GATE_ONLY && spec.id !== process.env.GATE_ONLY) continue;
   const inp = inputOf(spec);
   const startRow = rows.length;
   const origFiles: Record<string, string> = { [inp.file]: inp.source, ...inp.companions };
@@ -231,6 +233,11 @@ for (const spec of specs) {
     let files = out!.files!;
     if (CONTROL) {
       const m = files[inp.file] ?? inp.source;
+      if (CONTROL === 'lastline' || CONTROL === 'twonl') {
+        const name = [inp.file, ...Object.keys(inp.companions)].find((n) => !origFiles[n]!.endsWith('\n') && (files[n] ?? '').startsWith(origFiles[n]!) && files[n] !== origFiles[n]) ?? inp.file;
+        const o = origFiles[name]!, x = files[name] ?? '';
+        files = { ...files, [name]: `${x.slice(0, o.length)}${CONTROL === 'lastline' ? ' ' : '\n'}${x.slice(o.length)}` };
+      } else
       files = CONTROL === 'noop' ? { ...origFiles } : CONTROL === 'reformat' ? { ...files, [inp.file]: m.replace('\n', '\n ') } : { ...files, [inp.file]: m.replace('</head>', '<style>p,li,td,div,span,h1,h2,h3,a{color:#123456 !important}</style></head>') };
     }
     const dirX = join(TMP, spec.id, 'exported');
@@ -297,8 +304,10 @@ for (const spec of specs) {
     add(tag, 'E4L', p4L.length === 0, p4L.slice(0, 3).join(' | ') || `no other element changed at ${spec.widths.length} widths (locked E4)`);
     // E5
     const r5 = e5(spec, inp, files, out!.spans!.startTag);
+    const r5L = e5(spec, inp, files, out!.spans!.startTag, false);
+    add(tag, 'E5L', r5L.problems.length === 0, `${r5L.diff}${r5L.problems.length ? ' | ' + r5L.problems.slice(0, 3).join(' | ') : ''} (locked E5)`);
     add(tag, 'E5', r5.problems.length === 0, `${r5.diff}${r5.problems.length ? ' | ' + r5.problems.slice(0, 3).join(' | ') : ''}`);
-    outcome = rows.slice(startRow).filter((r) => r.rule !== 'E4L').every((r) => r.pass) ? 'PASS' : 'FAIL';
+    outcome = rows.slice(startRow).filter((r) => r.rule !== 'E4L' && r.rule !== 'E5L').every((r) => r.pass) ? 'PASS' : 'FAIL';
   }
   const notes = out && !out.refused ? out.notes ?? [] : [];
   rows.push({ run: RUN, id: spec.id, case: spec.case, kind: spec.kind, fixture: spec.fixture, rule: 'NOTES', outcome: '', pass: true, detail: JSON.stringify(notes).slice(0, 600) });
@@ -315,7 +324,7 @@ const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
 const lines = rows.map((r) => [r.run, r.id, r.case, r.kind, r.fixture, r.rule, r.outcome, r.pass ? 'true' : 'false', q(r.detail)].join(','));
 if (CONTROL) {
   const by = new Map<string, number>();
-  for (const r of rows) if (!r.pass && r.rule !== 'E4L' && r.rule !== 'NOTES') by.set(r.rule, (by.get(r.rule) ?? 0) + 1);
+  for (const r of rows) if (!r.pass && r.rule !== 'E4L' && r.rule !== 'E5L' && r.rule !== 'NOTES') by.set(r.rule, (by.get(r.rule) ?? 0) + 1);
   console.log(`CONTROL ${CONTROL}: specs failing per rule`, JSON.stringify([...by.entries()].sort()));
   process.exit(0);
 }
