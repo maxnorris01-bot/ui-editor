@@ -17,8 +17,8 @@ function csv(path: string): Record<string, string>[] {
   });
 }
 const resp = csv(join(ROOT, 'responsive-check/results/responsive-results.csv')).filter((r) => r.run === RUN);
-const gate = csv(join(ROOT, 'results/gate-results.csv')).filter((r) => r.run === 'resp');
-const real = csv(join(ROOT, 'realpage-check/results/realpage-results.csv')).filter((r) => r.run === 'resp');
+const gate = csv(join(ROOT, 'results/gate-results.csv')).filter((r) => r.run === (process.env.REG_RUN ?? 'resp'));
+const real = csv(join(ROOT, 'realpage-check/results/realpage-results.csv')).filter((r) => r.run === (process.env.REG_RUN ?? 'resp'));
 const regress = JSON.parse(readFileSync(join(ROOT, 'responsive-check/results/regression.json'), 'utf8')) as { noMediaRule: number; byteIdentical: number; notIdentical: string[] };
 const timing = JSON.parse(readFileSync(join(ROOT, 'results/timing.json'), 'utf8')) as { bundle: { rawBytes: number; gzipBytes: number }; overall: { worstMedian_previewMs: number; worstMedian_applyMs: number }; scaling: Record<string, { previewMedianMs: number; applyMedianMs: number }> };
 
@@ -30,6 +30,7 @@ const missed: string[] = [];
 
 // 1. R01, R09
 const item1 = ['R01', 'R09'].map((id) => ({ id, outcome: outcome(resp, id), why: resp.filter((r) => r.id === id && r.pass === 'false').map((r) => `${r.rule}: ${r.detail}`).join(' || ').slice(0, 500) }));
+const e4Locked = (id: string) => resp.filter((r) => r.id === id && r.rule === 'E4L').every((r) => r.pass === 'true') ? 'PASS' : 'FAIL';
 const ok1 = item1.every((x) => x.outcome === 'PASS');
 if (!ok1) missed.push(`1. R01/R09 at all test widths: ${item1.map((x) => `${x.id} ${x.outcome}`).join(', ')} (line: both PASS)`);
 
@@ -74,6 +75,7 @@ md.push(`| 2. new specs | ${pass2} PASS, ${sOut.filter((x) => x.o === 'REFUSED')
 md.push(`| 3. regression | gate ${gatePass}/40, other real-page ${realPass}/18, byte-identical ${regress.byteIdentical}/${regress.noMediaRule} | all | ${ok3 ? 'yes' : '**NO**'} |`);
 md.push(`| 4. no-op round trips | ${rtAll.filter((r) => r.pass === 'true').length} of ${rtAll.length} byte-identical (${rtGate.length} gate, ${rtReal.length} real, ${rtResp.length} new) | all | ${ok4 ? 'yes' : '**NO**'} |`);
 md.push(`| 5. speed thresholds | see below | all met | ${ok5 ? 'yes' : '**NO**'} |`, '');
+md.push('', `R01 under the locked E4: ${e4Locked('R01')}; under amended E4 (scored): ${outcome(resp, 'R01')}. R09 (E4 locked ${e4Locked('R09')}, amended ${resp.filter((r) => r.id === 'R09' && r.rule === 'E4').every((r) => r.pass === 'true') ? 'PASS' : 'FAIL'}): ${outcome(resp, 'R09')}.`, '');
 md.push('### Speed', '', '| metric | measured | threshold | met |', '|---|---|---|---|');
 for (const x of sp) md.push(`| ${x.n} | ${+x.v.toFixed(3)} ${x.u} | <= ${x.t} ${x.u} | ${x.v <= x.t ? 'yes' : '**NO**'} |`);
 md.push('', '## Specs (outcome, diff size, notes)', '', '| id | case | fixture | outcome | diff | not-scaled notes |', '|---|---|---|---|---|---|');

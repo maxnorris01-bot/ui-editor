@@ -69,3 +69,12 @@ Only width media features are evaluated. width and height are never scaled (appl
 with a note). Conditions that span both environments are scaled but not pin-protected. Linked offsets
 and reorders still refuse when a media rule sets `transform`. Appended lines go before the closing
 tag of the last `<style>` block; a one-line `<style>` block changes that line.
+
+## Amendment (iteration 2, 2026-11-12)
+
+Where the last stylesheet (the last `<style>` block or the companion CSS) ends with a
+`/*# sourceMappingURL=... */` comment, optionally followed only by whitespace, the appended rules go
+immediately before that comment, on their own lines if the comment is on its own line. The comment
+stays the last thing in the file and no existing line changes. Known limit: a file with no such comment
+and no trailing newline still gets the old behaviour (a newline, then the rules), which changes that
+file's last line in a line diff. `freelancer-index`'s `css/styles.css` is exactly that case.

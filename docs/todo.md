@@ -21,10 +21,15 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 
 <!-- Worth doing if the moment presents itself; not worth planning around. -->
 
+## Next (decision needed from Max)
+
+- [ ] Responsive iteration 2 left R09 failing E5 (`styles.css` has no trailing newline and no source-map comment). Options in `docs/sessions/2026-11-12-responsive-iter2.md`.
+
 ## Completed (most recent first)
 
 <!-- Move items here when done, newest first, with a one-line note on what happened. -->
 
+- [x] Responsive iteration 2 (2026-11-12): amendment 1 (`c1096f8`), source-map placement fix, run `iter2`: R01 PASS (amended E4), R09 FAIL (E5), items 2 to 6 met. Verdict FAIL.
 - [x] Responsive edits (2026-11-11): rules/specs locked (`51a861f`), engine `engine/src/responsive.ts`, harness `run-responsive.ts`; run 1 FAIL (item 1), items 2 to 5 met.
 - [x] Real-page check (2026-11-10): rules and specs locked (`ad1c999`), harness `harness/run-realpage.ts`, run 1 and run 2 in `realpage-check/results/`.
 - [x] Step 4 (2026-11-10): thresholds committed (`fd51815`), `harness/run-gate.ts` written, no-op round

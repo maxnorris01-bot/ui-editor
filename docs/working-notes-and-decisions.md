@@ -93,6 +93,18 @@ new behaviour (inline style for a linked colour edit).
   one changed last line when a rule is appended (R09). The old `@media` refusal is gone.
 - SVG goes through parse5's HTML parser; SVG that is only valid as XML may be split differently.
 
+## Responsive iteration 2 (2026-11-12)
+
+- **Decision (Max, 2026-11-12): amendment 1 to responsive E4.** The layout-resolved allowance now also
+  covers preceding siblings (and their descendants) of the target and its ancestors when they share a
+  `tr` or a flex or grid container. Why: cells and items in one line share cross-axis size, no engine can
+  avoid it. Made after seeing R01 fail; R01 under the locked rule stays FAIL in run 1. Text:
+  `docs/responsive-rules-amendment-1.md`.
+- **Decision (Max): engine places override rules before a trailing `/*# sourceMappingURL */` comment.**
+  Done and tested. It does NOT help R09: `css/styles.css` has no such comment and no trailing newline, so
+  the old behaviour (append after the last byte) still applies and E5 still fails by one changed line.
+  Iteration 2 therefore FAILS item 1. Open decision for Max: see the session note.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.
