@@ -78,3 +78,16 @@ immediately before that comment, on their own lines if the comment is on its own
 stays the last thing in the file and no existing line changes. Known limit: a file with no such comment
 and no trailing newline still gets the old behaviour (a newline, then the rules), which changes that
 file's last line in a line diff. `freelancer-index`'s `css/styles.css` is exactly that case.
+
+## Amendment (size scaling, 2026-11-12)
+
+Linked `width` and `height` edits now follow the ratio rules (`docs/size-scaling-rules.md`). With E the edited
+environment and O the other: the new value is written as a scoped rule inside E's condition; if the cascade
+winner at O's reference width (390 or 1280) is a fixed px, rem or em length, or a numeric `width`/`height`
+attribute, it is multiplied by the ratio and written inside O's condition (one unconditional rule when both
+values come out equal); otherwise O is left alone and a note says why. A px width gets `max-width: 100%` in
+its rule only when the element's computed `max-width` there is `none`. Unlinked edits, moves and SVG are
+unchanged. A non-px new value, no usable old value or no stylesheet falls back to the old behaviour. `!important`
+in a matching page rule refuses. Known defect found by the regression run: the new path does not write
+`flex-basis` for a flex item with a non-auto `flex-basis` (the old `placeHtml` did), which fails gate edit E14.
+

@@ -1,0 +1,11 @@
+PASS
+Scorer check for docs/size-scaling-rules.md, run before any engine change (harness/run-responsive.ts with SUITE=size, harness/run-realpage.ts).
+Each control is an export built on purpose to be wrong; numbers are specs (of 16) or edits failing each rule.
+- unchanged file (noop): fails E2 and E3 on all 16 size specs; real-page HTML 12/12 and SVG 8/8 fail E2 and E3.
+- extra CSS rules changing other elements (collateral): fails E4 on 16/16; real-page HTML 12/12 and SVG 8/8 fail E4.
+- one added space (reformat): fails E5 on 16/16; real-page HTML 12/12 and SVG 8/8 fail E5.
+- reference export (hand-written correct CSS, no engine): measured values match the Truth at every width in all 16 specs
+  (the only E2 reports were engine notes/refusals of the old engine, not measurements).
+- phone width wrongly equal to the desktop value (samewidth): fails E2 at @640 and @390 on 14 of 16 specs; the two others
+  are Z09 and Z12 (edited at the phone width, so the desktop value IS the phone Truth) and Z13 (the old engine refused it).
+- width overflows the phone container (overflow, 3000px): fails E2 at @640 and @390 on all 16.

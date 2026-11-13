@@ -115,6 +115,15 @@ new behaviour (inline style for a linked colour edit).
   needed to get there; the README should say so.
 - `docs/known-limits.md` collects every limit found so far for the README.
 
+## Size scaling (2026-11-12)
+
+- **Decision (Max, 2026-11-12):** resizing keeps the same ratio rules as font size; moves stay unlinked in v1.
+  Rules, fixtures and 16 specs locked in `909459a` (`docs/size-scaling-rules.md`).
+- **Run 1 (size1): FAIL.** The 16 new specs all pass, but the regression missed: gate 39/40. E14 (width on a flex
+  item with `flex: 0 0 240px`) stays at 240 px because the new path does not write `flex-basis` as the old path did.
+  Everything else met the pass line. Per the brief there is no second engine change without Max's decision; the
+  cheapest next test is to reuse the old flex-basis handling in the new path and re-run only the gate and size suites.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.

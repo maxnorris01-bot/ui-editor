@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-12T05:26:25.001Z",
+  "measuredAt": "2026-11-13T05:54:08.038Z",
   "runsPerFile": 20,
   "machine": {
     "model": "Mac17,4",
@@ -15,23 +15,23 @@
     "playwright": "1.65.0"
   },
   "bundle": {
-    "rawBytes": 267606,
-    "gzipBytes": 76171
+    "rawBytes": 270450,
+    "gzipBytes": 76996
   },
   "largestFixture": {
     "file": "large-page.html",
     "bytes": 14712,
     "elements": 251,
     "previewMs": {
-      "median": 2.300000011920929,
-      "min": 2,
-      "max": 8,
-      "first": 4.099999964237213
+      "median": 2.5,
+      "min": 2.199999988079071,
+      "max": 5.199999988079071,
+      "first": 5.199999988079071
     },
     "applyMs": {
-      "median": 0.06974999994039535,
-      "min": 0.06599999994039535,
-      "max": 0.08950000017881393
+      "median": 0.07,
+      "min": 0.06699999988079071,
+      "max": 0.08900000005960465
     },
     "applyStatus": "ok",
     "applyRefusal": ""
@@ -42,15 +42,15 @@
       "bytes": 2054,
       "elements": 29,
       "previewMs": {
-        "median": 1.5,
-        "min": 1.199999988079071,
+        "median": 1.5499999821186066,
+        "min": 1.2000000476837158,
         "max": 7.399999976158142,
         "first": 7.399999976158142
       },
       "applyMs": {
-        "median": 0.007999999970197678,
+        "median": 0.00800000011920929,
         "min": 0.0075,
-        "max": 0.017999999821186066
+        "max": 0.01800000011920929
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -60,15 +60,15 @@
       "bytes": 1547,
       "elements": 34,
       "previewMs": {
-        "median": 1.199999988079071,
+        "median": 1.300000011920929,
         "min": 1.0999999642372131,
-        "max": 2.199999988079071,
-        "first": 2.199999988079071
+        "max": 2.200000047683716,
+        "first": 2.200000047683716
       },
       "applyMs": {
-        "median": 0.006250000149011612,
-        "min": 0.0054999998211860655,
-        "max": 0.010500000119209289
+        "median": 0.006500000059604645,
+        "min": 0.00550000011920929,
+        "max": 0.010999999940395355
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -78,15 +78,15 @@
       "bytes": 1253,
       "elements": 18,
       "previewMs": {
-        "median": 1.899999976158142,
-        "min": 1.7999999523162842,
-        "max": 5.300000011920929,
-        "first": 3.399999976158142
+        "median": 1.9000000357627869,
+        "min": 1.7000000476837158,
+        "max": 3.5,
+        "first": 3.5
       },
       "applyMs": {
         "median": 0.0009999999403953552,
         "min": 0,
-        "max": 0.0019999998807907105
+        "max": 0.0030000001192092896
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -96,14 +96,14 @@
       "bytes": 1584,
       "elements": 15,
       "previewMs": {
-        "median": 1.100000023841858,
+        "median": 1.199999988079071,
         "min": 1,
-        "max": 1.800000011920929,
-        "first": 1.800000011920929
+        "max": 1.5,
+        "first": 1.5
       },
       "applyMs": {
         "median": 0.005,
-        "min": 0.003499999940395355,
+        "min": 0.004000000059604645,
         "max": 0.01
       },
       "applyStatus": "ok",
@@ -114,15 +114,15 @@
       "bytes": 14712,
       "elements": 251,
       "previewMs": {
-        "median": 2.300000011920929,
-        "min": 2,
-        "max": 8,
-        "first": 4.099999964237213
+        "median": 2.5,
+        "min": 2.199999988079071,
+        "max": 5.199999988079071,
+        "first": 5.199999988079071
       },
       "applyMs": {
-        "median": 0.06974999994039535,
-        "min": 0.06599999994039535,
-        "max": 0.08950000017881393
+        "median": 0.07,
+        "min": 0.06699999988079071,
+        "max": 0.08900000005960465
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -132,15 +132,15 @@
       "bytes": 744,
       "elements": 19,
       "previewMs": {
-        "median": 1.100000023841858,
+        "median": 1.199999988079071,
         "min": 1,
-        "max": 2.300000011920929,
-        "first": 2.300000011920929
+        "max": 2.200000047683716,
+        "first": 2.200000047683716
       },
       "applyMs": {
-        "median": 0.004500000029802323,
-        "min": 0.003999999761581421,
-        "max": 0.005999999940395355
+        "median": 0.004500000178813935,
+        "min": 0.004000000059604645,
+        "max": 0.006500000059604645
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -151,13 +151,13 @@
       "elements": 18,
       "previewMs": {
         "median": 1.100000023841858,
-        "min": 1,
-        "max": 1.899999976158142,
-        "first": 1.899999976158142
+        "min": 1.0999999642372131,
+        "max": 2.200000047683716,
+        "first": 2.200000047683716
       },
       "applyMs": {
-        "median": 0.005,
-        "min": 0.004000000059604645,
+        "median": 0.004500000178813935,
+        "min": 0.003999999761581421,
         "max": 0.006500000059604645
       },
       "applyStatus": "ok",
@@ -168,15 +168,15 @@
       "bytes": 917,
       "elements": 9,
       "previewMs": {
-        "median": 1.800000011920929,
-        "min": 1.5,
-        "max": 5.100000023841858,
-        "first": 2.099999964237213
+        "median": 1.7999999821186066,
+        "min": 1.600000023841858,
+        "max": 2.399999976158142,
+        "first": 2.399999976158142
       },
       "applyMs": {
-        "median": 0.0004999999701976776,
+        "median": 0.0005000001192092896,
         "min": 0,
-        "max": 0.0010000002384185792
+        "max": 0.0009999999403953552
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -186,15 +186,15 @@
       "bytes": 1257,
       "elements": 19,
       "previewMs": {
-        "median": 1.0999999642372131,
-        "min": 0.8999999761581421,
-        "max": 1.2999999523162842,
-        "first": 1.199999988079071
+        "median": 1.1500000059604645,
+        "min": 1,
+        "max": 1.399999976158142,
+        "first": 1.399999976158142
       },
       "applyMs": {
         "median": 0.004000000059604645,
         "min": 0.003499999940395355,
-        "max": 0.017999999821186066
+        "max": 0.006500000059604645
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -206,32 +206,32 @@
       "previewMs": {
         "median": 1.199999988079071,
         "min": 1.0999999642372131,
-        "max": 4.899999976158142,
-        "first": 4.899999976158142
+        "max": 5,
+        "first": 2
       },
       "applyMs": {
-        "median": 0.003999999910593033,
+        "median": 0.004000000059604645,
         "min": 0.003499999940395355,
-        "max": 0.00550000011920929
+        "max": 0.005999999940395355
       },
       "applyStatus": "ok",
       "applyRefusal": ""
     }
   ],
   "overall": {
-    "medianOfMedians_previewMs": 1.199999988079071,
-    "worstMedian_previewMs": 2.300000011920929,
-    "medianOfMedians_applyMs": 0.004750000014901161,
-    "worstMedian_applyMs": 0.06974999994039535
+    "medianOfMedians_previewMs": 1.25,
+    "worstMedian_previewMs": 2.5,
+    "medianOfMedians_applyMs": 0.004500000178813935,
+    "worstMedian_applyMs": 0.07
   },
   "scaling": {
-    "measuredAt": "2026-11-12T05:26:59.838Z",
+    "measuredAt": "2026-11-13T05:55:24.285Z",
     "runs": 20,
     "1x": {
       "bytes": 14712,
       "elements": 251,
-      "previewMedianMs": 2.5,
-      "applyMedianMs": 0.06899999991059302,
+      "previewMedianMs": 2.5499999821186066,
+      "applyMedianMs": 0.0675,
       "applyStatus": "ok",
       "threshold": "report only",
       "pass": null
@@ -239,8 +239,8 @@
     "10x": {
       "bytes": 98410,
       "elements": 2447,
-      "previewMedianMs": 7.600000023841858,
-      "applyMedianMs": 0.5470000000298023,
+      "previewMedianMs": 7.5,
+      "applyMedianMs": 0.545,
       "applyStatus": "ok",
       "threshold": {
         "previewMs": 250,
@@ -251,8 +251,8 @@
     "100x": {
       "bytes": 937210,
       "elements": 24407,
-      "previewMedianMs": 62.39999997615814,
-      "applyMedianMs": 7.503499999791384,
+      "previewMedianMs": 63.75,
+      "applyMedianMs": 7.51,
       "applyStatus": "ok",
       "threshold": "report only",
       "pass": null

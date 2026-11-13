@@ -227,6 +227,51 @@ Refusals detected: 0.
 
 ### Verdict, run sbase: **PASS**
 
+## Run size1
+
+### Per edit type
+
+| type | passed | of | line | met |
+|---|---|---|---|---|
+| T1 | 10 | 10 | >= 9 | yes |
+| T2 | 9 | 10 | >= 9 | yes |
+| T3 | 10 | 10 | >= 9 | yes |
+| T4 | 10 | 10 | >= 9 | yes |
+| total | 39 | 40 | >= 36 | yes |
+
+### Per rule (edits passing the rule)
+
+| rule | passed | of |
+|---|---|---|
+| E1 | 40 | 40 |
+| E2 | 39 | 40 |
+| E3 | 40 | 40 |
+| E4 | 40 | 40 |
+| E5 | 40 | 40 |
+
+### Per file
+
+| file | edits passed | of | no-op round trip |
+|---|---|---|---|
+| flex-layout.html | 3 | 4 | byte-identical, loads |
+| grid-table.html | 4 | 4 | byte-identical, loads |
+| grouped-transforms.svg | 4 | 4 | byte-identical, loads |
+| inline-styles.html | 4 | 4 | byte-identical, loads |
+| large-page.html | 4 | 4 | byte-identical, loads |
+| linked-css.html | 4 | 4 | byte-identical, loads |
+| messy.html | 4 | 4 | byte-identical, loads |
+| shapes-text.svg | 4 | 4 | byte-identical, loads |
+| shared-classes.html | 4 | 4 | byte-identical, loads |
+| style-block.html | 4 | 4 | byte-identical, loads |
+
+### Failed edits (1)
+
+- **E14** flex-layout.html T2: E2 (#sidebar width: got "240px", want "300px" | dw: got 0, want 60)
+
+Refusals detected: 0.
+
+### Verdict, run size1: **PASS**
+
 ## Speed (one build, `results/timing.json`)
 
 | metric | measured | threshold | met |
@@ -241,4 +286,4 @@ Refusals detected: 0.
 | 100x large-page apply + export, median | 7.503 ms | report only | n/a |
 | largest fixture | large-page.html, 14712 B | report only | n/a |
 
-Verdicts: run 1: PASS; run resp: PASS; run iter2: PASS; run rescore: PASS; run sbase: PASS
+Verdicts: run 1: PASS; run resp: PASS; run iter2: PASS; run rescore: PASS; run sbase: PASS; run size1: PASS
