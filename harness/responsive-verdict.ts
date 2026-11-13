@@ -75,7 +75,7 @@ md.push(`| 2. new specs | ${pass2} PASS, ${sOut.filter((x) => x.o === 'REFUSED')
 md.push(`| 3. regression | gate ${gatePass}/40, other real-page ${realPass}/18, byte-identical ${regress.byteIdentical}/${regress.noMediaRule} | all | ${ok3 ? 'yes' : '**NO**'} |`);
 md.push(`| 4. no-op round trips | ${rtAll.filter((r) => r.pass === 'true').length} of ${rtAll.length} byte-identical (${rtGate.length} gate, ${rtReal.length} real, ${rtResp.length} new) | all | ${ok4 ? 'yes' : '**NO**'} |`);
 md.push(`| 5. speed thresholds | see below | all met | ${ok5 ? 'yes' : '**NO**'} |`, '');
-md.push('', `R01 under the locked E4: ${e4Locked('R01')}; under amended E4 (scored): ${outcome(resp, 'R01')}. R09 (E4 locked ${e4Locked('R09')}, amended ${resp.filter((r) => r.id === 'R09' && r.rule === 'E4').every((r) => r.pass === 'true') ? 'PASS' : 'FAIL'}): ${outcome(resp, 'R09')}.`, '');
+md.push('', `R01 under the locked E4: ${e4Locked('R01')}; under amended E4 (scored): ${outcome(resp, 'R01')}. R09 (E5 locked ${resp.filter((r) => r.id === 'R09' && r.rule === 'E5L').every((r) => r.pass === 'true') ? 'PASS' : 'FAIL'}, E5 amended ${resp.filter((r) => r.id === 'R09' && r.rule === 'E5').every((r) => r.pass === 'true') ? 'PASS' : 'FAIL'}; E4 locked ${e4Locked('R09')}, amended ${resp.filter((r) => r.id === 'R09' && r.rule === 'E4').every((r) => r.pass === 'true') ? 'PASS' : 'FAIL'}): ${outcome(resp, 'R09')}.`, '');
 md.push('### Speed', '', '| metric | measured | threshold | met |', '|---|---|---|---|');
 for (const x of sp) md.push(`| ${x.n} | ${+x.v.toFixed(3)} ${x.u} | <= ${x.t} ${x.u} | ${x.v <= x.t ? 'yes' : '**NO**'} |`);
 md.push('', '## Specs (outcome, diff size, notes)', '', '| id | case | fixture | outcome | diff | not-scaled notes |', '|---|---|---|---|---|---|');

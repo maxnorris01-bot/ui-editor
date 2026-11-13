@@ -105,6 +105,16 @@ new behaviour (inline style for a linked colour edit).
   the old behaviour (append after the last byte) still applies and E5 still fails by one changed line.
   Iteration 2 therefore FAILS item 1. Open decision for Max: see the session note.
 
+## Responsive re-score (2026-11-12)
+
+- **Decision (Max): amendment 2 to E5.** A missing final newline in the original, with the export appending
+  content that starts with exactly one newline, no longer counts as a changed last line. Why: a line diff
+  reports the unchanged text of the last line as changed only because of the end-of-file newline. Text:
+  `docs/responsive-rules-amendment-2.md`. R09 under the locked E5 stays FAIL (iteration 2).
+- Re-score with an unchanged engine: PASS. Only R09's E5 changed. Two post-hoc amendments (E4, E5) were
+  needed to get there; the README should say so.
+- `docs/known-limits.md` collects every limit found so far for the README.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.
