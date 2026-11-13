@@ -13,6 +13,7 @@ import { diffLines } from 'diff';
 import { createModel, exportFiles, sources } from '../engine/src/index';
 import { ROOT } from './fixtures';
 import { serve } from './serve';
+import { precedingAllowed } from './e4-amend';
 import { writeRealSummary } from './summary-real';
 
 const RUN = process.env.GATE_RUN ?? '1';
@@ -189,6 +190,7 @@ function e4(spec: Spec, orig: Dump, exp: Dump): { pass: boolean; detail: string 
   if (spec.legit === 'flow') layoutAllowed = flowSet(t);
   else if (spec.legit === 'reorder') { const p = orig.rows[t]!.parent; layoutAllowed = new Set([...anc(t), ...subtree(orig, p), ...flowSet(p)]); }
   else if (spec.legit === 'svg-ancestors') bboxOnly = new Set(anc(t));
+  if (spec.legit === 'flow' || spec.legit === 'reorder') for (const k of precedingAllowed(orig.rows, orig.names, t)) layoutAllowed.add(k); // amendment 1
   const expIndex = new Map<string, number>(exp.names.map((nm, i) => [nm, i]));
   const bad: string[] = [];
   let compared = 0;

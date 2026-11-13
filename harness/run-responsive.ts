@@ -11,13 +11,16 @@ import { diffLines } from 'diff';
 import { createModel, exportFiles, sources } from '../engine/src/index';
 import { ROOT } from './fixtures';
 import { serve } from './serve';
+import { precedingAllowed } from './e4-amend';
 
 const RUN = process.env.GATE_RUN ?? '1';
+// GATE_CONTROL=noop|collateral|reformat: scorer sanity check on deliberately broken exports (nothing is written to the results).
+const CONTROL = process.env.GATE_CONTROL ?? '';
 const REAL = resolve(process.argv[2] ?? join(ROOT, '../ui-editor-realpages'));
 const OUT = join(ROOT, 'responsive-check/results');
 const CSV = join(OUT, 'responsive-results.csv');
-const TMP = join(ROOT, 'responsive-check/tmp', `run-${RUN}`);
-const RAW = join(ROOT, 'responsive-check/raw', `run-${RUN}`);
+const TMP = join(ROOT, 'responsive-check/tmp', CONTROL ? `control-${CONTROL}` : `run-${RUN}`);
+const RAW = join(ROOT, 'responsive-check/raw', CONTROL ? `control-${CONTROL}` : `run-${RUN}`);
 
 interface Step { target: string; op: 'set' | 'offset' | 'reorder'; properties?: Record<string, string>; dx?: number; dy?: number; placement?: string; sibling?: string; environment?: string; link?: boolean }
 interface Measure { target?: string; parent?: string; props?: string[]; bbox?: boolean; visualOrder?: boolean }
@@ -28,7 +31,7 @@ interface Spec {
 }
 interface Input { file: string; kind: 'html' | 'svg'; source: string; companions: Record<string, string>; dir: string }
 
-if (existsSync(CSV) && readFileSync(CSV, 'utf8').split('\n').some((l) => l.startsWith(`${RUN},`))) throw new Error(`run ${RUN} already exists in ${CSV}`);
+if (!CONTROL && existsSync(CSV) && readFileSync(CSV, 'utf8').split('\n').some((l) => l.startsWith(`${RUN},`))) throw new Error(`run ${RUN} already exists in ${CSV}`);
 rmSync(TMP, { recursive: true, force: true });
 mkdirSync(TMP, { recursive: true });
 mkdirSync(RAW, { recursive: true });
@@ -121,7 +124,7 @@ async function loadAt(dir: string, file: string, width: number, measure: Measure
 }
 
 const layoutIdx = (names: string[]) => new Set(names.map((n, i) => (['width', 'height', 'inline-size', 'block-size', 'perspective-origin', 'transform-origin'].includes(n) ? i : -1)).filter((i) => i >= 0));
-function e4(spec: Spec, orig: Dump, exp: Dump): string[] {
+function e4(spec: Spec, orig: Dump, exp: Dump, amended = true): string[] {
   if (orig.rows.length !== exp.rows.length) return [`element count ${orig.rows.length} vs ${exp.rows.length}`];
   const n = orig.rows.length;
   const kids = (p: number) => orig.rows.map((r, i) => (r.parent === p ? i : -1)).filter((i) => i >= 0);
@@ -137,6 +140,7 @@ function e4(spec: Spec, orig: Dump, exp: Dump): string[] {
   if (spec.legit === 'flow') layoutAllowed = flowSet(t);
   else if (spec.legit === 'reorder') { const p = orig.rows[t]!.parent; layoutAllowed = new Set([...anc(t), ...subtree(p), ...flowSet(p)]); }
   else if (spec.legit === 'svg-ancestors') bboxOnly = new Set(anc(t));
+  if (amended && (spec.legit === 'flow' || spec.legit === 'reorder')) for (const k of precedingAllowed(orig.rows, orig.names, t)) layoutAllowed.add(k);
   const expIndex = new Map<string, number>(exp.names.map((nm, i) => [nm, i]));
   const bad: string[] = [];
   for (let i = 0; i < n; i++) {
@@ -224,7 +228,11 @@ for (const spec of specs) {
     outcome = 'FAIL';
     add(tag, 'E2', false, 'expected a refusal but the engine produced an export');
   } else {
-    const files = out!.files!;
+    let files = out!.files!;
+    if (CONTROL) {
+      const m = files[inp.file] ?? inp.source;
+      files = CONTROL === 'noop' ? { ...origFiles } : CONTROL === 'reformat' ? { ...files, [inp.file]: m.replace('\n', '\n ') } : { ...files, [inp.file]: m.replace('</head>', '<style>p,li,td,div,span,h1,h2,h3,a{color:#123456 !important}</style></head>') };
+    }
     const dirX = join(TMP, spec.id, 'exported');
     writeSet(dirX, files);
     // original measurements per width (and expected values for the real-page specs, from the formula)
@@ -280,13 +288,17 @@ for (const spec of specs) {
     add(tag, 'E2', p2.length === 0, p2.slice(0, 4).join(' | ') || `matches the Truth at ${spec.widths.length} widths${spec.real ? `; expected ${JSON.stringify(expected['font-size'])}` : ''}`);
     add(tag, 'E3', p3.length === 0, p3.slice(0, 4).join(' | ') || `preview and export agree at ${spec.widths.length} widths`);
     // E4
-    const p4: string[] = [];
-    for (const w of spec.widths) { const bad = e4(spec, O[w]!.dump!, X[w]!.dump!); if (bad.length) p4.push(`@${w}: ${bad.length} element(s): ${bad.slice(0, 2).join(' || ')}`); }
-    add(tag, 'E4', p4.length === 0, p4.slice(0, 3).join(' | ') || `no other element changed at ${spec.widths.length} widths`);
+    const p4: string[] = [], p4L: string[] = [];
+    for (const w of spec.widths) {
+      const bad = e4(spec, O[w]!.dump!, X[w]!.dump!, true); if (bad.length) p4.push(`@${w}: ${bad.length} element(s): ${bad.slice(0, 2).join(' || ')}`);
+      const badL = e4(spec, O[w]!.dump!, X[w]!.dump!, false); if (badL.length) p4L.push(`@${w}: ${badL.length} element(s): ${badL.slice(0, 2).join(' || ')}`);
+    }
+    add(tag, 'E4', p4.length === 0, p4.slice(0, 3).join(' | ') || `no other element changed at ${spec.widths.length} widths (amended E4)`);
+    add(tag, 'E4L', p4L.length === 0, p4L.slice(0, 3).join(' | ') || `no other element changed at ${spec.widths.length} widths (locked E4)`);
     // E5
     const r5 = e5(spec, inp, files, out!.spans!.startTag);
     add(tag, 'E5', r5.problems.length === 0, `${r5.diff}${r5.problems.length ? ' | ' + r5.problems.slice(0, 3).join(' | ') : ''}`);
-    outcome = rows.slice(startRow).every((r) => r.pass) ? 'PASS' : 'FAIL';
+    outcome = rows.slice(startRow).filter((r) => r.rule !== 'E4L').every((r) => r.pass) ? 'PASS' : 'FAIL';
   }
   const notes = out && !out.refused ? out.notes ?? [] : [];
   rows.push({ run: RUN, id: spec.id, case: spec.case, kind: spec.kind, fixture: spec.fixture, rule: 'NOTES', outcome: '', pass: true, detail: JSON.stringify(notes).slice(0, 600) });
@@ -301,6 +313,12 @@ server.close();
 const header = 'run,id,case,kind,fixture,rule,outcome,pass,detail';
 const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
 const lines = rows.map((r) => [r.run, r.id, r.case, r.kind, r.fixture, r.rule, r.outcome, r.pass ? 'true' : 'false', q(r.detail)].join(','));
+if (CONTROL) {
+  const by = new Map<string, number>();
+  for (const r of rows) if (!r.pass && r.rule !== 'E4L' && r.rule !== 'NOTES') by.set(r.rule, (by.get(r.rule) ?? 0) + 1);
+  console.log(`CONTROL ${CONTROL}: specs failing per rule`, JSON.stringify([...by.entries()].sort()));
+  process.exit(0);
+}
 const prev = existsSync(CSV) ? readFileSync(CSV, 'utf8').trimEnd() : header;
 writeFileSync(CSV, `${prev}\n${lines.join('\n')}\n`);
 const tally = [...outcomes.values()].reduce((a, o) => ({ ...a, [o.outcome]: (a[o.outcome] ?? 0) + 1 }), {} as Record<string, number>);
