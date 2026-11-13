@@ -242,3 +242,49 @@ describe('listUnlinked', () => {
     expect(listUnlinked(st).map((x) => x.selector)).toEqual(['/a', '/b']);
   });
 });
+
+describe('override rules and a trailing source-map comment', () => {
+  const edit = (e: ReturnType<typeof env>) => e.run({ op: 'set', target: e.at('#a'), properties: { 'font-size': '48px' } });
+  const NEW = '#a { font-size: 48px; }\n@media (max-width: 640px) { #a { font-size: 19.2px; } }\n';
+  const MAP = '/*# sourceMappingURL=site.css.map */';
+
+  it('companion CSS: puts the rules before the comment on its own line, with a trailing newline', () => {
+    const css = `${CSS}\n${MAP}\n`;
+    const e = env('<html><head><link rel="stylesheet" href="s.css"></head><body><h1 id="a">T</h1></body></html>', 'html', { 's.css': css }, fs);
+    const out = e.files(edit(e))['s.css']!;
+    expect(out).toBe(`${CSS}\n${NEW}${MAP}\n`);
+    expect(out.endsWith(`${MAP}\n`)).toBe(true);
+  });
+  it('companion CSS: same without a trailing newline, the comment line stays byte-identical', () => {
+    const css = `${CSS}\n${MAP}`;
+    const e = env('<html><head><link rel="stylesheet" href="s.css"></head><body><h1 id="a">T</h1></body></html>', 'html', { 's.css': css }, fs);
+    const out = e.files(edit(e))['s.css']!;
+    expect(out).toBe(`${CSS}\n${NEW}${MAP}`);
+  });
+  it('companion CSS: a comment on the same line as the last rule gets the rules inserted before it', () => {
+    const css = `${CSS}${MAP}`;
+    const e = env('<html><head><link rel="stylesheet" href="s.css"></head><body><h1 id="a">T</h1></body></html>', 'html', { 's.css': css }, fs);
+    const out = e.files(edit(e))['s.css']!;
+    expect(out).toBe(`${CSS}${NEW}${MAP}`);
+  });
+  it('companion CSS without a comment keeps the old behaviour (with and without a trailing newline)', () => {
+    const mk = (css: string) => { const e = env('<html><head><link rel="stylesheet" href="s.css"></head><body><h1 id="a">T</h1></body></html>', 'html', { 's.css': css }, fs); return e.files(edit(e))['s.css']!; };
+    expect(mk(`${CSS}\n`)).toBe(`${CSS}\n${NEW}`);
+    expect(mk(CSS)).toBe(`${CSS}\n${NEW}`);
+  });
+  it('a similar comment that is not the last thing in the file is not treated as the source-map comment', () => {
+    const css = `${CSS}\n${MAP}\n.x { color: red; }\n`;
+    const e = env('<html><head><link rel="stylesheet" href="s.css"></head><body><h1 id="a">T</h1></body></html>', 'html', { 's.css': css }, fs);
+    expect(e.files(edit(e))['s.css']).toBe(`${css}${NEW}`);
+  });
+  it('<style> block: puts the rules before a trailing source-map comment', () => {
+    const src = page(`${CSS}\n${MAP}`, '<h1 id="a">T</h1>');
+    const e = env(src, 'html', {}, fs);
+    expect(e.out(edit(e))).toBe(src.replace(MAP, `${NEW}${MAP}`));
+  });
+  it('<style> block without a comment is unchanged behaviour', () => {
+    const src = page(CSS, '<h1 id="a">T</h1>');
+    const e = env(src, 'html', {}, fs);
+    expect(e.out(edit(e))).toBe(src.replace('\n</style>', `\n${NEW}</style>`));
+  });
+});

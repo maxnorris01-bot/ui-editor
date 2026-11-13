@@ -318,6 +318,12 @@ const lineText = (sel: string, l: RuleLine): string => {
 };
 
 /** Where the appended lines go: the page's last stylesheet (cascade order), before its closing tag. */
+/** Offset of a trailing `/*# sourceMappingURL=... *\/` comment (followed only by whitespace) in a stylesheet text, or -1. */
+export function sourceMapStart(text: string): number {
+  const m = /\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/.exec(text);
+  return m ? m.index : -1;
+}
+
 function appendCss(model: Model, lines: string[]): { patch: Patch; dom: DomOp } {
   const sheet = model.sheets[model.sheets.length - 1];
   if (!sheet) return no('no-stylesheet', 'the page has no <style> block or supplied stylesheet to add the override rules to');
@@ -330,11 +336,27 @@ function appendCss(model: Model, lines: string[]): { patch: Patch; dom: DomOp } 
     const indent = /^[ \t]*/.exec(lastLine)![0];
     const lineStart = src.lastIndexOf('\n', el.endTagStart - 1) + 1;
     const own = /^[ \t]*$/.test(src.slice(lineStart, el.endTagStart)) && lineStart > el.startTagEnd - 1;
+    const smap = sourceMapStart(content);
+    if (smap >= 0) {
+      const mapAt = el.startTagEnd + smap;
+      const mapLine = src.lastIndexOf('\n', mapAt - 1) + 1;
+      const alone = mapLine > el.startTagEnd - 1 && /^[ \t]*$/.test(src.slice(mapLine, mapAt));
+      const text = alone ? lines.map((l) => `${indent}${l}\n`).join('') : `${lines.map((l) => l).join('\n')}\n`;
+      const at = alone ? mapLine : mapAt;
+      return { patch: { file: model.primary.file, start: at, end: at, text }, dom: { type: 'css', index: sheet.elementIndex, text: `${lines.join('\n')}\n` } };
+    }
     const at = own ? lineStart : el.endTagStart;
     const text = own ? lines.map((l) => `${indent}${l}\n`).join('') : `\n${lines.map((l) => `${indent}${l}`).join('\n')}\n`;
     return { patch: { file: model.primary.file, start: at, end: at, text }, dom: { type: 'css', index: sheet.elementIndex, text: `${lines.join('\n')}\n` } };
   }
   const src = model.companions[sheet.file]!.source;
+  const smap = sourceMapStart(src);
+  if (smap >= 0) {
+    const mapLine = src.lastIndexOf('\n', smap - 1) + 1;
+    const alone = /^[ \t]*$/.test(src.slice(mapLine, smap));
+    const at = alone ? mapLine : smap;
+    return { patch: { file: sheet.file, start: at, end: at, text: `${lines.join('\n')}\n` }, dom: { type: 'css', index: sheet.elementIndex, text: `${lines.join('\n')}\n` } };
+  }
   const text = `${src === '' || src.endsWith('\n') ? '' : '\n'}${lines.join('\n')}\n`;
   return { patch: { file: sheet.file, start: src.length, end: src.length, text }, dom: { type: 'css', index: sheet.elementIndex, text: `${lines.join('\n')}\n` } };
 }
