@@ -1,0 +1,627 @@
+{
+  "version": 1,
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "tolerance_px": 1,
+  "inputDir": "../ui-editor-realpages",
+  "companions": {
+    "freelancer-index.html": {
+      "css/styles.css": "css/styles.css"
+    }
+  },
+  "edits": [
+    {
+      "id": "R01",
+      "file": "leemunroe-email.html",
+      "type": "T1",
+      "target": "td.wrapper > p:nth-of-type(1)",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "24px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "td.wrapper > p:nth-of-type(1)",
+            "property": "font-size",
+            "value": "24px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "leemunroe-email.html"
+      ],
+      "why": "All text elements tie at 16px; first in document order with a rendered box and own text is the 'Hi there' paragraph.",
+      "styleSource": "type selector rule `p { font-size: 16px }` in the <style> block; the element has no inline style. The `.main p` rule that mentions font-size is inside @media (max-width: 640px), inactive at 1280 px."
+    },
+    {
+      "id": "R02",
+      "file": "leemunroe-email.html",
+      "type": "T2",
+      "target": "table.body",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "height": "500px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "table.body",
+            "property": "height",
+            "value": "500px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "table.body",
+          "dw": 0,
+          "dh": 86
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "leemunroe-email.html"
+      ],
+      "why": "Largest candidate container by bounding-box area at 1280x800 (1280 x 414): the outer layout table.",
+      "styleSource": "class rule `.body` plus type rule `table` (width: 100%) in the <style> block; no inline style; table has legacy attributes border/cellpadding/cellspacing."
+    },
+    {
+      "id": "R03",
+      "file": "leemunroe-email.html",
+      "type": "T3",
+      "target": "td.wrapper > p:nth-of-type(4)",
+      "edit": {
+        "op": "reorder",
+        "move": "td.wrapper > p:nth-of-type(4)",
+        "placement": "before",
+        "sibling": "td.wrapper > p:nth-of-type(1)"
+      },
+      "expected": {
+        "order": {
+          "parent": "td.wrapper",
+          "key": {
+            "attr": "text",
+            "length": 14
+          },
+          "values": [
+            "Good luck! Hop",
+            "Hi there",
+            "Sometimes you ",
+            "Call To Action",
+            "This is a real"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "leemunroe-email.html"
+      ],
+      "why": "A paragraph with four siblings in td.wrapper; the last paragraph is moved before the first.",
+      "styleSource": "No styling involved. The paragraphs are separate source lines; siblings are whitespace-separated."
+    },
+    {
+      "id": "R04",
+      "file": "leemunroe-email.html",
+      "type": "T4",
+      "target": "a[target=\"_blank\"]",
+      "edit": {
+        "op": "offset",
+        "dx": 24,
+        "dy": 16
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "a[target=\"_blank\"]",
+          "dx": 24,
+          "dy": 16,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "leemunroe-email.html"
+      ],
+      "why": "The only button: the 'Call To Action' link, display: inline-block through the `.btn a` rule.",
+      "styleSource": "class rules `.btn a` and `.btn-primary a` in the <style> block; no inline style, no existing transform."
+    },
+    {
+      "id": "R05",
+      "file": "mailgun-action.html",
+      "type": "T1",
+      "target": "td.content td.content > p:nth-of-type(1)",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "22px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "td.content td.content > p:nth-of-type(1)",
+            "property": "font-size",
+            "value": "22px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "mailgun-action.html"
+      ],
+      "why": "All text elements tie at 16px; first in document order with a rendered box and own text is the 'Please confirm' paragraph.",
+      "styleSource": "own inline style (`font-size:16px`) on a very long source line (the whole content table sits on one line, over 2,000 characters)."
+    },
+    {
+      "id": "R06",
+      "file": "mailgun-action.html",
+      "type": "T2",
+      "target": "div[role=\"article\"]",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "height": "420px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "div[role=\"article\"]",
+            "property": "height",
+            "value": "420px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "div[role=\"article\"]",
+          "dw": 0,
+          "dh": 78
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "mailgun-action.html"
+      ],
+      "why": "Largest candidate container by bounding-box area at 1280x800 (1264 x 342): the div[role=article] wrapper.",
+      "styleSource": "own inline style (several font-size declarations, background-color) on a long line; no height declared yet."
+    },
+    {
+      "id": "R07",
+      "file": "mailgun-action.html",
+      "type": "T3",
+      "target": "td.content td.content > p:nth-of-type(2)",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "text-align": "right"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "td.content td.content > p:nth-of-type(2)",
+            "property": "text-align",
+            "value": "right"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "mailgun-action.html"
+      ],
+      "why": "A paragraph with three siblings; alignment edit (text-align: right).",
+      "styleSource": "text-align is not declared on the element: current value is the inherited/initial `start`; the ancestor cell chain uses legacy `align=\"center\"` attributes on td and table, and the element has its own inline style for colour and font."
+    },
+    {
+      "id": "R08",
+      "file": "mailgun-action.html",
+      "type": "T4",
+      "target": "td.content td.content",
+      "edit": {
+        "op": "offset",
+        "dx": 24,
+        "dy": 16
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "td.content td.content",
+          "dx": 24,
+          "dy": 16,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "mailgun-action.html"
+      ],
+      "why": "A table cell (the one holding the four paragraphs).",
+      "styleSource": "no inline style on the cell; the only rule naming `.content` is inside @media (prefers-color-scheme: dark), inactive in this load, and the cell sits under legacy align/valign/width attributes."
+    },
+    {
+      "id": "R09",
+      "file": "freelancer-index.html",
+      "type": "T1",
+      "target": "h1.masthead-heading",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "80px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "h1.masthead-heading",
+            "property": "font-size",
+            "value": "80px"
+          }
+        ]
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "freelancer-index.html",
+        "css/styles.css"
+      ],
+      "why": "Largest computed font-size at 1280 px is 64px, the masthead h1.",
+      "styleSource": "class rule in the companion stylesheet css/styles.css (and possibly a @media variant); no inline style."
+    },
+    {
+      "id": "R10",
+      "file": "freelancer-index.html",
+      "type": "T2",
+      "target": "#contact",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "padding": "120px 0"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#contact",
+            "property": "padding-top",
+            "value": "120px"
+          },
+          {
+            "selector": "#contact",
+            "property": "padding-bottom",
+            "value": "120px"
+          },
+          {
+            "selector": "#contact",
+            "property": "padding-left",
+            "value": "0px"
+          },
+          {
+            "selector": "#contact",
+            "property": "padding-right",
+            "value": "0px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "#contact",
+          "dw": 0,
+          "dh": 48
+        }
+      },
+      "legit": "flow",
+      "expectedFiles": [
+        "freelancer-index.html",
+        "css/styles.css"
+      ],
+      "why": "Largest candidate container by bounding-box area at 1280x800 (1280 x 834): the contact section.",
+      "styleSource": "shared class rule `.page-section` (padding 6rem 0 = 96px) in css/styles.css, shared with #portfolio and #about; the edit is for this one element only."
+    },
+    {
+      "id": "R11",
+      "file": "freelancer-index.html",
+      "type": "T3",
+      "target": "#portfolio .row > div:nth-of-type(4)",
+      "edit": {
+        "op": "reorder",
+        "move": "#portfolio .row > div:nth-of-type(4)",
+        "placement": "before",
+        "sibling": "#portfolio .row > div:nth-of-type(1)"
+      },
+      "expected": {
+        "order": {
+          "parent": "#portfolio .row",
+          "key": {
+            "selector": ".portfolio-item",
+            "attr": "data-bs-target"
+          },
+          "values": [
+            "#portfolioModal4",
+            "#portfolioModal1",
+            "#portfolioModal2",
+            "#portfolioModal3",
+            "#portfolioModal5",
+            "#portfolioModal6"
+          ]
+        }
+      },
+      "legit": "reorder",
+      "expectedFiles": [
+        "freelancer-index.html"
+      ],
+      "why": "A grid column with five siblings; portfolio item 4 is moved before item 1.",
+      "styleSource": "No styling involved. Bootstrap margin utilities on the columns (mb-5, mb-lg-0) make the layout change as a consequence."
+    },
+    {
+      "id": "R12",
+      "file": "freelancer-index.html",
+      "type": "T4",
+      "target": "a.btn-xl",
+      "edit": {
+        "op": "offset",
+        "dx": 24,
+        "dy": 16
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "a.btn-xl",
+          "dx": 24,
+          "dy": 16,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "freelancer-index.html",
+        "css/styles.css"
+      ],
+      "why": "The only large button: the 'Free Download!' link.",
+      "styleSource": "class rules `.btn`, `.btn-xl`, `.btn-outline-light` in css/styles.css; no inline style."
+    },
+    {
+      "id": "R13",
+      "file": "fibonacci-spiral.svg",
+      "type": "T1",
+      "target": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "stroke": "#c0392b"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+            "property": "stroke",
+            "value": "rgb(192, 57, 43)"
+          }
+        ]
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "fibonacci-spiral.svg"
+      ],
+      "why": "The file has no text, so the shape with the largest stroke area (perimeter x stroke-width = 2176 x 2.5 = 5440): the 544 px square. Colour edit: stroke.",
+      "styleSource": "stroke is inherited: `stroke=\"#000\"` is a presentation attribute on the root <svg>, stroke-width on the parent <g>; the rect has no stroke attribute or style of its own."
+    },
+    {
+      "id": "R14",
+      "file": "fibonacci-spiral.svg",
+      "type": "T2",
+      "target": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "width": "600"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+            "property": "width",
+            "value": "600px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+          "dw": 56,
+          "dh": 0
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "fibonacci-spiral.svg"
+      ],
+      "why": "Largest shape by bounding-box area (544 x 544, tied with a path; first in document order is this rect).",
+      "styleSource": "SVG presentation attribute `width=\"544\"` on the rect."
+    },
+    {
+      "id": "R15",
+      "file": "fibonacci-spiral.svg",
+      "type": "T3",
+      "target": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+      "edit": {
+        "op": "reorder",
+        "move": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+        "placement": "before",
+        "sibling": "svg > g:nth-of-type(1) > rect:nth-of-type(1)"
+      },
+      "expected": {
+        "order": {
+          "parent": "svg > g:nth-of-type(1)",
+          "key": {
+            "attr": [
+              "x",
+              "y"
+            ]
+          },
+          "values": [
+            "16,18.5",
+            "639.88,402.5",
+            "639.88,418.5",
+            "655.88,402.62",
+            "639.88,354.5",
+            "559.88,354.5",
+            "559.88,434.09",
+            "687.85,354.61",
+            "560,18.5"
+          ]
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "fibonacci-spiral.svg"
+      ],
+      "why": "A rect with eight siblings in its group; the last rect is moved before the first (paint order).",
+      "styleSource": "No styling involved. Attributes are written in the order y, x after height and width."
+    },
+    {
+      "id": "R16",
+      "file": "fibonacci-spiral.svg",
+      "type": "T4",
+      "target": "svg > g:nth-of-type(2) > path:nth-of-type(1)",
+      "edit": {
+        "op": "offset",
+        "dx": 24,
+        "dy": 16
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "svg > g:nth-of-type(2) > path:nth-of-type(1)",
+          "dx": 24,
+          "dy": 16,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "fibonacci-spiral.svg"
+      ],
+      "why": "A small shape (the 16 px arc); it has an existing transform attribute, so the shift must be composed with it.",
+      "styleSource": "SVG presentation attribute `transform=\"translate(255.88 648.31)\"` on the path; stroke-width inherited from the parent <g>."
+    },
+    {
+      "id": "R17",
+      "file": "normal-distribution.svg",
+      "type": "T1",
+      "target": "#text4315",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "font-size": "40px"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#text4315",
+            "property": "font-size",
+            "value": "40px"
+          }
+        ]
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "normal-distribution.svg"
+      ],
+      "why": "Largest <text>/<tspan> by computed font-size is 32px; first in document order is text#text4315 (the rotated phi label).",
+      "styleSource": "own inline style (`font-size:32px;...`); the element also has a `transform` rotation attribute and a child <tspan>."
+    },
+    {
+      "id": "R18",
+      "file": "normal-distribution.svg",
+      "type": "T2",
+      "target": "#rect3248",
+      "edit": {
+        "op": "set",
+        "properties": {
+          "width": "700"
+        }
+      },
+      "expected": {
+        "computed": [
+          {
+            "selector": "#rect3248",
+            "property": "width",
+            "value": "700px"
+          }
+        ],
+        "bboxDelta": {
+          "selector": "#rect3248",
+          "dw": 60,
+          "dh": 0
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "normal-distribution.svg"
+      ],
+      "why": "Largest shape by bounding-box area (640 x 400): the plot frame rect.",
+      "styleSource": "SVG presentation attribute `width=\"640\"` on the rect, with fill/stroke in an inline style."
+    },
+    {
+      "id": "R19",
+      "file": "normal-distribution.svg",
+      "type": "T3",
+      "target": "#path2846",
+      "edit": {
+        "op": "reorder",
+        "move": "#path2846",
+        "placement": "before",
+        "sibling": "#path2844"
+      },
+      "expected": {
+        "order": {
+          "parent": "#layer3",
+          "key": {
+            "attr": "id"
+          },
+          "values": [
+            "path2846",
+            "path2844",
+            "path2848",
+            "path2842"
+          ]
+        }
+      },
+      "legit": "descendants",
+      "expectedFiles": [
+        "normal-distribution.svg"
+      ],
+      "why": "A path with three siblings in layer3; the last (topmost) curve is moved before the first.",
+      "styleSource": "No styling involved. Inkscape writes each attribute on its own line, so the element spans many lines."
+    },
+    {
+      "id": "R20",
+      "file": "normal-distribution.svg",
+      "type": "T4",
+      "target": "#text8878",
+      "edit": {
+        "op": "offset",
+        "dx": 24,
+        "dy": 16
+      },
+      "expected": {
+        "bboxDelta": {
+          "selector": "#text8878",
+          "dx": 24,
+          "dy": 16,
+          "dw": 0,
+          "dh": 0
+        }
+      },
+      "legit": "svg-ancestors",
+      "expectedFiles": [
+        "normal-distribution.svg"
+      ],
+      "why": "A small text element inside a transformed group (g#g8871, matrix(1.364137,0,0,1.406645,...)): the shift must be in screen pixels, so x/y change by 24/1.364137 and 16/1.406645 user units.",
+      "styleSource": "SVG geometry attributes `x=\"80.5\" y=\"137\"` and a presentation attribute `font-size=\"10px\"`, plus the ancestor group's transform attribute; fill and font-family in an inline style."
+    }
+  ]
+}

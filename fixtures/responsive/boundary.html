@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Own breakpoint at 700</title>
+<style>
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.2; }
+.lbl { font-size: 18px; margin: 0 0 8px; }
+@media (max-width: 700px) {
+  .lbl { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<p class="lbl" id="l1">Label one</p>
+<p class="lbl" id="l2">Label two</p>
+<p id="foot">Foot</p>
+</body>
+</html>

@@ -1,0 +1,547 @@
+{
+  "run1": {
+    "informationOnly": true,
+    "measuredAt": "2026-11-11T05:58:58.548Z",
+    "runsPerFile": 20,
+    "machine": {
+      "model": "Mac17,4",
+      "cpu": "Apple M5",
+      "cores": 10,
+      "ramGiB": 32,
+      "os": "darwin 25.6.0",
+      "arch": "arm64"
+    },
+    "versions": {
+      "node": "v24.21.0",
+      "chromium": "158.0.8127.18"
+    },
+    "perFile": [
+      {
+        "file": "leemunroe-email.html",
+        "bytes": 8903,
+        "elements": 43,
+        "previewMs": {
+          "median": 1.899999976158142,
+          "min": 1.5999999642372131,
+          "max": 3.300000011920929,
+          "first": 2.899999976158142
+        },
+        "applyMs": {
+          "median": 0.014249999970197678,
+          "min": 0.013499999940395356,
+          "max": 0.019000000059604644
+        },
+        "applyStatus": "refused",
+        "applyRefusal": "conditional-rule"
+      },
+      {
+        "file": "mailgun-action.html",
+        "bytes": 6780,
+        "elements": 40,
+        "previewMs": {
+          "median": 1.5,
+          "min": 1.199999988079071,
+          "max": 2.199999988079071,
+          "first": 2.199999988079071
+        },
+        "applyMs": {
+          "median": 0.008499999940395355,
+          "min": 0.0075,
+          "max": 0.011500000059604644
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "freelancer-index.html",
+        "bytes": 30997,
+        "elements": 274,
+        "previewMs": {
+          "median": 13.199999988079071,
+          "min": 12.199999988079071,
+          "max": 16.80000001192093,
+          "first": 16.80000001192093
+        },
+        "applyMs": {
+          "median": 2.7207500000298026,
+          "min": 2.7075,
+          "max": 2.8065000000596045
+        },
+        "applyStatus": "refused",
+        "applyRefusal": "conditional-rule"
+      },
+      {
+        "file": "fibonacci-spiral.svg",
+        "bytes": 1265,
+        "elements": 20,
+        "previewMs": {
+          "median": 1.9500000178813934,
+          "min": 1.7000000476837158,
+          "max": 3.899999976158142,
+          "first": 3.899999976158142
+        },
+        "applyMs": {
+          "median": 0.0009999999403953552,
+          "min": 0.0004999998211860656,
+          "max": 0.0019999998807907105
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "normal-distribution.svg",
+        "bytes": 62916,
+        "elements": 316,
+        "previewMs": {
+          "median": 4.75,
+          "min": 4.399999976158142,
+          "max": 6.5,
+          "first": 5.800000011920929
+        },
+        "applyMs": {
+          "median": 0.009249999970197677,
+          "min": 0.0075,
+          "max": 0.01550000011920929
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      }
+    ]
+  },
+  "run2": {
+    "informationOnly": true,
+    "measuredAt": "2026-11-11T05:59:47.661Z",
+    "runsPerFile": 20,
+    "machine": {
+      "model": "Mac17,4",
+      "cpu": "Apple M5",
+      "cores": 10,
+      "ramGiB": 32,
+      "os": "darwin 25.6.0",
+      "arch": "arm64"
+    },
+    "versions": {
+      "node": "v24.21.0",
+      "chromium": "158.0.8127.18"
+    },
+    "perFile": [
+      {
+        "file": "leemunroe-email.html",
+        "bytes": 8903,
+        "elements": 43,
+        "previewMs": {
+          "median": 1.899999976158142,
+          "min": 1.600000023841858,
+          "max": 3,
+          "first": 2.800000011920929
+        },
+        "applyMs": {
+          "median": 0.014000000059604644,
+          "min": 0.01300000011920929,
+          "max": 0.01899999976158142
+        },
+        "applyStatus": "refused",
+        "applyRefusal": "conditional-rule"
+      },
+      {
+        "file": "mailgun-action.html",
+        "bytes": 6780,
+        "elements": 40,
+        "previewMs": {
+          "median": 1.5,
+          "min": 1.300000011920929,
+          "max": 2.199999988079071,
+          "first": 2.199999988079071
+        },
+        "applyMs": {
+          "median": 0.008500000238418579,
+          "min": 0.007999999821186066,
+          "max": 0.010999999940395355
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "freelancer-index.html",
+        "bytes": 30997,
+        "elements": 274,
+        "previewMs": {
+          "median": 13.049999982118607,
+          "min": 12.399999976158142,
+          "max": 20,
+          "first": 20
+        },
+        "applyMs": {
+          "median": 2.73125,
+          "min": 2.7205000001192094,
+          "max": 2.8215000000596047
+        },
+        "applyStatus": "refused",
+        "applyRefusal": "conditional-rule"
+      },
+      {
+        "file": "fibonacci-spiral.svg",
+        "bytes": 1265,
+        "elements": 20,
+        "previewMs": {
+          "median": 2,
+          "min": 1.5999999642372131,
+          "max": 5.199999988079071,
+          "first": 5.199999988079071
+        },
+        "applyMs": {
+          "median": 0.0009999999403953552,
+          "min": 0,
+          "max": 0.002000000178813934
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "normal-distribution.svg",
+        "bytes": 62916,
+        "elements": 316,
+        "previewMs": {
+          "median": 4.6500000059604645,
+          "min": 4.400000035762787,
+          "max": 7.199999988079071,
+          "first": 5.5
+        },
+        "applyMs": {
+          "median": 0.00949999988079071,
+          "min": 0.00699999988079071,
+          "max": 0.015999999940395356
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      }
+    ]
+  },
+  "runresp": {
+    "informationOnly": true,
+    "measuredAt": "2026-11-12T05:26:04.340Z",
+    "runsPerFile": 20,
+    "machine": {
+      "model": "Mac17,4",
+      "cpu": "Apple M5",
+      "cores": 10,
+      "ramGiB": 32,
+      "os": "darwin 25.6.0",
+      "arch": "arm64"
+    },
+    "versions": {
+      "node": "v24.21.0",
+      "chromium": "158.0.8127.18"
+    },
+    "perFile": [
+      {
+        "file": "leemunroe-email.html",
+        "bytes": 8903,
+        "elements": 43,
+        "previewMs": {
+          "median": 1.899999976158142,
+          "min": 1.5,
+          "max": 3,
+          "first": 2.800000011920929
+        },
+        "applyMs": {
+          "median": 0.0275,
+          "min": 0.02550000011920929,
+          "max": 0.03550000011920929
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "mailgun-action.html",
+        "bytes": 6780,
+        "elements": 40,
+        "previewMs": {
+          "median": 1.5,
+          "min": 1.2999999523162842,
+          "max": 2.5,
+          "first": 2.199999988079071
+        },
+        "applyMs": {
+          "median": 0.0175,
+          "min": 0.016500000059604645,
+          "max": 0.020999999940395354
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "freelancer-index.html",
+        "bytes": 30997,
+        "elements": 274,
+        "previewMs": {
+          "median": 13.149999976158142,
+          "min": 12.099999964237213,
+          "max": 15.600000023841858,
+          "first": 14.800000011920929
+        },
+        "applyMs": {
+          "median": 2.8267499999701977,
+          "min": 2.8154999998211863,
+          "max": 2.876500000059605
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "fibonacci-spiral.svg",
+        "bytes": 1265,
+        "elements": 20,
+        "previewMs": {
+          "median": 1.9000000357627869,
+          "min": 1.699999988079071,
+          "max": 6.399999976158142,
+          "first": 6.399999976158142
+        },
+        "applyMs": {
+          "median": 0.0007500000298023224,
+          "min": 0.0004999998211860656,
+          "max": 0.002000000178813934
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "normal-distribution.svg",
+        "bytes": 62916,
+        "elements": 316,
+        "previewMs": {
+          "median": 4.5999999940395355,
+          "min": 4.400000035762787,
+          "max": 6.600000023841858,
+          "first": 5.899999976158142
+        },
+        "applyMs": {
+          "median": 0.01725000008940697,
+          "min": 0.00800000011920929,
+          "max": 0.04800000011920929
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      }
+    ]
+  },
+  "runiter2": {
+    "informationOnly": true,
+    "measuredAt": "2026-11-13T05:13:07.824Z",
+    "runsPerFile": 20,
+    "machine": {
+      "model": "Mac17,4",
+      "cpu": "Apple M5",
+      "cores": 10,
+      "ramGiB": 32,
+      "os": "darwin 25.6.0",
+      "arch": "arm64"
+    },
+    "versions": {
+      "node": "v24.21.0",
+      "chromium": "158.0.8127.18"
+    },
+    "perFile": [
+      {
+        "file": "leemunroe-email.html",
+        "bytes": 8903,
+        "elements": 43,
+        "previewMs": {
+          "median": 1.8499999940395355,
+          "min": 1.5,
+          "max": 3,
+          "first": 2.899999976158142
+        },
+        "applyMs": {
+          "median": 0.028499999940395357,
+          "min": 0.02699999988079071,
+          "max": 0.035
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "mailgun-action.html",
+        "bytes": 6780,
+        "elements": 40,
+        "previewMs": {
+          "median": 1.699999988079071,
+          "min": 1.5,
+          "max": 2.900000035762787,
+          "first": 2.300000011920929
+        },
+        "applyMs": {
+          "median": 0.01824999988079071,
+          "min": 0.017000000178813934,
+          "max": 0.021500000059604646
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "freelancer-index.html",
+        "bytes": 30997,
+        "elements": 274,
+        "previewMs": {
+          "median": 13,
+          "min": 12.100000023841858,
+          "max": 17.30000001192093,
+          "first": 16.100000023841858
+        },
+        "applyMs": {
+          "median": 2.8947499999403954,
+          "min": 2.880500000119209,
+          "max": 2.965500000119209
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "fibonacci-spiral.svg",
+        "bytes": 1265,
+        "elements": 20,
+        "previewMs": {
+          "median": 2.099999964237213,
+          "min": 1.800000011920929,
+          "max": 5.199999988079071,
+          "first": 5.199999988079071
+        },
+        "applyMs": {
+          "median": 0.0007500000298023224,
+          "min": 0.0004999998211860656,
+          "max": 0.0015000000596046448
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "normal-distribution.svg",
+        "bytes": 62916,
+        "elements": 316,
+        "previewMs": {
+          "median": 4.749999970197678,
+          "min": 4.399999976158142,
+          "max": 6.400000035762787,
+          "first": 5.300000011920929
+        },
+        "applyMs": {
+          "median": 0.008250000029802322,
+          "min": 0.0075,
+          "max": 0.015999999940395356
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      }
+    ]
+  },
+  "runrescore": {
+    "informationOnly": true,
+    "measuredAt": "2026-11-13T05:21:42.178Z",
+    "runsPerFile": 20,
+    "machine": {
+      "model": "Mac17,4",
+      "cpu": "Apple M5",
+      "cores": 10,
+      "ramGiB": 32,
+      "os": "darwin 25.6.0",
+      "arch": "arm64"
+    },
+    "versions": {
+      "node": "v24.21.0",
+      "chromium": "158.0.8127.18"
+    },
+    "perFile": [
+      {
+        "file": "leemunroe-email.html",
+        "bytes": 8903,
+        "elements": 43,
+        "previewMs": {
+          "median": 1.899999976158142,
+          "min": 1.5,
+          "max": 3.099999964237213,
+          "first": 3.099999964237213
+        },
+        "applyMs": {
+          "median": 0.02874999985098839,
+          "min": 0.02649999976158142,
+          "max": 0.03449999988079071
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "mailgun-action.html",
+        "bytes": 6780,
+        "elements": 40,
+        "previewMs": {
+          "median": 1.600000023841858,
+          "min": 1.300000011920929,
+          "max": 2.799999952316284,
+          "first": 2.199999988079071
+        },
+        "applyMs": {
+          "median": 0.01799999997019768,
+          "min": 0.01699999988079071,
+          "max": 0.02199999988079071
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "freelancer-index.html",
+        "bytes": 30997,
+        "elements": 274,
+        "previewMs": {
+          "median": 13.099999994039536,
+          "min": 12.399999976158142,
+          "max": 16.700000047683716,
+          "first": 15.400000035762787
+        },
+        "applyMs": {
+          "median": 2.8880000001192094,
+          "min": 2.8789999997615814,
+          "max": 2.9394999998807907
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "fibonacci-spiral.svg",
+        "bytes": 1265,
+        "elements": 20,
+        "previewMs": {
+          "median": 2,
+          "min": 1.800000011920929,
+          "max": 4.600000023841858,
+          "first": 4.600000023841858
+        },
+        "applyMs": {
+          "median": 0.0005000001192092896,
+          "min": 0.0004999998211860656,
+          "max": 0.0019999998807907105
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "normal-distribution.svg",
+        "bytes": 62916,
+        "elements": 316,
+        "previewMs": {
+          "median": 4.600000023841858,
+          "min": 4.399999976158142,
+          "max": 6.399999976158142,
+          "first": 5.600000023841858
+        },
+        "applyMs": {
+          "median": 0.008250000029802322,
+          "min": 0.0075,
+          "max": 0.016500000059604645
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      }
+    ]
+  }
+}

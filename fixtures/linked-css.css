@@ -1,0 +1,13 @@
+/* linked-css.css - site styles supplied as a companion file */
+body { margin: 0; font-family: Georgia, serif; color: #222; background: #faf8f5; }
+
+#hero { padding: 24px; background: #e9e2d5; text-align: center; }
+#avatar { width: 72px; height: 72px; margin: 0 auto 12px; border-radius: 50%; background: #8a6f4d; color: #fff; line-height: 72px; font-size: 24px; transform: rotate(8deg); }
+#hero-title { margin: 0; font-size: 40px; color: #2d2a26; }
+.tagline { margin: 6px 0 0; font-size: 16px; color: #5c554b; }
+
+.menu { list-style: none; margin: 0; padding: 12px 24px; display: flex; gap: 20px; }
+.menu li { font-size: 15px; cursor: pointer; }
+
+#sidebar-box { margin: 24px; padding: 16px; width: 300px; background: #fff; border: 1px solid #d9d2c3; }
+#sidebar-box h2 { margin: 0 0 8px; font-size: 18px; }

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacing</title>
+<style>
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.2; }
+.card { width: 300px; padding: 12px 20px; margin: 0 auto 16px; background: #eeeeee; box-sizing: content-box; }
+.note { margin: 0 0 16px; background: #dde6f0; }
+@media (max-width: 640px) {
+  .card { padding: 8px 12px; }
+  .note { margin: 0 0 8px; }
+}
+</style>
+</head>
+<body>
+<div class="card" id="c1">Card one</div>
+<div class="card" id="c2">Card two</div>
+<p class="note" id="note-a">Note A</p>
+<p class="note" id="note-b">Note B</p>
+<p id="after">After</p>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dashboard shell</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #202124; background: #f6f7f9; }
+#topbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: #1f2933; color: #fff; }
+#brand { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+#topnav { display: flex; gap: 16px; font-size: 14px; }
+#layout { display: flex; gap: 24px; padding: 24px; }
+#sidebar { flex: 0 0 240px; display: flex; flex-direction: column; gap: 10px; align-self: flex-start; background: #fff; padding: 16px; border: 1px solid #dde1e6; }
+.side-item { font-size: 14px; padding: 6px 8px; background: #eef2f7; }
+#main { flex: 1; min-width: 0; }
+#stats { display: flex; gap: 16px; margin-bottom: 20px; }
+.stat { flex: 1; background: #fff; border: 1px solid #dde1e6; padding: 14px; text-align: center; }
+.stat b { display: block; font-size: 24px; }
+#cta-row { display: flex; justify-content: flex-start; gap: 12px; }
+.btn { padding: 8px 16px; background: #2563eb; color: #fff; border-radius: 4px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div id="brand">Northwind</div>
+  <div id="topnav"><span>Overview</span><span>Reports</span><span>Settings</span></div>
+</div>
+<div id="layout">
+  <div id="sidebar">
+    <div class="side-item">Inbox</div>
+    <div class="side-item">Projects</div>
+    <div class="side-item">Archive</div>
+  </div>
+  <div id="main">
+    <div id="stats">
+      <div class="stat" id="stat-1"><b>128</b>Open tasks</div>
+      <div class="stat" id="stat-2" style="transform: translateY(4px)"><b>14</b>Overdue</div>
+      <div class="stat" id="stat-3"><b>9</b>Due today</div>
+    </div>
+    <p>Welcome back. Here is a quick look at where things stand across your projects this week.</p>
+    <div id="cta-row">
+      <span class="btn" id="btn-a">New task</span>
+      <span class="btn" id="btn-b">Import</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

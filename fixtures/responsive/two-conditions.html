@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two media conditions</title>
+<style>
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.2; }
+.wrap { padding: 8px 12px; }
+.badge { font-size: 14px; margin: 0 0 8px; }
+.plain { font-size: 20px; margin: 0 0 8px; }
+@media (max-width: 640px) {
+  .badge { font-size: 11px; }
+  .wrap { padding: 4px 6px; }
+}
+@media (min-width: 1200px) {
+  .badge { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="badge" id="b1">Badge one</p>
+  <p class="badge" id="b2">Badge two</p>
+  <p class="plain" id="p1">Plain one</p>
+  <p class="plain" id="p2">Plain two</p>
+</div>
+</body>
+</html>

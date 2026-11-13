@@ -1,0 +1,33 @@
+{
+  "checked": 60,
+  "noMediaRule": 55,
+  "byteIdentical": 55,
+  "notIdentical": [],
+  "withMediaRule": [
+    {
+      "id": "real:R01",
+      "prop": "font-size",
+      "identical": false
+    },
+    {
+      "id": "real:R06",
+      "prop": "height",
+      "identical": true
+    },
+    {
+      "id": "real:R09",
+      "prop": "font-size",
+      "identical": false
+    },
+    {
+      "id": "real:R10",
+      "prop": "padding",
+      "identical": true
+    },
+    {
+      "id": "real:R12",
+      "prop": "transform",
+      "identical": true
+    }
+  ]
+}
