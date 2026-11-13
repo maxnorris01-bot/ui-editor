@@ -142,13 +142,6 @@ describe('linked ratio edits', () => {
     expect(out).toContain('@media (max-width: 640px) { #a { padding: 12px 18px; } }');
     expect(out).toContain('style="color: #c00"');
   });
-  it('notes that width is not scaled and applies it at every width', () => {
-    const src = page('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: auto; } }', '<div class="p" id="a">x</div>');
-    const e = env(src);
-    const r = okR(e.run({ op: 'set', target: e.at('#a'), properties: { width: '500px' } }));
-    expect(r.notes?.[0]?.reason).toContain('not scaled');
-    expect(e.out(r)).toContain('style="width: 500px"');
-  });
 });
 
 describe('unlinked edits and pins', () => {
@@ -286,5 +279,87 @@ describe('override rules and a trailing source-map comment', () => {
     const src = page(CSS, '<h1 id="a">T</h1>');
     const e = env(src, 'html', {}, fs);
     expect(e.out(edit(e))).toBe(src.replace('\n</style>', `\n${NEW}</style>`));
+  });
+});
+
+describe('linked width and height', () => {
+  const wh = table({ width: { 1280: '480px', 390: '200px' }, height: { 1280: '100px', 390: '50px' }, 'max-width': { 1280: 'none', 390: 'none' } });
+  const widthPage = (css: string, tag = '<div class="p" id="a">x</div>') => page(css, tag);
+  const set = (src: string, props: Record<string, string>, extra: Partial<Edit> = {}, tweak = wh) => {
+    const e = env(src, 'html', {}, tweak);
+    return { e, r: okR(e.run({ op: 'set', target: e.at('#a'), properties: props, ...extra } as Edit)) };
+  };
+  it('scales a fixed px value of the other environment and guards both widths', () => {
+    const { e, r } = set(widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '600px' });
+    const out = e.out(r);
+    expect(out).toContain('@media (min-width: 641px) { #a { width: 600px; max-width: 100%; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { width: 250px; max-width: 100%; } }');
+    expect(r.notes ?? []).toEqual([]);
+  });
+  it('scales rem and em declarations and keeps their unit', () => {
+    const { e, r } = set(widthPage('.p { width: 30rem; }\n@media (max-width: 640px) { .p { width: 12.5em; } }'), { width: '600px' });
+    expect(e.out(r)).toContain('@media (max-width: 640px) { #a { width: 15.625em; max-width: 100%; } }');
+  });
+  it('leaves a percentage or auto alone, applies the new value to the edited environment only and notes it', () => {
+    for (const flexible of ['80%', 'auto', 'clamp(100px, 50vw, 300px)', 'calc(100% - 20px)']) {
+      const { e, r } = set(widthPage(`.p { width: 480px; }\n@media (max-width: 640px) { .p { width: ${flexible}; } }`), { width: '600px' });
+      const out = e.out(r);
+      expect(out).toContain('@media (min-width: 641px) { #a { width: 600px; max-width: 100%; } }');
+      expect(out).not.toContain('max-width: 640px) { #a');
+      expect(r.notes).toEqual([{ property: 'width', condition: '@media (max-width: 640px)', value: flexible, reason: expect.stringContaining('left alone') }]);
+    }
+  });
+  it('leaves an undeclared value alone', () => {
+    const { e, r } = set(widthPage('.q { color: red; }\n@media (max-width: 640px) { .q { color: blue; } }'), { width: '600px' });
+    expect(e.out(r)).toContain('@media (min-width: 641px) { #a { width: 600px; max-width: 100%; } }');
+    expect(r.notes?.[0]).toMatchObject({ property: 'width', value: '(not declared)' });
+  });
+  it('writes one rule when both environments end up with the same value', () => {
+    const { e, r } = set(widthPage('#a { width: 480px; }\n@media (max-width: 640px) { .q { color: blue; } }'), { width: '600px' }, {}, table({ width: { 1280: '480px', 390: '480px' } }));
+    expect(e.out(r)).toContain('#a { width: 600px; max-width: 100%; }');
+    expect(e.out(r)).not.toContain('@media (min-width: 641px) { #a');
+  });
+  it('adds no guard to height and none when the element has its own max-width', () => {
+    const h = set(widthPage('.p { height: 100px; }\n@media (max-width: 640px) { .p { height: 50px; } }'), { height: '150px' });
+    expect(h.e.out(h.r)).toContain('@media (min-width: 641px) { #a { height: 150px; } }');
+    expect(h.e.out(h.r)).toContain('@media (max-width: 640px) { #a { height: 75px; } }');
+    const m = set(widthPage('.p { width: 480px; max-width: 500px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '600px' }, {}, table({ width: { 1280: '480px', 390: '200px' }, 'max-width': { 1280: '500px', 390: '500px' } }));
+    expect(m.e.out(m.r)).toContain('@media (min-width: 641px) { #a { width: 600px; } }');
+    expect(m.e.out(m.r)).toContain('@media (max-width: 640px) { #a { width: 250px; } }');
+  });
+  it('treats a numeric width attribute as a fixed px value', () => {
+    const { e, r } = set(widthPage('.q { color: red; }\n@media (max-width: 640px) { .q { color: blue; } }', '<table id="a" width="400"><tr><td>x</td></tr></table>'), { width: '480px' }, {}, table({ width: { 1280: '400px', 390: '400px' }, 'max-width': { 1280: 'none', 390: 'none' } }));
+    expect(e.out(r)).toContain('#a { width: 480px; max-width: 100%; }');
+  });
+  it('treats a percentage attribute as flexible', () => {
+    const { e, r } = set(widthPage('.q { color: red; }\n@media (max-width: 640px) { .q { color: blue; } }', '<table id="a" width="100%"><tr><td>x</td></tr></table>'), { width: '480px' }, {}, table({ width: { 1280: '1000px', 390: '390px' } }));
+    expect(e.out(r)).toContain('@media (min-width: 641px) { #a { width: 480px; max-width: 100%; } }');
+    expect(r.notes?.[0]?.value).toBe('100%');
+  });
+  it('uses !important only for an inline declaration and refuses a page !important', () => {
+    const inl = set(widthPage('@media (max-width: 640px) { .q { color: blue; } }', '<div id="a" class="p" style="width: 480px">x</div>'), { width: '600px' });
+    expect(inl.e.out(inl.r)).toContain('#a { width: 600px !important; max-width: 100%; }');
+    const e = env(widthPage('.p { width: 480px !important; }\n@media (max-width: 640px) { .p { width: 200px; } }'), 'html', {}, wh);
+    const x = e.run({ op: 'set', target: e.at('#a'), properties: { width: '600px' } });
+    expect(!x.ok && x.refusal.code).toBe('important-conflict');
+  });
+  it('keeps a pinned value of the other environment', () => {
+    const src = widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }');
+    const e = env(src, 'html', {}, wh);
+    const a = okR(e.run({ op: 'set', target: e.at('#a'), properties: { width: '250px' }, environment: 'phone', link: false }));
+    const b = okR(applyEdit(e.model, { op: 'set', target: e.at('#a'), properties: { width: '600px' } }, e.probe, a.state));
+    expect(b.notes?.[0]?.reason).toContain('pinned');
+    expect(JSON.stringify(b.patches)).not.toContain('max-width: 640px');
+  });
+  it('falls back to the old behaviour for a non-px value or a page with no stylesheet', () => {
+    const a = set(widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '50%' });
+    expect(a.e.out(a.r)).toContain('style="width: 50%"');
+    const e = env('<html><body><div id="a">x</div></body></html>', 'html', {}, wh);
+    const r = okR(e.run({ op: 'set', target: e.at('#a'), properties: { width: '600px' } }));
+    expect(e.out(r)).toContain('style="width: 600px"');
+  });
+  it('unlinked width and height keep the old behaviour (inside the environment, no guard)', () => {
+    const { e, r } = set(widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '300px' }, { environment: 'phone', link: false });
+    expect(e.out(r)).toContain('@media (max-width: 640px) { #a { width: 300px; } }');
   });
 });

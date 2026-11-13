@@ -26,8 +26,9 @@ import type { Decl, DomOp, Edit, EditResult, EditState, ElementNode, Environment
  *
  * LIMITS (labelled): only the media features `max-width`/`min-width` (px, em, rem) are evaluated;
  * other conditions are treated as not matching at the test widths but are still scaled when they
- * wrap a matching rule. Only the properties font-size, padding(-*) and margin(-*) are ratios; width
- * and height are applied at every width (with a note). Linked offsets and reorders keep the
+ * wrap a matching rule. font-size, padding(-*) and margin(-*) are plain ratios; width and height are
+ * ratios where the other environment declares a fixed length (see linkedSize), and are otherwise
+ * kept inside the edited environment. Linked offsets and reorders keep the
  * pre-existing behaviour (and still refuse when a media rule sets `transform`). A page rule whose
  * selector has an id cannot be out-specified for an element without an id (refused). The pinned
  * record only covers (element, property, environment); media rules whose condition spans both
@@ -239,6 +240,8 @@ interface RuleLine {
   prop: string;
   value: string;
   important: boolean;
+  /** Further declarations written in the same rule (the width overflow guard). */
+  extra?: { prop: string; value: string; important: boolean }[];
 }
 
 interface Ctx {
@@ -313,7 +316,8 @@ function scopedSelector(ctx: Ctx): string {
 }
 
 const lineText = (sel: string, l: RuleLine): string => {
-  const rule = `${sel} { ${l.prop}: ${l.value}${l.important ? ' !important' : ''}; }`;
+  const more = (l.extra ?? []).map((x) => ` ${x.prop}: ${x.value}${x.important ? ' !important' : ''};`).join('');
+  const rule = `${sel} { ${l.prop}: ${l.value}${l.important ? ' !important' : ''};${more} }`;
   return l.chain.length ? `${l.chain.join(' { ')} { ${rule} }${' }'.repeat(l.chain.length - 1)}` : rule;
 };
 
@@ -451,6 +455,81 @@ function linkedRatio(ctx: Ctx, p: string, V: string): boolean {
   return true;
 }
 
+// ---------------------------------------------------------------------------------------------
+// Linked width and height (docs/size-scaling-rules.md)
+// ---------------------------------------------------------------------------------------------
+
+const SIZE_PROPS = new Set(['width', 'height']);
+const FIXED_LEN = /^([-+]?(?:\d+\.?\d*|\.\d+))(px|rem|em)$/i;
+const ATTR_LEN = /^\s*(\d+(?:\.\d+)?)\s*(?:px)?\s*$/i;
+
+/**
+ * Linked width or height edit made in environment E. The other environment O keeps the page's own value
+ * unless the winning declaration there is a fixed length (px, rem, em, or a numeric HTML attribute), which
+ * is multiplied by the same ratio. Flexible or undeclared values are left alone and the new value applies
+ * only inside E's condition. Every px width gets `max-width: 100%` when the element's own max-width is
+ * `none` there. Returns false (nothing written) when the old behaviour should be used instead.
+ */
+function linkedSize(ctx: Ctx, p: string, V: string): boolean {
+  const E = ctx.env;
+  const O = other(E);
+  const wE = envWidth(E);
+  const wO = envWidth(O);
+  const newPx = asPx(V.trim());
+  const v0 = parseFloat(ctx.probe.computed(ctx.el.index, p, wE));
+  if (newPx === null || !(v0 > 0) || ctx.model.sheets.length === 0) return false;
+  const r = newPx / v0;
+
+  const all = collect(ctx.matched, p);
+  for (const x of all) ctx.maxSpec = Math.max(ctx.maxSpec, x.spec);
+  for (const x of all) if (x.d.important) no('important-conflict', `"${p}" is set with !important in rule "${x.rule.selector}"; an override would not win`);
+  const inl = ctx.inline ? lastDecl(ctx.inline.decls, p) : undefined;
+  if (inl?.important) no('important-conflict', `"${p}" is set with !important in the element's style attribute`);
+
+  // The declaration that wins at O's reference width: inline style, else the cascade winner, else the HTML attribute.
+  const win = best(all.filter((x) => chainMatches(x.chain, wO)));
+  const attrVal = attrOf(ctx.el, p)?.value ?? null;
+  let declared: string | null = inl ? inl.value : win ? win.d.value : null;
+  let fromAttr = false;
+  if (declared === null && attrVal !== null) {
+    const m = ATTR_LEN.exec(attrVal);
+    if (m) { declared = `${m[1]}px`; fromAttr = true; } else declared = attrVal;
+  }
+  const fixed = declared !== null && FIXED_LEN.test(declared.trim());
+  const pinnedO = ctx.pins.some((q) => q.selector === ctx.path && q.property === p && q.environment === O);
+  const important = !!(ctx.inline && inl); // an inline declaration beats rules, so the override must be !important
+  const maxAt = (w: number) => ctx.probe.computed(ctx.el.index, 'max-width', w).trim();
+  const guardOn = (w: number) => p === 'width' && (maxAt(w) === 'none' || maxAt(w) === '');
+  const guardIm = !!(ctx.inline && lastDecl(ctx.inline.decls, 'max-width'));
+  const mk = (chain: string[], value: string, guard: boolean): RuleLine => ({ chain, prop: p, value, important, extra: guard ? [{ prop: 'max-width', value: '100%', important: guardIm }] : undefined });
+  const chainE = [envCondition(E, ctx.b)];
+  const chainO = [envCondition(O, ctx.b)];
+
+  if (fixed && !pinnedO) {
+    const scaled = scaleValue(declared!.trim(), [r]).value;
+    if (scaled === V.trim() && guardOn(wE) === guardOn(wO)) {
+      ctx.lines.push(mk([], V.trim(), guardOn(wE)));
+      ctx.placements.push(`${p} (same value at every width)`);
+    } else {
+      ctx.lines.push(mk(chainE, V.trim(), guardOn(wE)));
+      ctx.lines.push(mk(chainO, scaled, guardOn(wO)));
+      ctx.placements.push(`${p} inside ${chainE[0]} and scaled inside ${chainO[0]}${fromAttr ? ' (from the HTML attribute)' : ''}`);
+    }
+  } else {
+    ctx.lines.push(mk(chainE, V.trim(), guardOn(wE)));
+    const why = pinnedO
+      ? `"${p}" is pinned in the ${O} environment`
+      : declared === null
+        ? `${p} is not declared for the ${O} environment`
+        : `${declared.trim()} is not a fixed px, rem or em length`;
+    ctx.notes.push({ property: p, condition: chainO[0]!, value: declared ?? '(not declared)', reason: `left alone: ${why}; the new ${p} applies only inside ${chainE[0]}` });
+    ctx.placements.push(`${p} inside ${chainE[0]} only`);
+  }
+  const pin = ctx.pins.find((q) => q.selector === ctx.path && q.property === p && q.environment === E);
+  if (pin) addPin(ctx, p, E, V.trim());
+  return true;
+}
+
 /** Linked non-ratio edit (colour, width, height ...) when the page has media rules for the property. */
 function linkedPlain(ctx: Ctx, p: string, V: string, warnings: string[]): { handled: boolean; base?: EditResult } {
   const all = collect(ctx.matched, p);
@@ -463,7 +542,7 @@ function linkedPlain(ctx: Ctx, p: string, V: string, warnings: string[]): { hand
     if (g.win.d.important) ctx.lines.push({ chain: g.chain, prop: p, value: V, important: true });
   }
   if (p === 'width' || p === 'height') {
-    ctx.notes.push({ property: p, condition: '(all widths)', value: V, reason: `${p} is not scaled across screen sizes in this version: the new value applies at every width` });
+    ctx.notes.push({ property: p, condition: '(all widths)', value: V, reason: `${p} could not be scaled (the new value is not in px, or there is no usable old value): it applies at every width` });
   }
   return { handled: true, base };
 }
@@ -479,6 +558,8 @@ export function htmlSetResponsive(model: Model, edit: Extract<Edit, { op: 'set' 
     if (RATIO_PROPS.has(p)) {
       if (linkedRatio(ctx, p, v)) any = true;
       else rest[p] = v;
+    } else if (SIZE_PROPS.has(p) && linkedSize(ctx, p, v)) {
+      any = true;
     } else {
       const r = linkedPlain(ctx, p, v, warnings);
       if (r.handled) {
