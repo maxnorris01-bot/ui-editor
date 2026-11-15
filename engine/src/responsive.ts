@@ -463,12 +463,70 @@ const SIZE_PROPS = new Set(['width', 'height']);
 const FIXED_LEN = /^([-+]?(?:\d+\.?\d*|\.\d+))(px|rem|em)$/i;
 const ATTR_LEN = /^\s*(\d+(?:\.\d+)?)\s*(?:px)?\s*$/i;
 
+// A flex item's main-size property is overridden by a non-auto flex-basis, so the basis must move with the size.
+
+/** True when `prop` is the main-size property of a flex item whose computed flex-basis is not auto at width `w`. */
+function flexMain(ctx: Ctx, prop: string, w: number): boolean {
+  const parent = ctx.el.parent;
+  if (!parent || parent.implied) return false;
+  if (!ctx.probe.computed(parent.index, 'display', w).includes('flex')) return false;
+  const row = ctx.probe.computed(parent.index, 'flex-direction', w).startsWith('row');
+  if (!((prop === 'width' && row) || (prop === 'height' && !row))) return false;
+  const basis = ctx.probe.computed(ctx.el.index, 'flex-basis', w).trim();
+  return basis !== '' && basis !== 'auto';
+}
+
+/** Refuses a flex item that can grow: the container, not the size, would decide how large it is. */
+function checkGrow(ctx: Ctx, p: string, w: number): void {
+  if (parseFloat(ctx.probe.computed(ctx.el.index, 'flex-grow', w)) > 0) {
+    no('flex-grow', `the ${p} of this flex item cannot be set exactly: its flex-grow is above 0, so the container decides how large it is (setting flex-grow: 0 would also change how its siblings share the space)`);
+  }
+}
+
+/** The basis in a `flex` shorthand value: a length, percentage or `content` token; `0%` when only numbers are given. */
+export function basisOfFlex(value: string): string {
+  const toks = splitTokens(value.trim().toLowerCase());
+  if (toks.length === 1 && ['none', 'auto', 'initial'].includes(toks[0]!)) return 'auto';
+  const nums = toks.filter((t) => /^[-+]?(?:\d+\.?\d*|\.\d+)$/.test(t));
+  const other = toks.find((t) => !/^[-+]?(?:\d+\.?\d*|\.\d+)$/.test(t));
+  if (other) return other;
+  if (nums.length === 3) return `${nums[2]}px`;
+  return nums.length ? '0%' : 'auto';
+}
+
+/** The declared flex-basis that wins at width `w` (from `flex` or `flex-basis`), or null. */
+function declaredBasis(ctx: Ctx, w: number): string | null {
+  const cands: D2[] = [];
+  for (const m of ctx.matched) {
+    if (!chainMatches(m.rule.conditions, w)) continue;
+    const ds = m.rule.decls.filter((d) => d.lprop === 'flex' || d.lprop === 'flex-basis');
+    const d = ds[ds.length - 1];
+    if (d) cands.push({ rule: m.rule, d, spec: m.spec, order: m.rule.order, chain: m.rule.conditions });
+  }
+  const win = best(cands);
+  const ins = ctx.inline ? ctx.inline.decls.filter((d) => d.lprop === 'flex' || d.lprop === 'flex-basis') : [];
+  const inl = ins[ins.length - 1];
+  const d = inl && !win?.d.important ? inl : win?.d;
+  if (!d) return null;
+  return d.lprop === 'flex' ? basisOfFlex(d.value) : d.value.trim();
+}
+
+/** The flex-basis written with a size needs !important only to beat an inline or important page declaration. */
+function basisImportant(ctx: Ctx): boolean {
+  if (ctx.inline && ctx.inline.decls.some((d) => d.lprop === 'flex' || d.lprop === 'flex-basis')) return true;
+  return ctx.matched.some((m) => m.rule.decls.some((d) => (d.lprop === 'flex' || d.lprop === 'flex-basis') && d.important));
+}
+
+type Pair = [string, string];
+
 /**
  * Linked width or height edit made in environment E. The other environment O keeps the page's own value
  * unless the winning declaration there is a fixed length (px, rem, em, or a numeric HTML attribute), which
  * is multiplied by the same ratio. Flexible or undeclared values are left alone and the new value applies
  * only inside E's condition. Every px width gets `max-width: 100%` when the element's own max-width is
- * `none` there. Returns false (nothing written) when the old behaviour should be used instead.
+ * `none` there. A flex item with a non-auto flex-basis gets its basis written with the size, and where O is
+ * also such an item, O's basis is the declaration that is scaled. Returns false (nothing written) when the
+ * old behaviour should be used instead.
  */
 function linkedSize(ctx: Ctx, p: string, V: string): boolean {
   const E = ctx.env;
@@ -479,12 +537,18 @@ function linkedSize(ctx: Ctx, p: string, V: string): boolean {
   const v0 = parseFloat(ctx.probe.computed(ctx.el.index, p, wE));
   if (newPx === null || !(v0 > 0) || ctx.model.sheets.length === 0) return false;
   const r = newPx / v0;
+  const Vt = V.trim();
 
   const all = collect(ctx.matched, p);
   for (const x of all) ctx.maxSpec = Math.max(ctx.maxSpec, x.spec);
   for (const x of all) if (x.d.important) no('important-conflict', `"${p}" is set with !important in rule "${x.rule.selector}"; an override would not win`);
   const inl = ctx.inline ? lastDecl(ctx.inline.decls, p) : undefined;
   if (inl?.important) no('important-conflict', `"${p}" is set with !important in the element's style attribute`);
+  const flexE = flexMain(ctx, p, wE);
+  const flexO = flexMain(ctx, p, wO);
+  if (flexE) checkGrow(ctx, p, wE);
+  if (flexO) checkGrow(ctx, p, wO);
+  for (const m of ctx.matched) for (const d of m.rule.decls) if ((flexE || flexO) && d.important && (d.lprop === 'flex' || d.lprop === 'flex-basis')) no('important-conflict', `"${d.lprop}" is set with !important in rule "${m.rule.selector}"; an override would not win`);
 
   // The declaration that wins at O's reference width: inline style, else the cascade winner, else the HTML attribute.
   const win = best(all.filter((x) => chainMatches(x.chain, wO)));
@@ -498,35 +562,53 @@ function linkedSize(ctx: Ctx, p: string, V: string): boolean {
   const fixed = declared !== null && FIXED_LEN.test(declared.trim());
   const pinnedO = ctx.pins.some((q) => q.selector === ctx.path && q.property === p && q.environment === O);
   const important = !!(ctx.inline && inl); // an inline declaration beats rules, so the override must be !important
+  const bImportant = basisImportant(ctx);
   const maxAt = (w: number) => ctx.probe.computed(ctx.el.index, 'max-width', w).trim();
   const guardOn = (w: number) => p === 'width' && (maxAt(w) === 'none' || maxAt(w) === '');
   const guardIm = !!(ctx.inline && lastDecl(ctx.inline.decls, 'max-width'));
-  const mk = (chain: string[], value: string, guard: boolean): RuleLine => ({ chain, prop: p, value, important, extra: guard ? [{ prop: 'max-width', value: '100%', important: guardIm }] : undefined });
+  const mk = (chain: string[], decls: Pair[], guard: boolean): RuleLine => {
+    const [first, ...rest] = decls as [Pair, ...Pair[]];
+    const extra = rest.map(([prop, value]) => ({ prop, value, important: prop === 'flex-basis' ? bImportant : important }));
+    if (guard) extra.push({ prop: 'max-width', value: '100%', important: guardIm });
+    return { chain, prop: first[0], value: first[1], important: first[0] === 'flex-basis' ? bImportant : important, extra: extra.length ? extra : undefined };
+  };
   const chainE = [envCondition(E, ctx.b)];
   const chainO = [envCondition(O, ctx.b)];
+  const declsE: Pair[] = flexE ? [[p, Vt], ['flex-basis', Vt]] : [[p, Vt]];
+  const same = (a: Pair[], b: Pair[]) => a.length === b.length && a.every((x, i) => x[0] === b[i]![0] && x[1] === b[i]![1]);
 
-  if (fixed && !pinnedO) {
-    const scaled = scaleValue(declared!.trim(), [r]).value;
-    if (scaled === V.trim() && guardOn(wE) === guardOn(wO)) {
-      ctx.lines.push(mk([], V.trim(), guardOn(wE)));
+  let declsO: Pair[] | null = null;
+  let alone = '';
+  let aloneValue: string | null = declared;
+  if (flexO) {
+    const basis = declaredBasis(ctx, wO);
+    if (pinnedO) { alone = `"${p}" is pinned in the ${O} environment`; aloneValue = basis; }
+    else if (basis !== null && FIXED_LEN.test(basis)) {
+      declsO = [['flex-basis', scaleValue(basis, [r]).value]];
+      if (fixed) declsO.push([p, scaleValue(declared!.trim(), [r]).value]);
+    } else { alone = `flex-basis ${basis ?? '(not declared)'} is not a fixed px, rem or em length`; aloneValue = basis; }
+  } else if (fixed && !pinnedO) {
+    declsO = [[p, scaleValue(declared!.trim(), [r]).value]];
+  } else {
+    alone = pinnedO ? `"${p}" is pinned in the ${O} environment` : declared === null ? `${p} is not declared for the ${O} environment` : `${declared.trim()} is not a fixed px, rem or em length`;
+  }
+
+  if (declsO) {
+    if (same(declsE, declsO) && guardOn(wE) === guardOn(wO)) {
+      ctx.lines.push(mk([], declsE, guardOn(wE)));
       ctx.placements.push(`${p} (same value at every width)`);
     } else {
-      ctx.lines.push(mk(chainE, V.trim(), guardOn(wE)));
-      ctx.lines.push(mk(chainO, scaled, guardOn(wO)));
-      ctx.placements.push(`${p} inside ${chainE[0]} and scaled inside ${chainO[0]}${fromAttr ? ' (from the HTML attribute)' : ''}`);
+      ctx.lines.push(mk(chainE, declsE, guardOn(wE)));
+      ctx.lines.push(mk(chainO, declsO, guardOn(wO)));
+      ctx.placements.push(`${p} inside ${chainE[0]} and scaled inside ${chainO[0]}${fromAttr ? ' (from the HTML attribute)' : ''}${flexE || flexO ? ' (with flex-basis)' : ''}`);
     }
   } else {
-    ctx.lines.push(mk(chainE, V.trim(), guardOn(wE)));
-    const why = pinnedO
-      ? `"${p}" is pinned in the ${O} environment`
-      : declared === null
-        ? `${p} is not declared for the ${O} environment`
-        : `${declared.trim()} is not a fixed px, rem or em length`;
-    ctx.notes.push({ property: p, condition: chainO[0]!, value: declared ?? '(not declared)', reason: `left alone: ${why}; the new ${p} applies only inside ${chainE[0]}` });
+    ctx.lines.push(mk(chainE, declsE, guardOn(wE)));
+    ctx.notes.push({ property: p, condition: chainO[0]!, value: aloneValue ?? '(not declared)', reason: `left alone: ${alone}; the new ${p} applies only inside ${chainE[0]}` });
     ctx.placements.push(`${p} inside ${chainE[0]} only`);
   }
   const pin = ctx.pins.find((q) => q.selector === ctx.path && q.property === p && q.environment === E);
-  if (pin) addPin(ctx, p, E, V.trim());
+  if (pin) addPin(ctx, p, E, Vt);
   return true;
 }
 
@@ -596,7 +678,10 @@ function unlinkedSet(ctx: Ctx, props: [string, string][], warnings: string[]): E
   for (const [p, v] of props) {
     const all = collect(ctx.matched, p);
     for (const x of all) ctx.maxSpec = Math.max(ctx.maxSpec, x.spec);
-    ctx.lines.push({ chain, prop: p, value: v, important: importantNeeded(ctx, all, p) });
+    const w = envWidth(ctx.env);
+    const flex = SIZE_PROPS.has(p) && flexMain(ctx, p, w);
+    if (flex) checkGrow(ctx, p, w);
+    ctx.lines.push({ chain, prop: p, value: v, important: importantNeeded(ctx, all, p), extra: flex ? [{ prop: 'flex-basis', value: v, important: basisImportant(ctx) }] : undefined });
     addPin(ctx, p, ctx.env, v);
     ctx.placements.push(`${p} inside ${chain[0]}`);
   }

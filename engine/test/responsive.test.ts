@@ -3,6 +3,7 @@ import { applyDomOps, breakpointOf, chainEnv, chainMatches, commit, createModel,
 import type { Edit, EditResult, EditState, Probe } from '../src';
 import { applyEdit } from '../src';
 import { env } from './helpers';
+import { basisOfFlex } from '../src/responsive';
 
 /** A probe whose computed values come from a table keyed by property and width (jsdom has no media queries). */
 const table = (vals: Record<string, Record<number, string>>) => (p: Probe): Probe => ({
@@ -363,3 +364,81 @@ describe('linked width and height', () => {
     expect(e.out(r)).toContain('@media (max-width: 640px) { #a { width: 300px; } }');
   });
 });
+
+describe('linked and unlinked size edits on flex items', () => {
+  const flexV = (over: Record<string, Record<number, string>> = {}) => table({
+    display: { 1280: 'flex', 390: 'flex' }, 'flex-direction': { 1280: 'row', 390: 'row' }, 'flex-basis': { 1280: '240px', 390: '240px' }, 'flex-grow': { 1280: '0', 390: '0' },
+    width: { 1280: '240px', 390: '240px' }, height: { 1280: '100px', 390: '60px' }, 'max-width': { 1280: 'none', 390: 'none' }, ...over,
+  });
+  const row = (css: string, item = '<div id="a" class="s">x</div>') => page(css, `<div class="row">${item}<div>y</div></div>`);
+  const run = (src: string, props: Record<string, string>, tweak = flexV(), extra: Partial<Edit> = {}) => {
+    const e = env(src, 'html', {}, tweak);
+    return { e, r: e.run({ op: 'set', target: e.at('#a'), properties: props, ...extra } as Edit) };
+  };
+  it('writes flex-basis with the width and scales the other environment\'s basis', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 400px; }\n@media (max-width: 640px) { .s { flex-basis: 200px; } }'), { width: '480px' }, flexV({ 'flex-basis': { 1280: '400px', 390: '200px' }, width: { 1280: '400px', 390: '200px' } }));
+    const out = e.out(okR(r));
+    expect(out).toContain('@media (min-width: 641px) { #a { width: 480px; flex-basis: 480px; max-width: 100%; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { flex-basis: 240px; max-width: 100%; } }');
+  });
+  it('the E14 shape: no width declared, same basis in both: a basis rule for each environment', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 240px; }\n@media (max-width: 640px) { .q { color: red; } }'), { width: '300px' });
+    const out = e.out(okR(r));
+    expect(out).toContain('@media (min-width: 641px) { #a { width: 300px; flex-basis: 300px; max-width: 100%; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { flex-basis: 300px; max-width: 100%; } }');
+  });
+  it('scales a basis in rem and em and keeps the unit', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 30rem; }\n@media (max-width: 640px) { .s { flex-basis: 10em; } }'), { width: '600px' }, flexV({ 'flex-basis': { 1280: '480px', 390: '160px' }, width: { 1280: '480px', 390: '160px' } }));
+    expect(e.out(okR(r))).toContain('#a { flex-basis: 12.5em; max-width: 100%; }');
+  });
+  it('leaves a flexible basis alone with a note', () => {
+    for (const basis of ['30%', 'content', 'calc(100% - 20px)']) {
+      const { e, r } = run(row(`.row { display: flex; }\n.s { flex: 0 0 240px; }\n@media (max-width: 640px) { .s { flex-basis: ${basis}; } }`), { width: '300px' });
+      const x = okR(r);
+      expect(e.out(x)).not.toContain('max-width: 640px) { #a');
+      expect(x.notes?.[0]).toMatchObject({ property: 'width', value: basis, reason: expect.stringContaining('left alone') });
+    }
+  });
+  it('scales the width too when it is also declared as a fixed length', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 240px; width: 240px; }\n@media (max-width: 640px) { .s { flex-basis: 200px; width: 200px; } }'), { width: '300px' }, flexV({ 'flex-basis': { 1280: '240px', 390: '200px' }, width: { 1280: '240px', 390: '200px' } }));
+    expect(e.out(okR(r))).toContain('@media (max-width: 640px) { #a { flex-basis: 250px; width: 250px; max-width: 100%; } }');
+  });
+  it('uses the height and the basis for a column container, with no guard', () => {
+    const { e, r } = run(row('.row { display: flex; flex-direction: column; }\n.s { flex: 0 0 100px; }\n@media (max-width: 640px) { .s { flex-basis: 60px; } }'), { height: '150px' }, flexV({ 'flex-direction': { 1280: 'column', 390: 'column' }, 'flex-basis': { 1280: '100px', 390: '60px' }, height: { 1280: '100px', 390: '60px' } }));
+    const out = e.out(okR(r));
+    expect(out).toContain('@media (min-width: 641px) { #a { height: 150px; flex-basis: 150px; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { flex-basis: 90px; } }');
+  });
+  it('treats a flex item with an auto basis, and a non-flex parent, as before', () => {
+    const auto = run(row('.row { display: flex; }\n.s { width: 240px; }\n@media (max-width: 640px) { .s { width: 200px; } }'), { width: '300px' }, flexV({ 'flex-basis': { 1280: 'auto', 390: 'auto' }, width: { 1280: '240px', 390: '200px' } }));
+    expect(auto.e.out(okR(auto.r))).not.toContain('flex-basis');
+    const block = run(row('.row { display: block; }\n.s { width: 240px; }\n@media (max-width: 640px) { .s { width: 200px; } }'), { width: '300px' }, flexV({ display: { 1280: 'block', 390: 'block' }, width: { 1280: '240px', 390: '200px' } }));
+    expect(block.e.out(okR(block.r))).not.toContain('flex-basis');
+  });
+  it('refuses a flex item that can grow, in either environment', () => {
+    const css = '.row { display: flex; }\n.s { flex: 1; }\n@media (max-width: 640px) { .q { color: red; } }';
+    for (const grow of [{ 1280: '1', 390: '0' }, { 1280: '0', 390: '2' }]) {
+      const { r } = run(row(css), { width: '300px' }, flexV({ 'flex-basis': { 1280: '0%', 390: '0%' }, 'flex-grow': grow }));
+      expect(!r.ok && r.refusal.code).toBe('flex-grow');
+    }
+  });
+  it('unlinked size edits on a flex item also write flex-basis, only inside the environment', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 300px; }\n@media (max-width: 640px) { .q { color: red; } }'), { width: '200px' }, flexV(), { environment: 'phone', link: false });
+    expect(e.out(okR(r))).toContain('@media (max-width: 640px) { #a { width: 200px; flex-basis: 200px; } }');
+    const g = run(row('.row { display: flex; }\n.s { flex: 1; }\n@media (max-width: 640px) { .q { color: red; } }'), { width: '200px' }, flexV({ 'flex-basis': { 1280: '0%', 390: '0%' }, 'flex-grow': { 1280: '1', 390: '1' } }), { environment: 'phone', link: false });
+    expect(!g.r.ok && g.r.refusal.code).toBe('flex-grow');
+  });
+  it('a flex-basis in the element\'s own style attribute is beaten with !important', () => {
+    const { e, r } = run(row('.row { display: flex; }\n@media (max-width: 640px) { .q { color: red; } }', '<div id="a" style="flex: 0 0 240px">x</div>'), { width: '300px' });
+    expect(e.out(okR(r))).toContain('flex-basis: 300px !important;');
+  });
+  it('reads the basis out of the flex shorthand', () => {
+    expect(basisOfFlex('0 0 240px')).toBe('240px');
+    expect(basisOfFlex('1')).toBe('0%');
+    expect(basisOfFlex('1 1')).toBe('0%');
+    expect(basisOfFlex('none')).toBe('auto');
+    expect(basisOfFlex('2 1 content')).toBe('content');
+    expect(basisOfFlex('1 1 10em')).toBe('10em');
+  });
+});
+
