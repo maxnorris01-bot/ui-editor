@@ -124,6 +124,13 @@ new behaviour (inline style for a linked colour edit).
   Everything else met the pass line. Per the brief there is no second engine change without Max's decision; the
   cheapest next test is to reuse the old flex-basis handling in the new path and re-run only the gate and size suites.
 
+## Size scaling iteration 2 (2026-11-15)
+
+- **Decision (Max, 2026-11-15):** labelled iteration 2 to fix the flex-item gap found by size1. Amendment, 6 new specs
+  Z17 to Z22 and fixtures locked in `5d8898c` (post-hoc: written after seeing the size1 failure). Size1 stays FAIL on record.
+- **My choice, flex-grow above 0: REFUSE** (not `flex-grow: 0`), because `flex-grow: 0` changes how siblings share space.
+- **Result (run sflex1): PASS**, all seven items met. Z17 to Z21 pass; Z22 (`flex: 1`) is REFUSED with a true reason.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.

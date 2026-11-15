@@ -45,9 +45,15 @@ takes effect at every screen width.
   `max-height` and `aspect-ratio` are never changed. A page rule that uses `!important` on the size refuses
   (`important-conflict`). A non-px new value, or a page with no stylesheet at all, falls back to applying at
   every width with a note.
-- **Known defect (size iteration run 1, gate edit E14):** the new size path does not write `flex-basis` for a
-  flex item that has a non-auto `flex-basis`, so a width edit on such an item (for example `flex: 0 0 240px`)
-  does not take effect (it stays 240 px). The old path did write it. Not fixed yet: waiting for Max.
+- **Flex items:** a width edit (or a height edit in a column container) on a flex item with a non-auto
+  `flex-basis` also writes `flex-basis`, because the basis beats the width on the main axis. Where the other
+  screen size has a fixed px, rem or em basis it is scaled by the same ratio; a flexible basis (`%`, `content`, a
+  function, `var()`) is left alone with a note. Unlinked size edits on such an item write the basis too.
+  **A flex item that can grow (`flex-grow` above 0, for example `flex: 1`) is refused** (`flex-grow`): the
+  container, not the size, would decide how large it is, and `flex-grow: 0` would also change how its siblings
+  share the space. `flex-shrink` is not touched, so a shrinkable item can still end up smaller than the size
+  asked for in a narrow container. Flex items with an `auto` basis, and grid items, are handled like any other
+  element. **(unsure)** how an item with `flex-wrap` and a basis larger than its line behaves; not tested.
 - **Values it cannot scale** (`calc()`, `clamp()`, `min()`, `max()`, `var()`, `env()`, keywords such as
   `auto`) are copied as the page wrote them and reported in a note (one of the 20 responsive specs, S06).
 - **The new value must be in px** so a ratio can be derived. Other units are refused (`ratio-unit`). A zero or

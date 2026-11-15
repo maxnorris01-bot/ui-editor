@@ -88,6 +88,16 @@ attribute, it is multiplied by the ratio and written inside O's condition (one u
 values come out equal); otherwise O is left alone and a note says why. A px width gets `max-width: 100%` in
 its rule only when the element's computed `max-width` there is `none`. Unlinked edits, moves and SVG are
 unchanged. A non-px new value, no usable old value or no stylesheet falls back to the old behaviour. `!important`
-in a matching page rule refuses. Known defect found by the regression run: the new path does not write
-`flex-basis` for a flex item with a non-auto `flex-basis` (the old `placeHtml` did), which fails gate edit E14.
+in a matching page rule refuses. The size1 regression run found that the new path did not write `flex-basis` for a flex item with a non-auto
+`flex-basis` (the old `htmlSet` did), which failed gate edit E14; see the next amendment.
+
+## Amendment (size scaling iteration 2, flex items, 2026-11-15)
+
+`linkedSize` (and the unlinked size path) now write `flex-basis` with the size when the parent is a flex container,
+the property is the main-size property (`width` in a row, `height` in a column) and the item's computed
+`flex-basis` is not `auto` at that width. Where O is also such an item, O's declared basis (from `flex` or
+`flex-basis`; `basisOfFlex` reads the shorthand) is the declaration that is scaled, and `width` is scaled too if
+it is a fixed length; a flexible basis leaves O alone with a note. A flex item with `flex-grow` above 0 at either
+width is refused (`flex-grow`) instead of silently missing the size. A page `!important` on `flex`/`flex-basis`
+refuses. Rules and the pass line: `docs/size-scaling-rules-amendment-1.md`.
 

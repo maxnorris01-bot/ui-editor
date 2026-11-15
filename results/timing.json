@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-13T05:54:08.038Z",
+  "measuredAt": "2026-11-15T23:05:30.278Z",
   "runsPerFile": 20,
   "machine": {
     "model": "Mac17,4",
@@ -15,8 +15,8 @@
     "playwright": "1.65.0"
   },
   "bundle": {
-    "rawBytes": 270450,
-    "gzipBytes": 76996
+    "rawBytes": 272987,
+    "gzipBytes": 77796
   },
   "largestFixture": {
     "file": "large-page.html",
@@ -24,14 +24,14 @@
     "elements": 251,
     "previewMs": {
       "median": 2.5,
-      "min": 2.199999988079071,
-      "max": 5.199999988079071,
-      "first": 5.199999988079071
+      "min": 2.300000011920929,
+      "max": 4.5,
+      "first": 4.5
     },
     "applyMs": {
-      "median": 0.07,
-      "min": 0.06699999988079071,
-      "max": 0.08900000005960465
+      "median": 0.07049999982118607,
+      "min": 0.06799999982118607,
+      "max": 0.10099999994039535
     },
     "applyStatus": "ok",
     "applyRefusal": ""
@@ -43,14 +43,14 @@
       "elements": 29,
       "previewMs": {
         "median": 1.5499999821186066,
-        "min": 1.2000000476837158,
-        "max": 7.399999976158142,
-        "first": 7.399999976158142
+        "min": 1.199999988079071,
+        "max": 5.399999976158142,
+        "first": 5.399999976158142
       },
       "applyMs": {
-        "median": 0.00800000011920929,
+        "median": 0.008250000029802322,
         "min": 0.0075,
-        "max": 0.01800000011920929
+        "max": 0.018499999940395355
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -62,13 +62,13 @@
       "previewMs": {
         "median": 1.300000011920929,
         "min": 1.0999999642372131,
-        "max": 2.200000047683716,
-        "first": 2.200000047683716
+        "max": 2.399999976158142,
+        "first": 2.399999976158142
       },
       "applyMs": {
         "median": 0.006500000059604645,
-        "min": 0.00550000011920929,
-        "max": 0.010999999940395355
+        "min": 0.0054999998211860655,
+        "max": 0.010499999821186067
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -78,15 +78,15 @@
       "bytes": 1253,
       "elements": 18,
       "previewMs": {
-        "median": 1.9000000357627869,
-        "min": 1.7000000476837158,
-        "max": 3.5,
-        "first": 3.5
+        "median": 2,
+        "min": 1.699999988079071,
+        "max": 6.900000035762787,
+        "first": 6.900000035762787
       },
       "applyMs": {
-        "median": 0.0009999999403953552,
-        "min": 0,
-        "max": 0.0030000001192092896
+        "median": 0.0007500000298023224,
+        "min": 0.0004999998211860656,
+        "max": 0.0025
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -96,14 +96,14 @@
       "bytes": 1584,
       "elements": 15,
       "previewMs": {
-        "median": 1.199999988079071,
+        "median": 1.1500000059604645,
         "min": 1,
-        "max": 1.5,
-        "first": 1.5
+        "max": 1.600000023841858,
+        "first": 1.600000023841858
       },
       "applyMs": {
-        "median": 0.005,
-        "min": 0.004000000059604645,
+        "median": 0.004500000178813935,
+        "min": 0.003999999761581421,
         "max": 0.01
       },
       "applyStatus": "ok",
@@ -115,14 +115,14 @@
       "elements": 251,
       "previewMs": {
         "median": 2.5,
-        "min": 2.199999988079071,
-        "max": 5.199999988079071,
-        "first": 5.199999988079071
+        "min": 2.300000011920929,
+        "max": 4.5,
+        "first": 4.5
       },
       "applyMs": {
-        "median": 0.07,
-        "min": 0.06699999988079071,
-        "max": 0.08900000005960465
+        "median": 0.07049999982118607,
+        "min": 0.06799999982118607,
+        "max": 0.10099999994039535
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -132,15 +132,15 @@
       "bytes": 744,
       "elements": 19,
       "previewMs": {
-        "median": 1.199999988079071,
+        "median": 1.2000000178813934,
         "min": 1,
-        "max": 2.200000047683716,
-        "first": 2.200000047683716
+        "max": 2.299999952316284,
+        "first": 2.299999952316284
       },
       "applyMs": {
         "median": 0.004500000178813935,
-        "min": 0.004000000059604645,
-        "max": 0.006500000059604645
+        "min": 0.003999999761581421,
+        "max": 0.005999999940395355
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -150,15 +150,15 @@
       "bytes": 1219,
       "elements": 18,
       "previewMs": {
-        "median": 1.100000023841858,
-        "min": 1.0999999642372131,
-        "max": 2.200000047683716,
-        "first": 2.200000047683716
+        "median": 1.199999988079071,
+        "min": 1,
+        "max": 2,
+        "first": 2
       },
       "applyMs": {
-        "median": 0.004500000178813935,
-        "min": 0.003999999761581421,
-        "max": 0.006500000059604645
+        "median": 0.004750000089406967,
+        "min": 0.004000000059604645,
+        "max": 0.0064999997615814206
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -168,15 +168,15 @@
       "bytes": 917,
       "elements": 9,
       "previewMs": {
-        "median": 1.7999999821186066,
-        "min": 1.600000023841858,
-        "max": 2.399999976158142,
-        "first": 2.399999976158142
+        "median": 1.899999976158142,
+        "min": 1.699999988079071,
+        "max": 2.299999952316284,
+        "first": 2.299999952316284
       },
       "applyMs": {
         "median": 0.0005000001192092896,
         "min": 0,
-        "max": 0.0009999999403953552
+        "max": 0.0010000002384185792
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -186,15 +186,15 @@
       "bytes": 1257,
       "elements": 19,
       "previewMs": {
-        "median": 1.1500000059604645,
-        "min": 1,
-        "max": 1.399999976158142,
-        "first": 1.399999976158142
+        "median": 1.0999999642372131,
+        "min": 0.8999999761581421,
+        "max": 1.4000000357627869,
+        "first": 1.4000000357627869
       },
       "applyMs": {
         "median": 0.004000000059604645,
-        "min": 0.003499999940395355,
-        "max": 0.006500000059604645
+        "min": 0.003999999761581421,
+        "max": 0.016500000059604645
       },
       "applyStatus": "ok",
       "applyRefusal": ""
@@ -204,10 +204,10 @@
       "bytes": 1275,
       "elements": 14,
       "previewMs": {
-        "median": 1.199999988079071,
+        "median": 1.300000011920929,
         "min": 1.0999999642372131,
-        "max": 5,
-        "first": 2
+        "max": 6.699999988079071,
+        "first": 4.900000035762787
       },
       "applyMs": {
         "median": 0.004000000059604645,
@@ -219,19 +219,19 @@
     }
   ],
   "overall": {
-    "medianOfMedians_previewMs": 1.25,
+    "medianOfMedians_previewMs": 1.300000011920929,
     "worstMedian_previewMs": 2.5,
     "medianOfMedians_applyMs": 0.004500000178813935,
-    "worstMedian_applyMs": 0.07
+    "worstMedian_applyMs": 0.07049999982118607
   },
   "scaling": {
-    "measuredAt": "2026-11-13T05:55:24.285Z",
+    "measuredAt": "2026-11-15T23:06:05.468Z",
     "runs": 20,
     "1x": {
       "bytes": 14712,
       "elements": 251,
-      "previewMedianMs": 2.5499999821186066,
-      "applyMedianMs": 0.0675,
+      "previewMedianMs": 2.6500000059604645,
+      "applyMedianMs": 0.06875,
       "applyStatus": "ok",
       "threshold": "report only",
       "pass": null
@@ -239,8 +239,8 @@
     "10x": {
       "bytes": 98410,
       "elements": 2447,
-      "previewMedianMs": 7.5,
-      "applyMedianMs": 0.545,
+      "previewMedianMs": 7.849999964237213,
+      "applyMedianMs": 0.5645000000298024,
       "applyStatus": "ok",
       "threshold": {
         "previewMs": 250,
@@ -251,8 +251,8 @@
     "100x": {
       "bytes": 937210,
       "elements": 24407,
-      "previewMedianMs": 63.75,
-      "applyMedianMs": 7.51,
+      "previewMedianMs": 62.650000005960464,
+      "applyMedianMs": 7.617999999821186,
       "applyStatus": "ok",
       "threshold": "report only",
       "pass": null

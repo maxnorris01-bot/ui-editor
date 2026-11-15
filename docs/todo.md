@@ -26,12 +26,13 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 - [ ] Max: ship the stack of five branches (see the session note) and decide what the README says about the two amendments.
 - [ ] Write the README from `docs/known-limits.md`.
 
-- [ ] Max: decide on the size-scaling E14 defect (flex item with non-auto flex-basis); see `docs/sessions/2026-11-12-size-scaling.md`.
+- [ ] Max: ship branch `feat/size-scaling` (size1 FAIL on record, iteration 2 PASS).
 
 ## Completed (most recent first)
 
 <!-- Move items here when done, newest first, with a one-line note on what happened. -->
 
+- [x] Size scaling iteration 2 (2026-11-15): flex-basis written with size, Z17 to Z22 (5 PASS, Z22 REFUSED), gate 40/40. Verdict PASS.
 - [x] Size scaling run 1 (2026-11-12): rules locked (`909459a`), engine change, 16/16 new specs PASS, but gate 39/40 (E14). Verdict FAIL.
 - [x] Responsive re-score (2026-11-12): amendment 2 (E5 final newline), engine unchanged, run `rescore`: all six pass-line items met. `docs/known-limits.md` written.
 - [x] Responsive iteration 2 (2026-11-12): amendment 1 (`c1096f8`), source-map placement fix, run `iter2`: R01 PASS (amended E4), R09 FAIL (E5), items 2 to 6 met. Verdict FAIL.
