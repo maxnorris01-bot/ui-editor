@@ -7,11 +7,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT } from './fixtures';
 
-const specs = (JSON.parse(readFileSync(join(ROOT, 'fixtures/size/edits.json'), 'utf8')) as { edits: { id: string; fixture: string; widths: number[]; measure: { target: string; props: string[] }; expected: Record<string, Record<string, string>>; reference: string }[] }).edits;
+const specs = (JSON.parse(readFileSync(join(ROOT, 'fixtures/' + (process.env.SIZE_DIR ?? 'size') + '/edits.json'), 'utf8')) as { edits: { id: string; fixture: string; widths: number[]; measure: { target: string; props: string[] }; expected: Record<string, Record<string, string>>; reference: string }[] }).edits;
 const browser = await chromium.launch({ headless: true });
 let bad = 0;
 for (const s of specs) {
-  const src = readFileSync(join(ROOT, 'fixtures/size', s.fixture), 'utf8').replace('</head>', `<style>${s.reference}</style></head>`);
+  const src = readFileSync(join(ROOT, 'fixtures/' + (process.env.SIZE_DIR ?? 'size'), s.fixture), 'utf8').replace('</head>', `<style>${s.reference}</style></head>`);
   const probs: string[] = [];
   for (const w of s.widths) {
     const ctx = await browser.newContext({ viewport: { width: w, height: 800 }, javaScriptEnabled: false });

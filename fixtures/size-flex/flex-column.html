@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flex column</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+.col { display: flex; flex-direction: column; height: 400px; width: 200px; background: #eeeeee; }
+.item { flex: 0 0 100px; background: #cfe3f5; margin: 0 0 2px; }
+@media (max-width: 640px) {
+  .item { flex-basis: 60px; }
+}
+</style>
+</head>
+<body>
+<div class="col"><div class="item" id="c1">One</div><div class="item" id="c2">Two</div><div class="item" id="c3">Three</div></div>
+</body>
+</html>

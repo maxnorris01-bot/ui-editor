@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flex rows</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+.row { display: flex; margin: 0 0 8px; }
+.row > div { height: 30px; }
+.main { flex: 1; min-width: 0; background: #eeeeee; }
+#s17 { flex: 0 0 400px; background: #cfe3f5; }
+#sidebar { flex: 0 0 240px; background: #dddddd; }
+#s21 { flex: 0 0 300px; background: #f5e3cf; }
+#a22 { flex: 0 0 100px; background: #dddddd; }
+#fl { flex: 1; min-width: 0; background: #cfe3f5; }
+@media (max-width: 640px) {
+  #s17 { flex-basis: 200px; }
+  .main { background: #e4e4e4; }
+}
+</style>
+</head>
+<body>
+<div class="row"><div id="s17">Z17</div><div class="main" id="m17">Main</div></div>
+<div class="row"><div id="sidebar">Sidebar</div><div class="main" id="m18">Main</div></div>
+<div class="row"><div id="s21">Z21</div><div class="main" id="m21">Main</div></div>
+<div class="row"><div id="a22">Fixed</div><div id="fl">flex: 1</div></div>
+</body>
+</html>

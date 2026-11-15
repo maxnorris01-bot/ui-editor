@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grid item</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.cell { height: 30px; background: #dddddd; justify-self: start; }
+#g1 { width: 200px; }
+@media (max-width: 640px) {
+  #g1 { width: 120px; }
+}
+</style>
+</head>
+<body>
+<div class="grid"><div class="cell" id="g1">Grid one</div><div class="cell" id="g2">Grid two</div></div>
+</body>
+</html>
