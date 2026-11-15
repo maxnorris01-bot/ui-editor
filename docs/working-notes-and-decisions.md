@@ -115,6 +115,22 @@ new behaviour (inline style for a linked colour edit).
   needed to get there; the README should say so.
 - `docs/known-limits.md` collects every limit found so far for the README.
 
+## Size scaling (2026-11-12)
+
+- **Decision (Max, 2026-11-12):** resizing keeps the same ratio rules as font size; moves stay unlinked in v1.
+  Rules, fixtures and 16 specs locked in `909459a` (`docs/size-scaling-rules.md`).
+- **Run 1 (size1): FAIL.** The 16 new specs all pass, but the regression missed: gate 39/40. E14 (width on a flex
+  item with `flex: 0 0 240px`) stays at 240 px because the new path does not write `flex-basis` as the old path did.
+  Everything else met the pass line. Per the brief there is no second engine change without Max's decision; the
+  cheapest next test is to reuse the old flex-basis handling in the new path and re-run only the gate and size suites.
+
+## Size scaling iteration 2 (2026-11-15)
+
+- **Decision (Max, 2026-11-15):** labelled iteration 2 to fix the flex-item gap found by size1. Amendment, 6 new specs
+  Z17 to Z22 and fixtures locked in `5d8898c` (post-hoc: written after seeing the size1 failure). Size1 stays FAIL on record.
+- **My choice, flex-grow above 0: REFUSE** (not `flex-grow: 0`), because `flex-grow: 0` changes how siblings share space.
+- **Result (run sflex1): PASS**, all seven items met. Z17 to Z21 pass; Z22 (`flex: 1`) is REFUSED with a true reason.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.

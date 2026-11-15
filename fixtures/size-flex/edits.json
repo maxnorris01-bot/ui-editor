@@ -1,0 +1,281 @@
+{
+ "version": 1,
+ "defaultBreakpoint": 640,
+ "tolerance": {
+  "px": 0.5,
+  "bboxPx": 1
+ },
+ "viewportHeight": 800,
+ "edits": [
+  {
+   "id": "Z17",
+   "case": "a",
+   "kind": "linked",
+   "fixture": "flex-rows.html",
+   "steps": [
+    {
+     "target": "#s17",
+     "op": "set",
+     "properties": {
+      "width": "480px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#s17",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "480px",
+     "1024": "480px",
+     "768": "480px",
+     "641": "480px",
+     "640": "240px",
+     "390": "240px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #s17 { width: 480px; flex-basis: 480px; max-width: 100%; } } @media (max-width: 640px) { #s17 { flex-basis: 240px; max-width: 100%; } }",
+   "note": "flex: 0 0 400px, phone flex-basis 200px: edit 400 to 480 (x1.2), phone basis 200 x 1.2 = 240"
+  },
+  {
+   "id": "Z18",
+   "case": "b",
+   "kind": "linked",
+   "fixture": "flex-rows.html",
+   "steps": [
+    {
+     "target": "#sidebar",
+     "op": "set",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#sidebar",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "300px",
+     "1024": "300px",
+     "768": "300px",
+     "641": "300px",
+     "640": "300px",
+     "390": "300px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "#sidebar { width: 300px; flex-basis: 300px; max-width: 100%; }",
+   "note": "the E14 shape: flex: 0 0 240px, no width declared, same basis at every width: 240 x 1.25 = 300 at phone too"
+  },
+  {
+   "id": "Z19",
+   "case": "c",
+   "kind": "linked",
+   "fixture": "flex-column.html",
+   "steps": [
+    {
+     "target": "#c1",
+     "op": "set",
+     "properties": {
+      "height": "150px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#c1",
+    "props": [
+     "height"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "height": {
+     "1280": "150px",
+     "1024": "150px",
+     "768": "150px",
+     "641": "150px",
+     "640": "90px",
+     "390": "90px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #c1 { height: 150px; flex-basis: 150px; } } @media (max-width: 640px) { #c1 { flex-basis: 90px; } }",
+   "note": "column flex container: item flex: 0 0 100px, phone basis 60px: height 100 to 150 (x1.5), phone 60 x 1.5 = 90; #c2 and #c3 must not change"
+  },
+  {
+   "id": "Z20",
+   "case": "d",
+   "kind": "linked",
+   "fixture": "grid-item.html",
+   "steps": [
+    {
+     "target": "#g1",
+     "op": "set",
+     "properties": {
+      "width": "240px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#g1",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "240px",
+     "1024": "240px",
+     "768": "240px",
+     "641": "240px",
+     "640": "144px",
+     "390": "144px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #g1 { width: 240px; max-width: 100%; } } @media (max-width: 640px) { #g1 { width: 144px; max-width: 100%; } }",
+   "note": "grid item, no flex-basis involved (control): 200 to 240 (x1.2), phone 120 x 1.2 = 144"
+  },
+  {
+   "id": "Z21",
+   "case": "e",
+   "kind": "unlinked",
+   "fixture": "flex-rows.html",
+   "steps": [
+    {
+     "target": "#s21",
+     "op": "set",
+     "properties": {
+      "width": "200px"
+     },
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#s21",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "300px",
+     "1024": "300px",
+     "768": "300px",
+     "641": "300px",
+     "640": "200px",
+     "390": "200px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (max-width: 640px) { #s21 { width: 200px; flex-basis: 200px; } }",
+   "note": "unlinked phone-only width on a flex item with flex: 0 0 300px: the flex-basis is written with it"
+  },
+  {
+   "id": "Z22",
+   "case": "f",
+   "kind": "linked",
+   "fixture": "flex-rows.html",
+   "steps": [
+    {
+     "target": "#fl",
+     "op": "set",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#fl",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "300px",
+     "1024": "300px",
+     "768": "300px",
+     "641": "300px",
+     "640": "540px",
+     "390": "290px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #fl { flex: 0 0 300px; width: 300px; max-width: 100%; } }",
+   "note": "flex: 1 (basis 0%, grow 1): the container, not the width, decides the size; PASS with a size that holds, or a structured REFUSED with a true reason; a silent miss is a FAIL"
+  }
+ ]
+}

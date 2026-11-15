@@ -34,8 +34,26 @@ takes effect at every screen width.
 - **Scaled by ratio** (linked edits): `font-size`, `padding` and `margin` and their sides. Each number in
   the page's own rules is multiplied; units and keywords stay.
 - **Not scaled; applies everywhere:** colour, font-family, font-weight, alignment, offsets and reorders.
-- **`width` and `height` are not scaled** on purpose (a computed width usually comes from layout, not from a
-  declared length). The edit applies at every width and the engine notes it.
+- **`width` and `height` follow the ratio where the other screen size declares a fixed length**
+  (px, rem, em, or an HTML `width`/`height` attribute). The other size is multiplied by the same ratio.
+  Percentages, `auto`, `vw`/`vh`, `calc()`/`clamp()`/`min()`/`max()`/`var()`, keywords and "not declared"
+  are left alone: the new size applies only to the screen size being edited and the engine notes which one
+  was left alone. Every px width also gets `max-width: 100%` (so it cannot overflow a phone), unless the
+  element already has its own `max-width`. Height gets no such guard.
+- **Size edits: limits.** Only the declaration that wins at 390 px (phone) or 1280 px (desktop) is read, so
+  other breakpoints inside the same screen size are not scaled. `min-width`, `max-width`, `min-height`,
+  `max-height` and `aspect-ratio` are never changed. A page rule that uses `!important` on the size refuses
+  (`important-conflict`). A non-px new value, or a page with no stylesheet at all, falls back to applying at
+  every width with a note.
+- **Flex items:** a width edit (or a height edit in a column container) on a flex item with a non-auto
+  `flex-basis` also writes `flex-basis`, because the basis beats the width on the main axis. Where the other
+  screen size has a fixed px, rem or em basis it is scaled by the same ratio; a flexible basis (`%`, `content`, a
+  function, `var()`) is left alone with a note. Unlinked size edits on such an item write the basis too.
+  **A flex item that can grow (`flex-grow` above 0, for example `flex: 1`) is refused** (`flex-grow`): the
+  container, not the size, would decide how large it is, and `flex-grow: 0` would also change how its siblings
+  share the space. `flex-shrink` is not touched, so a shrinkable item can still end up smaller than the size
+  asked for in a narrow container. Flex items with an `auto` basis, and grid items, are handled like any other
+  element. **(unsure)** how an item with `flex-wrap` and a basis larger than its line behaves; not tested.
 - **Values it cannot scale** (`calc()`, `clamp()`, `min()`, `max()`, `var()`, `env()`, keywords such as
   `auto`) are copied as the page wrote them and reported in a note (one of the 20 responsive specs, S06).
 - **The new value must be in px** so a ratio can be derived. Other units are refused (`ratio-unit`). A zero or

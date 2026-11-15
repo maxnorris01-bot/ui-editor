@@ -1,0 +1,770 @@
+{
+ "version": 1,
+ "defaultBreakpoint": 640,
+ "tolerance": {
+  "px": 0.5,
+  "bboxPx": 1
+ },
+ "viewportHeight": 800,
+ "edits": [
+  {
+   "id": "Z01",
+   "case": "a",
+   "kind": "linked",
+   "fixture": "size-basic.html",
+   "steps": [
+    {
+     "target": "#pa",
+     "op": "set",
+     "properties": {
+      "width": "630px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#pa",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "630px",
+     "1024": "630px",
+     "768": "630px",
+     "641": "630px",
+     "640": "315px",
+     "390": "315px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #pa { width: 630px; max-width: 100%; } } @media (max-width: 640px) { #pa { width: 315px; max-width: 100%; } }",
+   "note": "phone declares 300px: 300 x 1.05; shared .panel: #pb and #pc must not change"
+  },
+  {
+   "id": "Z02",
+   "case": "b",
+   "kind": "linked",
+   "fixture": "size-basic.html",
+   "steps": [
+    {
+     "target": "#pct",
+     "op": "set",
+     "properties": {
+      "width": "630px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#pct",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "630px",
+     "1024": "630px",
+     "768": "630px",
+     "641": "630px",
+     "640": "512px",
+     "390": "312px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #pct { width: 630px; max-width: 100%; } }",
+   "note": "phone declares 80%: left alone, the page's own 80% of the container",
+   "expectNotScaled": [
+    "width"
+   ]
+  },
+  {
+   "id": "Z03",
+   "case": "c",
+   "kind": "linked",
+   "fixture": "size-basic.html",
+   "steps": [
+    {
+     "target": "#auto",
+     "op": "set",
+     "properties": {
+      "width": "500px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#auto",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "500px",
+     "1024": "500px",
+     "768": "500px",
+     "641": "500px",
+     "640": "640px",
+     "390": "390px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #auto { width: 500px; max-width: 100%; } }",
+   "note": "phone width undeclared (block, auto): left alone, fills the container",
+   "expectNotScaled": [
+    "width"
+   ]
+  },
+  {
+   "id": "Z04",
+   "case": "d",
+   "kind": "linked",
+   "fixture": "size-units.html",
+   "steps": [
+    {
+     "target": "#re",
+     "op": "set",
+     "properties": {
+      "width": "600px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#re",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "600px",
+     "1024": "600px",
+     "768": "600px",
+     "641": "600px",
+     "640": "300px",
+     "390": "300px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #re { width: 600px; max-width: 100%; } } @media (max-width: 640px) { #re { width: 18.75em; max-width: 100%; } }",
+   "note": "base 30rem (480px), phone 15em (240px at 16px): 15em x 1.25 = 18.75em = 300px"
+  },
+  {
+   "id": "Z05",
+   "case": "e",
+   "kind": "linked",
+   "fixture": "size-basic.html",
+   "steps": [
+    {
+     "target": "#pb",
+     "op": "set",
+     "properties": {
+      "height": "60px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#pb",
+    "props": [
+     "height"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "height": {
+     "1280": "60px",
+     "1024": "60px",
+     "768": "60px",
+     "641": "60px",
+     "640": "45px",
+     "390": "45px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #pb { height: 60px; } } @media (max-width: 640px) { #pb { height: 45px; } }",
+   "note": "phone declares height 30px: 30 x 1.5; no max-width guard on height"
+  },
+  {
+   "id": "Z06",
+   "case": "f",
+   "kind": "linked",
+   "fixture": "size-height.html",
+   "steps": [
+    {
+     "target": "#hauto",
+     "op": "set",
+     "properties": {
+      "height": "180px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#hauto",
+    "props": [
+     "height"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "height": {
+     "1280": "180px",
+     "1024": "180px",
+     "768": "180px",
+     "641": "180px",
+     "640": "20px",
+     "390": "20px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #hauto { height: 180px; } }",
+   "note": "phone height is auto (one 20px line): left alone",
+   "expectNotScaled": [
+    "height"
+   ]
+  },
+  {
+   "id": "Z07",
+   "case": "g",
+   "kind": "linked",
+   "fixture": "size-guard.html",
+   "steps": [
+    {
+     "target": "#big",
+     "op": "set",
+     "properties": {
+      "width": "720px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#big",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "720px",
+     "1024": "720px",
+     "768": "720px",
+     "641": "641px",
+     "640": "600px",
+     "390": "390px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #big { width: 720px; max-width: 100%; } } @media (max-width: 640px) { #big { width: 600px; max-width: 100%; } }",
+   "note": "phone 250 x 2.4 = 600: capped to the 390 container at 390; at 641 the new 720 is capped to 641"
+  },
+  {
+   "id": "Z08",
+   "case": "h",
+   "kind": "linked",
+   "fixture": "size-guard.html",
+   "steps": [
+    {
+     "target": "#capped",
+     "op": "set",
+     "properties": {
+      "width": "600px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#capped",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "480px",
+     "1024": "480px",
+     "768": "480px",
+     "641": "480px",
+     "640": "300px",
+     "390": "300px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #capped { width: 600px; } } @media (max-width: 640px) { #capped { width: 300px; } }",
+   "note": "element has max-width 480px: no guard added, its own max-width stands (480 at desktop), phone 200 x 1.5 = 300"
+  },
+  {
+   "id": "Z09",
+   "case": "i",
+   "kind": "linked",
+   "fixture": "size-envs.html",
+   "steps": [
+    {
+     "target": "#ph",
+     "op": "set",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "phone",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#ph",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "600px",
+     "1024": "600px",
+     "768": "600px",
+     "641": "600px",
+     "640": "300px",
+     "390": "300px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (max-width: 640px) { #ph { width: 300px; max-width: 100%; } } @media (min-width: 641px) { #ph { width: 600px; max-width: 100%; } }",
+   "note": "edit made at phone width: desktop 500 x 1.2 = 600"
+  },
+  {
+   "id": "Z10",
+   "case": "j",
+   "kind": "linked",
+   "fixture": "size-units.html",
+   "steps": [
+    {
+     "target": "#fn",
+     "op": "set",
+     "properties": {
+      "width": "630px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#fn",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "630px",
+     "1024": "630px",
+     "768": "630px",
+     "641": "630px",
+     "640": "320px",
+     "390": "200px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #fn { width: 630px; max-width: 100%; } }",
+   "note": "phone declares clamp(200px, 50vw, 500px): left alone plus a note",
+   "expectNotScaled": [
+    "width"
+   ]
+  },
+  {
+   "id": "Z11",
+   "case": "k",
+   "kind": "linked",
+   "fixture": "size-basic.html",
+   "steps": [
+    {
+     "target": "#pc",
+     "op": "set",
+     "properties": {
+      "width": "540px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#pc",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "540px",
+     "1024": "540px",
+     "768": "540px",
+     "641": "540px",
+     "640": "270px",
+     "390": "270px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #pc { width: 540px; max-width: 100%; } } @media (max-width: 640px) { #pc { width: 270px; max-width: 100%; } }",
+   "note": "shared .panel: only #pc changes, #pa and #pb stay (E4)"
+  },
+  {
+   "id": "Z12",
+   "case": "l",
+   "kind": "unlinked",
+   "fixture": "size-envs.html",
+   "steps": [
+    {
+     "target": "#unl",
+     "op": "set",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "phone",
+     "link": false
+    }
+   ],
+   "measure": {
+    "target": "#unl",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "600px",
+     "1024": "600px",
+     "768": "600px",
+     "641": "600px",
+     "640": "300px",
+     "390": "300px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (max-width: 640px) { #unl { width: 300px; } }",
+   "note": "unlinked phone-only width: existing behaviour (regression)"
+  },
+  {
+   "id": "Z13",
+   "case": "m",
+   "kind": "unlinked",
+   "fixture": "size-envs.html",
+   "steps": [
+    {
+     "target": "#pin",
+     "op": "set",
+     "properties": {
+      "width": "250px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "target": "#pin",
+     "op": "set",
+     "properties": {
+      "width": "630px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#pin",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "630px",
+     "1024": "630px",
+     "768": "630px",
+     "641": "630px",
+     "640": "250px",
+     "390": "250px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #pin { width: 630px; max-width: 100%; } } @media (max-width: 640px) { #pin { width: 250px; } }",
+   "note": "phone width 250 pinned; a later linked desktop edit 600 to 630 must not change it"
+  },
+  {
+   "id": "Z14",
+   "case": "n",
+   "kind": "linked",
+   "fixture": "size-attrs.html",
+   "steps": [
+    {
+     "target": "#tbl",
+     "op": "set",
+     "properties": {
+      "width": "630px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#tbl",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "630px",
+     "1024": "630px",
+     "768": "630px",
+     "641": "630px",
+     "640": "630px",
+     "390": "390px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "#tbl { width: 630px; max-width: 100%; }",
+   "note": "width comes from the HTML attribute width=600 (fixed at every width): 600 x 1.05 = 630, capped to the 390 container"
+  },
+  {
+   "id": "Z15",
+   "case": "o",
+   "kind": "linked",
+   "fixture": "size-attrs.html",
+   "steps": [
+    {
+     "target": "#img",
+     "op": "set",
+     "properties": {
+      "width": "480px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#img",
+    "props": [
+     "width"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "480px",
+     "1024": "480px",
+     "768": "480px",
+     "641": "480px",
+     "640": "288px",
+     "390": "288px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #img { width: 480px; max-width: 100%; } } @media (max-width: 640px) { #img { width: 288px; max-width: 100%; } }",
+   "note": "img with width=400 height=200 attributes; phone rule .hero width 240px: 240 x 1.2 = 288; the height attribute is not edited"
+  },
+  {
+   "id": "Z16",
+   "case": "p",
+   "kind": "linked",
+   "fixture": "size-height.html",
+   "steps": [
+    {
+     "target": "#seq",
+     "op": "set",
+     "properties": {
+      "width": "480px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "target": "#seq",
+     "op": "set",
+     "properties": {
+      "height": "150px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "measure": {
+    "target": "#seq",
+    "props": [
+     "width",
+     "height"
+    ]
+   },
+   "widths": [
+    1280,
+    1024,
+    768,
+    641,
+    640,
+    390
+   ],
+   "expected": {
+    "width": {
+     "1280": "480px",
+     "1024": "480px",
+     "768": "480px",
+     "641": "480px",
+     "640": "240px",
+     "390": "240px"
+    },
+    "height": {
+     "1280": "150px",
+     "1024": "150px",
+     "768": "150px",
+     "641": "150px",
+     "640": "75px",
+     "390": "75px"
+    }
+   },
+   "legit": "flow",
+   "expectedOutcome": "PASS",
+   "reference": "@media (min-width: 641px) { #seq { width: 480px; max-width: 100%; height: 150px; } } @media (max-width: 640px) { #seq { width: 240px; max-width: 100%; height: 75px; } }",
+   "note": "width 400 to 480 (x1.2, phone 200 to 240), then height 100 to 150 (x1.5, phone 50 to 75)"
+  }
+ ]
+}

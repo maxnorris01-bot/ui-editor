@@ -18,10 +18,13 @@ const RUN = process.env.GATE_RUN ?? '1';
 // GATE_CONTROL=noop|collateral|reformat: scorer sanity check on deliberately broken exports (nothing is written to the results).
 const CONTROL = process.env.GATE_CONTROL ?? '';
 const REAL = resolve(process.argv[2] ?? join(ROOT, '../ui-editor-realpages'));
-const OUT = join(ROOT, 'responsive-check/results');
-const CSV = join(OUT, 'responsive-results.csv');
-const TMP = join(ROOT, 'responsive-check/tmp', CONTROL ? `control-${CONTROL}` : `run-${RUN}`);
-const RAW = join(ROOT, 'responsive-check/raw', CONTROL ? `control-${CONTROL}` : `run-${RUN}`);
+// SUITE=size runs fixtures/size/edits.json (docs/size-scaling-rules.md) instead of the responsive specs and R01/R09.
+const SUITE = process.env.SUITE === 'size' ? 'size' : process.env.SUITE === 'size-flex' ? 'size-flex' : 'responsive';
+const SDIR = SUITE === 'responsive' ? 'responsive-check' : 'size-check';
+const OUT = join(ROOT, SDIR, 'results');
+const CSV = join(OUT, `${SUITE === 'responsive' ? 'responsive' : SUITE}-results.csv`);
+const TMP = join(ROOT, SDIR, 'tmp', CONTROL ? `control-${CONTROL}` : `run-${RUN}`);
+const RAW = join(ROOT, SDIR, 'raw', CONTROL ? `control-${CONTROL}` : `run-${RUN}`);
 
 interface Step { target: string; op: 'set' | 'offset' | 'reorder'; properties?: Record<string, string>; dx?: number; dy?: number; placement?: string; sibling?: string; environment?: string; link?: boolean }
 interface Measure { target?: string; parent?: string; props?: string[]; bbox?: boolean; visualOrder?: boolean }
@@ -38,14 +41,15 @@ mkdirSync(TMP, { recursive: true });
 mkdirSync(RAW, { recursive: true });
 mkdirSync(OUT, { recursive: true });
 
-const respSpecs = (JSON.parse(readFileSync(join(ROOT, 'fixtures/responsive/edits.json'), 'utf8')) as { edits: Spec[] }).edits;
+const FIXDIR = SUITE === 'size' ? 'fixtures/size' : SUITE === 'size-flex' ? 'fixtures/size-flex' : 'fixtures/responsive';
+const respSpecs = (JSON.parse(readFileSync(join(ROOT, FIXDIR, 'edits.json'), 'utf8')) as { edits: Spec[] }).edits;
 const realFile = JSON.parse(readFileSync(join(ROOT, 'realpage-check/edits.json'), 'utf8')) as { companions: Record<string, Record<string, string>>; edits: { id: string; file: string; target: string; edit: { op: 'set'; properties: Record<string, string> }; legit: Spec['legit'] }[] };
 
 // ---- inputs -----------------------------------------------------------------------------------
 const inputs = new Map<string, Input>();
 const fixtureInput = (file: string): Input => {
   let i = inputs.get(`r:${file}`);
-  if (!i) { const dir = join(ROOT, 'fixtures/responsive'); i = { file, kind: 'html', source: readFileSync(join(dir, file), 'utf8'), companions: {}, dir }; inputs.set(`r:${file}`, i); }
+  if (!i) { const dir = join(ROOT, FIXDIR); i = { file, kind: 'html', source: readFileSync(join(dir, file), 'utf8'), companions: {}, dir }; inputs.set(`r:${file}`, i); }
   return i;
 };
 const realInput = (file: string): Input => {
@@ -66,7 +70,7 @@ const realWidths = (inp: Input): number[] => {
   return [...set].sort((a, b) => b - a);
 };
 const specs: Spec[] = [...respSpecs];
-for (const id of ['R01', 'R09']) {
+for (const id of SUITE !== 'responsive' ? [] : ['R01', 'R09']) {
   const r = realFile.edits.find((e) => e.id === id)!;
   const inp = realInput(r.file);
   specs.push({ id, case: 'real-page', kind: 'linked', fixture: r.file, real: true, steps: [{ target: r.target, op: 'set', properties: r.edit.properties, environment: 'desktop', link: true }],
@@ -233,6 +237,16 @@ for (const spec of specs) {
     let files = out!.files!;
     if (CONTROL) {
       const m = files[inp.file] ?? inp.source;
+      if (CONTROL === 'samewidth' || CONTROL === 'overflow' || CONTROL === 'refgood') {
+        // Scorer check for the size suite: the phone value wrongly equals the desktop value, or overflows the phone container.
+        // Built from the spec's hand-written reference CSS (not from the engine), so only the sabotage can make E2 fail.
+        const refSrc = inp.source.replace('</head>', `<style>${(spec as Spec & { reference?: string }).reference ?? ''}</style></head>`);
+        const st = spec.steps[spec.steps.length - 1]!;
+        const prop = Object.keys(st.properties ?? {})[0] ?? 'width';
+        const val = CONTROL === 'refgood' ? '' : CONTROL === 'samewidth' ? st.properties![prop]! : '3000px';
+        const css = CONTROL === 'refgood' ? '' : `<style>@media (max-width: 640px) { ${spec.measure.target} { ${prop}: ${val} !important; flex-basis: ${val} !important; max-width: none !important; } }</style>`;
+        files = { ...files, [inp.file]: refSrc.replace('</head>', `${css}</head>`) };
+      } else
       if (CONTROL === 'lastline' || CONTROL === 'twonl') {
         const name = [inp.file, ...Object.keys(inp.companions)].find((n) => !origFiles[n]!.endsWith('\n') && (files[n] ?? '').startsWith(origFiles[n]!) && files[n] !== origFiles[n]) ?? inp.file;
         const o = origFiles[name]!, x = files[name] ?? '';
@@ -242,6 +256,7 @@ for (const spec of specs) {
     }
     const dirX = join(TMP, spec.id, 'exported');
     writeSet(dirX, files);
+    if (process.env.EXPORT_DIR && !CONTROL) writeSet(join(process.env.EXPORT_DIR, SUITE === 'responsive' ? 'resp' : SUITE, spec.id), files);
     // original measurements per width (and expected values for the real-page specs, from the formula)
     const O: Record<number, AtWidth> = {}, X: Record<number, AtWidth> = {};
     for (const w of spec.widths) { O[w] = await loadAt(dirO, inp.file, w, spec.measure, true, spec.steps[0]!.target); X[w] = await loadAt(dirX, inp.file, w, spec.measure, true, spec.steps[0]!.target); }
@@ -326,6 +341,7 @@ if (CONTROL) {
   const by = new Map<string, number>();
   for (const r of rows) if (!r.pass && r.rule !== 'E4L' && r.rule !== 'E5L' && r.rule !== 'NOTES') by.set(r.rule, (by.get(r.rule) ?? 0) + 1);
   console.log(`CONTROL ${CONTROL}: specs failing per rule`, JSON.stringify([...by.entries()].sort()));
+  if (process.env.CONTROL_DETAIL) for (const r of rows) if (!r.pass && r.rule === process.env.CONTROL_DETAIL) console.log(r.id, r.detail.slice(0, 200));
   process.exit(0);
 }
 const prev = existsSync(CSV) ? readFileSync(CSV, 'utf8').trimEnd() : header;

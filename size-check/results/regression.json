@@ -1,0 +1,44 @@
+{
+  "checked": 81,
+  "requiredIdentical": 72,
+  "byteIdentical": 72,
+  "notIdentical": [],
+  "listed": [
+    {
+      "id": "gate/E02",
+      "identical": true
+    },
+    {
+      "id": "gate/E10",
+      "identical": false
+    },
+    {
+      "id": "gate/E14",
+      "identical": false
+    },
+    {
+      "id": "gate/E18",
+      "identical": false
+    },
+    {
+      "id": "real/R02",
+      "identical": false
+    },
+    {
+      "id": "real/R06",
+      "identical": false
+    },
+    {
+      "id": "real/R14",
+      "identical": true
+    },
+    {
+      "id": "real/R18",
+      "identical": true
+    },
+    {
+      "id": "resp/S18",
+      "identical": true
+    }
+  ]
+}

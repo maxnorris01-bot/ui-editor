@@ -1,0 +1,15 @@
+PASS
+Scorer check for docs/size-scaling-rules-amendment-1.md (Z17 to Z22), run before the engine change (harness/run-responsive.ts, SUITE=size-flex).
+Step 1 run with the CURRENT (run size1) engine, kept as run `sflex0` in size-flex-results.csv:
+- Z17, Z18, Z19, Z21 FAIL as expected (the width is written but the flex-basis still wins), and Z22 FAILs (silent miss: 1180 px instead of 300 px);
+  Z20 (grid item control) PASSES. The specs detect the defect.
+Controls (specs of 6 failing each rule):
+- unchanged file (noop): fails E2 on 6/6.
+- collateral CSS: fails E4 on 6/6.
+- one added space (reformat): fails E5 on 6/6.
+- phone value wrongly equal to the desktop value (samewidth, built from the hand-written reference CSS, now also forcing flex-basis):
+  fails E2 at @640 and @390 on Z17, Z19, Z20. It cannot fail where the correct phone value equals the desktop value (Z18: 300 at every
+  width; Z21: the phone value is the edited one) or where the container decides the size (Z22, flex: 1); this is expected, not a miss.
+- width overflowing the phone container (3000px): fails E2 at @640 and @390 on Z17, Z18, Z19, Z20, Z21. Not on Z22: a flex-shrink 1 item
+  cannot overflow its container, so nothing overflows.
+The same two controls on the original 16 specs (now with flex-basis forced too): samewidth fails E2 on 14/16, overflow on 16/16 (as in size1).

@@ -78,3 +78,26 @@ immediately before that comment, on their own lines if the comment is on its own
 stays the last thing in the file and no existing line changes. Known limit: a file with no such comment
 and no trailing newline still gets the old behaviour (a newline, then the rules), which changes that
 file's last line in a line diff. `freelancer-index`'s `css/styles.css` is exactly that case.
+
+## Amendment (size scaling, 2026-11-12)
+
+Linked `width` and `height` edits now follow the ratio rules (`docs/size-scaling-rules.md`). With E the edited
+environment and O the other: the new value is written as a scoped rule inside E's condition; if the cascade
+winner at O's reference width (390 or 1280) is a fixed px, rem or em length, or a numeric `width`/`height`
+attribute, it is multiplied by the ratio and written inside O's condition (one unconditional rule when both
+values come out equal); otherwise O is left alone and a note says why. A px width gets `max-width: 100%` in
+its rule only when the element's computed `max-width` there is `none`. Unlinked edits, moves and SVG are
+unchanged. A non-px new value, no usable old value or no stylesheet falls back to the old behaviour. `!important`
+in a matching page rule refuses. The size1 regression run found that the new path did not write `flex-basis` for a flex item with a non-auto
+`flex-basis` (the old `htmlSet` did), which failed gate edit E14; see the next amendment.
+
+## Amendment (size scaling iteration 2, flex items, 2026-11-15)
+
+`linkedSize` (and the unlinked size path) now write `flex-basis` with the size when the parent is a flex container,
+the property is the main-size property (`width` in a row, `height` in a column) and the item's computed
+`flex-basis` is not `auto` at that width. Where O is also such an item, O's declared basis (from `flex` or
+`flex-basis`; `basisOfFlex` reads the shorthand) is the declaration that is scaled, and `width` is scaled too if
+it is a fixed length; a flexible basis leaves O alone with a note. A flex item with `flex-grow` above 0 at either
+width is refused (`flex-grow`) instead of silently missing the size. A page `!important` on `flex`/`flex-basis`
+refuses. Rules and the pass line: `docs/size-scaling-rules-amendment-1.md`.
+

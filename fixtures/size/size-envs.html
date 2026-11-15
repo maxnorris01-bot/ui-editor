@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Size environments</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; }
+#ph { width: 500px; height: 30px; margin: 0 0 8px; background: #dddddd; }
+#unl { width: 600px; height: 30px; margin: 0 0 8px; background: #cfe3f5; }
+#pin { width: 600px; height: 30px; margin: 0 0 8px; background: #f5e3cf; }
+.note { color: #222222; }
+@media (max-width: 640px) {
+  #ph { width: 250px; }
+  .note { color: #444444; }
+}
+</style>
+</head>
+<body>
+<div id="ph">Edited at phone width</div>
+<div id="unl">Unlinked</div>
+<div id="pin">Pinned</div>
+<p class="note">Note</p>
+</body>
+</html>

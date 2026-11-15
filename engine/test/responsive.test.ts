@@ -3,6 +3,7 @@ import { applyDomOps, breakpointOf, chainEnv, chainMatches, commit, createModel,
 import type { Edit, EditResult, EditState, Probe } from '../src';
 import { applyEdit } from '../src';
 import { env } from './helpers';
+import { basisOfFlex } from '../src/responsive';
 
 /** A probe whose computed values come from a table keyed by property and width (jsdom has no media queries). */
 const table = (vals: Record<string, Record<number, string>>) => (p: Probe): Probe => ({
@@ -141,13 +142,6 @@ describe('linked ratio edits', () => {
     expect(out).toContain('#a { padding: 18px 30px; }');
     expect(out).toContain('@media (max-width: 640px) { #a { padding: 12px 18px; } }');
     expect(out).toContain('style="color: #c00"');
-  });
-  it('notes that width is not scaled and applies it at every width', () => {
-    const src = page('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: auto; } }', '<div class="p" id="a">x</div>');
-    const e = env(src);
-    const r = okR(e.run({ op: 'set', target: e.at('#a'), properties: { width: '500px' } }));
-    expect(r.notes?.[0]?.reason).toContain('not scaled');
-    expect(e.out(r)).toContain('style="width: 500px"');
   });
 });
 
@@ -288,3 +282,163 @@ describe('override rules and a trailing source-map comment', () => {
     expect(e.out(edit(e))).toBe(src.replace('\n</style>', `\n${NEW}</style>`));
   });
 });
+
+describe('linked width and height', () => {
+  const wh = table({ width: { 1280: '480px', 390: '200px' }, height: { 1280: '100px', 390: '50px' }, 'max-width': { 1280: 'none', 390: 'none' } });
+  const widthPage = (css: string, tag = '<div class="p" id="a">x</div>') => page(css, tag);
+  const set = (src: string, props: Record<string, string>, extra: Partial<Edit> = {}, tweak = wh) => {
+    const e = env(src, 'html', {}, tweak);
+    return { e, r: okR(e.run({ op: 'set', target: e.at('#a'), properties: props, ...extra } as Edit)) };
+  };
+  it('scales a fixed px value of the other environment and guards both widths', () => {
+    const { e, r } = set(widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '600px' });
+    const out = e.out(r);
+    expect(out).toContain('@media (min-width: 641px) { #a { width: 600px; max-width: 100%; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { width: 250px; max-width: 100%; } }');
+    expect(r.notes ?? []).toEqual([]);
+  });
+  it('scales rem and em declarations and keeps their unit', () => {
+    const { e, r } = set(widthPage('.p { width: 30rem; }\n@media (max-width: 640px) { .p { width: 12.5em; } }'), { width: '600px' });
+    expect(e.out(r)).toContain('@media (max-width: 640px) { #a { width: 15.625em; max-width: 100%; } }');
+  });
+  it('leaves a percentage or auto alone, applies the new value to the edited environment only and notes it', () => {
+    for (const flexible of ['80%', 'auto', 'clamp(100px, 50vw, 300px)', 'calc(100% - 20px)']) {
+      const { e, r } = set(widthPage(`.p { width: 480px; }\n@media (max-width: 640px) { .p { width: ${flexible}; } }`), { width: '600px' });
+      const out = e.out(r);
+      expect(out).toContain('@media (min-width: 641px) { #a { width: 600px; max-width: 100%; } }');
+      expect(out).not.toContain('max-width: 640px) { #a');
+      expect(r.notes).toEqual([{ property: 'width', condition: '@media (max-width: 640px)', value: flexible, reason: expect.stringContaining('left alone') }]);
+    }
+  });
+  it('leaves an undeclared value alone', () => {
+    const { e, r } = set(widthPage('.q { color: red; }\n@media (max-width: 640px) { .q { color: blue; } }'), { width: '600px' });
+    expect(e.out(r)).toContain('@media (min-width: 641px) { #a { width: 600px; max-width: 100%; } }');
+    expect(r.notes?.[0]).toMatchObject({ property: 'width', value: '(not declared)' });
+  });
+  it('writes one rule when both environments end up with the same value', () => {
+    const { e, r } = set(widthPage('#a { width: 480px; }\n@media (max-width: 640px) { .q { color: blue; } }'), { width: '600px' }, {}, table({ width: { 1280: '480px', 390: '480px' } }));
+    expect(e.out(r)).toContain('#a { width: 600px; max-width: 100%; }');
+    expect(e.out(r)).not.toContain('@media (min-width: 641px) { #a');
+  });
+  it('adds no guard to height and none when the element has its own max-width', () => {
+    const h = set(widthPage('.p { height: 100px; }\n@media (max-width: 640px) { .p { height: 50px; } }'), { height: '150px' });
+    expect(h.e.out(h.r)).toContain('@media (min-width: 641px) { #a { height: 150px; } }');
+    expect(h.e.out(h.r)).toContain('@media (max-width: 640px) { #a { height: 75px; } }');
+    const m = set(widthPage('.p { width: 480px; max-width: 500px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '600px' }, {}, table({ width: { 1280: '480px', 390: '200px' }, 'max-width': { 1280: '500px', 390: '500px' } }));
+    expect(m.e.out(m.r)).toContain('@media (min-width: 641px) { #a { width: 600px; } }');
+    expect(m.e.out(m.r)).toContain('@media (max-width: 640px) { #a { width: 250px; } }');
+  });
+  it('treats a numeric width attribute as a fixed px value', () => {
+    const { e, r } = set(widthPage('.q { color: red; }\n@media (max-width: 640px) { .q { color: blue; } }', '<table id="a" width="400"><tr><td>x</td></tr></table>'), { width: '480px' }, {}, table({ width: { 1280: '400px', 390: '400px' }, 'max-width': { 1280: 'none', 390: 'none' } }));
+    expect(e.out(r)).toContain('#a { width: 480px; max-width: 100%; }');
+  });
+  it('treats a percentage attribute as flexible', () => {
+    const { e, r } = set(widthPage('.q { color: red; }\n@media (max-width: 640px) { .q { color: blue; } }', '<table id="a" width="100%"><tr><td>x</td></tr></table>'), { width: '480px' }, {}, table({ width: { 1280: '1000px', 390: '390px' } }));
+    expect(e.out(r)).toContain('@media (min-width: 641px) { #a { width: 480px; max-width: 100%; } }');
+    expect(r.notes?.[0]?.value).toBe('100%');
+  });
+  it('uses !important only for an inline declaration and refuses a page !important', () => {
+    const inl = set(widthPage('@media (max-width: 640px) { .q { color: blue; } }', '<div id="a" class="p" style="width: 480px">x</div>'), { width: '600px' });
+    expect(inl.e.out(inl.r)).toContain('#a { width: 600px !important; max-width: 100%; }');
+    const e = env(widthPage('.p { width: 480px !important; }\n@media (max-width: 640px) { .p { width: 200px; } }'), 'html', {}, wh);
+    const x = e.run({ op: 'set', target: e.at('#a'), properties: { width: '600px' } });
+    expect(!x.ok && x.refusal.code).toBe('important-conflict');
+  });
+  it('keeps a pinned value of the other environment', () => {
+    const src = widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }');
+    const e = env(src, 'html', {}, wh);
+    const a = okR(e.run({ op: 'set', target: e.at('#a'), properties: { width: '250px' }, environment: 'phone', link: false }));
+    const b = okR(applyEdit(e.model, { op: 'set', target: e.at('#a'), properties: { width: '600px' } }, e.probe, a.state));
+    expect(b.notes?.[0]?.reason).toContain('pinned');
+    expect(JSON.stringify(b.patches)).not.toContain('max-width: 640px');
+  });
+  it('falls back to the old behaviour for a non-px value or a page with no stylesheet', () => {
+    const a = set(widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '50%' });
+    expect(a.e.out(a.r)).toContain('style="width: 50%"');
+    const e = env('<html><body><div id="a">x</div></body></html>', 'html', {}, wh);
+    const r = okR(e.run({ op: 'set', target: e.at('#a'), properties: { width: '600px' } }));
+    expect(e.out(r)).toContain('style="width: 600px"');
+  });
+  it('unlinked width and height keep the old behaviour (inside the environment, no guard)', () => {
+    const { e, r } = set(widthPage('.p { width: 480px; }\n@media (max-width: 640px) { .p { width: 200px; } }'), { width: '300px' }, { environment: 'phone', link: false });
+    expect(e.out(r)).toContain('@media (max-width: 640px) { #a { width: 300px; } }');
+  });
+});
+
+describe('linked and unlinked size edits on flex items', () => {
+  const flexV = (over: Record<string, Record<number, string>> = {}) => table({
+    display: { 1280: 'flex', 390: 'flex' }, 'flex-direction': { 1280: 'row', 390: 'row' }, 'flex-basis': { 1280: '240px', 390: '240px' }, 'flex-grow': { 1280: '0', 390: '0' },
+    width: { 1280: '240px', 390: '240px' }, height: { 1280: '100px', 390: '60px' }, 'max-width': { 1280: 'none', 390: 'none' }, ...over,
+  });
+  const row = (css: string, item = '<div id="a" class="s">x</div>') => page(css, `<div class="row">${item}<div>y</div></div>`);
+  const run = (src: string, props: Record<string, string>, tweak = flexV(), extra: Partial<Edit> = {}) => {
+    const e = env(src, 'html', {}, tweak);
+    return { e, r: e.run({ op: 'set', target: e.at('#a'), properties: props, ...extra } as Edit) };
+  };
+  it('writes flex-basis with the width and scales the other environment\'s basis', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 400px; }\n@media (max-width: 640px) { .s { flex-basis: 200px; } }'), { width: '480px' }, flexV({ 'flex-basis': { 1280: '400px', 390: '200px' }, width: { 1280: '400px', 390: '200px' } }));
+    const out = e.out(okR(r));
+    expect(out).toContain('@media (min-width: 641px) { #a { width: 480px; flex-basis: 480px; max-width: 100%; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { flex-basis: 240px; max-width: 100%; } }');
+  });
+  it('the E14 shape: no width declared, same basis in both: a basis rule for each environment', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 240px; }\n@media (max-width: 640px) { .q { color: red; } }'), { width: '300px' });
+    const out = e.out(okR(r));
+    expect(out).toContain('@media (min-width: 641px) { #a { width: 300px; flex-basis: 300px; max-width: 100%; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { flex-basis: 300px; max-width: 100%; } }');
+  });
+  it('scales a basis in rem and em and keeps the unit', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 30rem; }\n@media (max-width: 640px) { .s { flex-basis: 10em; } }'), { width: '600px' }, flexV({ 'flex-basis': { 1280: '480px', 390: '160px' }, width: { 1280: '480px', 390: '160px' } }));
+    expect(e.out(okR(r))).toContain('#a { flex-basis: 12.5em; max-width: 100%; }');
+  });
+  it('leaves a flexible basis alone with a note', () => {
+    for (const basis of ['30%', 'content', 'calc(100% - 20px)']) {
+      const { e, r } = run(row(`.row { display: flex; }\n.s { flex: 0 0 240px; }\n@media (max-width: 640px) { .s { flex-basis: ${basis}; } }`), { width: '300px' });
+      const x = okR(r);
+      expect(e.out(x)).not.toContain('max-width: 640px) { #a');
+      expect(x.notes?.[0]).toMatchObject({ property: 'width', value: basis, reason: expect.stringContaining('left alone') });
+    }
+  });
+  it('scales the width too when it is also declared as a fixed length', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 240px; width: 240px; }\n@media (max-width: 640px) { .s { flex-basis: 200px; width: 200px; } }'), { width: '300px' }, flexV({ 'flex-basis': { 1280: '240px', 390: '200px' }, width: { 1280: '240px', 390: '200px' } }));
+    expect(e.out(okR(r))).toContain('@media (max-width: 640px) { #a { flex-basis: 250px; width: 250px; max-width: 100%; } }');
+  });
+  it('uses the height and the basis for a column container, with no guard', () => {
+    const { e, r } = run(row('.row { display: flex; flex-direction: column; }\n.s { flex: 0 0 100px; }\n@media (max-width: 640px) { .s { flex-basis: 60px; } }'), { height: '150px' }, flexV({ 'flex-direction': { 1280: 'column', 390: 'column' }, 'flex-basis': { 1280: '100px', 390: '60px' }, height: { 1280: '100px', 390: '60px' } }));
+    const out = e.out(okR(r));
+    expect(out).toContain('@media (min-width: 641px) { #a { height: 150px; flex-basis: 150px; } }');
+    expect(out).toContain('@media (max-width: 640px) { #a { flex-basis: 90px; } }');
+  });
+  it('treats a flex item with an auto basis, and a non-flex parent, as before', () => {
+    const auto = run(row('.row { display: flex; }\n.s { width: 240px; }\n@media (max-width: 640px) { .s { width: 200px; } }'), { width: '300px' }, flexV({ 'flex-basis': { 1280: 'auto', 390: 'auto' }, width: { 1280: '240px', 390: '200px' } }));
+    expect(auto.e.out(okR(auto.r))).not.toContain('flex-basis');
+    const block = run(row('.row { display: block; }\n.s { width: 240px; }\n@media (max-width: 640px) { .s { width: 200px; } }'), { width: '300px' }, flexV({ display: { 1280: 'block', 390: 'block' }, width: { 1280: '240px', 390: '200px' } }));
+    expect(block.e.out(okR(block.r))).not.toContain('flex-basis');
+  });
+  it('refuses a flex item that can grow, in either environment', () => {
+    const css = '.row { display: flex; }\n.s { flex: 1; }\n@media (max-width: 640px) { .q { color: red; } }';
+    for (const grow of [{ 1280: '1', 390: '0' }, { 1280: '0', 390: '2' }]) {
+      const { r } = run(row(css), { width: '300px' }, flexV({ 'flex-basis': { 1280: '0%', 390: '0%' }, 'flex-grow': grow }));
+      expect(!r.ok && r.refusal.code).toBe('flex-grow');
+    }
+  });
+  it('unlinked size edits on a flex item also write flex-basis, only inside the environment', () => {
+    const { e, r } = run(row('.row { display: flex; }\n.s { flex: 0 0 300px; }\n@media (max-width: 640px) { .q { color: red; } }'), { width: '200px' }, flexV(), { environment: 'phone', link: false });
+    expect(e.out(okR(r))).toContain('@media (max-width: 640px) { #a { width: 200px; flex-basis: 200px; } }');
+    const g = run(row('.row { display: flex; }\n.s { flex: 1; }\n@media (max-width: 640px) { .q { color: red; } }'), { width: '200px' }, flexV({ 'flex-basis': { 1280: '0%', 390: '0%' }, 'flex-grow': { 1280: '1', 390: '1' } }), { environment: 'phone', link: false });
+    expect(!g.r.ok && g.r.refusal.code).toBe('flex-grow');
+  });
+  it('a flex-basis in the element\'s own style attribute is beaten with !important', () => {
+    const { e, r } = run(row('.row { display: flex; }\n@media (max-width: 640px) { .q { color: red; } }', '<div id="a" style="flex: 0 0 240px">x</div>'), { width: '300px' });
+    expect(e.out(okR(r))).toContain('flex-basis: 300px !important;');
+  });
+  it('reads the basis out of the flex shorthand', () => {
+    expect(basisOfFlex('0 0 240px')).toBe('240px');
+    expect(basisOfFlex('1')).toBe('0%');
+    expect(basisOfFlex('1 1')).toBe('0%');
+    expect(basisOfFlex('none')).toBe('auto');
+    expect(basisOfFlex('2 1 content')).toBe('content');
+    expect(basisOfFlex('1 1 10em')).toBe('10em');
+  });
+});
+
