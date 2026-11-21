@@ -78,10 +78,11 @@ const ok4 = sp.every((x) => x.v <= x.t);
 if (!ok4) missed.push(`4. speed: ${sp.filter((x) => x.v > x.t).map((x) => `${x.n} ${x.v}${x.u} > ${x.t}${x.u}`).join('; ')}`);
 
 // 5. unit tests, typecheck, lint, build
-const vt = sh('npx vitest run --reporter=json');
+const vjson = join(ROOT, 'insert-check/tmp/vitest.json');
+sh(`npx vitest run --reporter=json --outputFile=${vjson}`);
 let total = 0, failed = 0, newTests = 0;
 try {
-  const j = JSON.parse(vt.out.slice(vt.out.indexOf('{'))) as { numTotalTests: number; numFailedTests: number; testResults: { name: string; assertionResults: unknown[] }[] };
+  const j = JSON.parse(readFileSync(vjson, 'utf8')) as { numTotalTests: number; numFailedTests: number; testResults: { name: string; assertionResults: unknown[] }[] };
   total = j.numTotalTests; failed = j.numFailedTests;
   newTests = j.testResults.filter((f) => f.name.endsWith('structure.test.ts')).reduce((n, f) => n + f.assertionResults.length, 0);
 } catch { failed = -1; }
@@ -120,7 +121,7 @@ for (const x of sp) md.push(`| ${x.n} | ${x.v} ${x.u} | <= ${x.t} ${x.u} | ${x.v
 md.push('', '## Specs', '', '| id | fixture | outcome | failing checks / refusal |', '|---|---|---|---|');
 for (const x of outs) {
   const rows = ins.filter((r) => r.id === x.id);
-  const detail = x.o === 'REFUSED' ? rows.find((r) => r.rule === 'R1')!.detail : rows.filter((r) => r.pass === 'false').map((r) => `${r.rule}: ${r.detail.slice(0, 120)}`).join(' | ') || rows.map((r) => r.rule).join(' ');
+  const detail = x.o === 'REFUSED' ? (rows.find((r) => r.rule === 'R1')?.detail ?? '') : rows.filter((r) => r.pass === 'false').map((r) => `${r.rule}: ${(r.detail ?? '').slice(0, 120)}`).join(' | ') || rows.map((r) => r.rule).join(' ');
   md.push(`| ${x.id} | ${x.fixture} | ${x.o} | ${detail.replace(/\|/g, '/')} |`);
 }
 md.push('', '## Failures', '');
