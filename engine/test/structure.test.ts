@@ -226,3 +226,118 @@ describe('note', () => {
     expect(out.indexOf('<li id="c">')).toBeLessThan(out.indexOf('<!-- NOTE FOR AI: A note -->'));
   });
 });
+
+describe('insert', () => {
+  const RULE = (cls: string, extra = '') => `.${cls} { box-sizing: border-box; width: 200px; max-width: 100%; height: 120px; background: #d9d9d9; border: 1px solid #999999;${extra}; }`.replace(';;', ';');
+  const page = '<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { margin: 0; }\n  </style>\n</head>\n<body>\n  <main id="m">\n    <h1 id="h">T</h1>\n    <p id="p">One</p>\n  </main>\n  <div id="row"><span id="a">A</span><span id="b">B</span></div>\n  <ul id="l"><li>x</li></ul>\n  <table id="t"><tr id="r"><td id="d">c</td></tr></table>\n  <div id="e"></div>\n</body>\n</html>\n';
+  const put = (text: string) => page.replace('  </style>\n', `    ${text}\n  </style>\n`);
+  it('inserts next to a line-formatted anchor as whole lines, with the rule in the style block', () => {
+    const e = env(page);
+    const r = e.run({ op: 'insert', kind: 'rect', anchor: e.at('#p'), placement: 'after' });
+    expect(r.ok && r.className).toBe('new-box-1');
+    expect(e.out(r)).toBe(put(RULE('new-box-1')).replace('    <p id="p">One</p>\n', '    <p id="p">One</p>\n    <div class="new-box-1"></div>\n'));
+    const r2 = e.run({ op: 'insert', kind: 'text', anchor: e.at('#p'), placement: 'before' });
+    expect(e.out(r2)).toContain('    <p class="new-text-1">Text</p>\n    <p id="p">One</p>');
+  });
+  it('first-child and last-child go on their own lines at the children\'s indent; an empty container gets one level more', () => {
+    const e = env(page);
+    expect(e.out(e.run({ op: 'insert', kind: 'rect', anchor: e.at('#m'), placement: 'first-child' }))).toContain('<main id="m">\n    <div class="new-box-1"></div>\n    <h1');
+    expect(e.out(e.run({ op: 'insert', kind: 'rect', anchor: e.at('#m'), placement: 'last-child' }))).toContain('One</p>\n    <div class="new-box-1"></div>\n  </main>');
+    expect(e.out(e.run({ op: 'insert', kind: 'ellipse', anchor: e.at('#e'), placement: 'first-child' }))).toContain('<div id="e"><div class="new-box-1"></div></div>');
+  });
+  it('writes no whitespace next to a same-line neighbour', () => {
+    const e = env(page);
+    expect(e.out(e.run({ op: 'insert', kind: 'button', anchor: e.at('#a'), placement: 'after' }))).toContain('<span id="a">A</span><button type="button" class="new-button-1">Button</button><span id="b">B</span>');
+    expect(e.out(e.run({ op: 'insert', kind: 'text', anchor: e.at('#b'), placement: 'before' }))).toContain('<span id="a">A</span><p class="new-text-1">Text</p><span id="b">B</span>');
+  });
+  it('puts the styles in the last companion stylesheet when there is one, and inline when there is none', () => {
+    const e = env('<html><head><link rel="stylesheet" href="a.css"></head><body><p id="p">x</p></body></html>', 'html', { 'a.css': 'p { color: red; }\n' });
+    const r = e.run({ op: 'insert', kind: 'rounded', anchor: e.at('#p'), placement: 'after' });
+    const files = e.files(r);
+    expect(files['a.css']).toBe(`p { color: red; }\n${RULE('new-box-1', ' border-radius: 12px')}\n`);
+    expect(files['document.html']).toContain('<p id="p">x</p><div class="new-box-1"></div>');
+    const n = env('<html><body><p id="p">x</p></body></html>');
+    const out = n.out(n.run({ op: 'insert', kind: 'text', anchor: n.at('#p'), placement: 'after' }));
+    expect(out).toBe('<html><body><p id="p">x</p><p class="new-text-1" style="max-width: 100%; overflow-wrap: break-word;">Text</p></body></html>');
+    expect(out).not.toContain('<style');
+  });
+  it('picks the smallest unused number from classes and rule selectors', () => {
+    const e = env('<html><head><style>.new-box-1 { color: red; }\n.new-box-3 { color: red; }</style></head><body><p id="p" class="new-text-2">x</p></body></html>');
+    const r = e.run({ op: 'insert', kind: 'rect', anchor: e.at('#p'), placement: 'after' });
+    expect(r.ok && r.className).toBe('new-box-2');
+    const r2 = e.run({ op: 'insert', kind: 'text', anchor: e.at('#p'), placement: 'after' });
+    expect(r2.ok && r2.className).toBe('new-text-1');
+  });
+  it('refuses where the parser would move the element or the content model forbids it', () => {
+    const e = env(page);
+    const code = (sel: string, placement: 'before' | 'after' | 'first-child' | 'last-child') => { const r = e.run({ op: 'insert', kind: 'rect', anchor: e.at(sel), placement }); return r.ok ? 'ok' : r.refusal.code; };
+    expect(code('#r', 'first-child')).toBe('invalid-parent');
+    expect(code('#t', 'last-child')).toBe('invalid-parent');
+    expect(code('#l', 'first-child')).toBe('invalid-parent');
+    expect(code('#d', 'before')).toBe('invalid-parent');
+    expect(code('#p', 'first-child')).toBe('parser-moves-element');
+    expect(code('#b', 'first-child')).toBe('ok');
+    const void_ = env('<html><body><p>x</p><br id="x"></body></html>');
+    const v = void_.run({ op: 'insert', kind: 'rect', anchor: void_.at('#x'), placement: 'first-child' });
+    expect(!v.ok && v.refusal.code).toBe('void-element');
+    const sel = env('<html><body><select id="s"><option>a</option></select></body></html>');
+    const s = sel.run({ op: 'insert', kind: 'text', anchor: sel.at('#s'), placement: 'first-child' });
+    expect(!s.ok && s.refusal.code).toBe('invalid-parent');
+    const head = env('<html><head><title>t</title></head><body></body></html>');
+    const h = head.run({ op: 'insert', kind: 'text', anchor: head.model.primary.elements.findIndex((x) => x.ltag === 'head'), placement: 'first-child' });
+    expect(!h.ok && h.refusal.code).toBe('parser-moves-element');
+    const frag = env('<p id="a">x</p>');
+    const body = frag.model.primary.elements.find((x) => x.ltag === 'body')!;
+    const f = frag.run({ op: 'insert', kind: 'rect', anchor: body.index, placement: 'first-child' });
+    expect(!f.ok && f.refusal.code).toBe('implied-anchor');
+    expect(frag.run({ op: 'insert', kind: 'rect', anchor: frag.at('#a'), placement: 'after' }).ok).toBe(true);
+  });
+  it('refuses SVG files', () => {
+    const svg = env('<svg xmlns="http://www.w3.org/2000/svg"><rect id="r" width="1" height="1"/></svg>', 'svg');
+    const r = svg.run({ op: 'insert', kind: 'rect', anchor: svg.at('#r'), placement: 'after' });
+    expect(!r.ok && r.refusal.code).toBe('svg-insert');
+  });
+  it('insert then remove restores the original bytes, in every placement and with an unusual stylesheet', () => {
+    const variants: [string, Record<string, string>][] = [
+      [page, {}],
+      ['<html><head><style>p{color:red}</style></head><body><p id="p">x</p></body></html>', {}],
+      ['<html><head><link rel="stylesheet" href="a.css"></head><body>\n<p id="p">x</p>\n</body></html>', { 'a.css': 'p { color: red; }' }],
+      ['<html><body>\n<p id="p">x</p>\n</body></html>', {}],
+    ];
+    for (const [src, comps] of variants) {
+      for (const placement of ['before', 'after', 'first-child', 'last-child'] as const) {
+        const e = env(src, 'html', comps);
+        const anchor = e.at(placement === 'before' || placement === 'after' ? '#p' : src === page ? '#m' : 'body');
+        const r = e.run({ op: 'insert', kind: 'rect', anchor, placement });
+        if (!r.ok) throw new Error(`${placement}: ${r.refusal.message}`);
+        const files = e.files(r);
+        const comps2 = Object.fromEntries(Object.keys(comps).map((k) => [k, files[k]!]));
+        const e2 = env(files['document.html']!, 'html', comps2);
+        const r2 = e2.run({ op: 'remove', target: e2.at('.new-box-1') });
+        expect(r2.ok).toBe(true);
+        const back = e2.files(r2);
+        expect(back['document.html']).toBe(src);
+        for (const k of Object.keys(comps)) expect(back[k]).toBe(comps[k]);
+      }
+    }
+  });
+  it('returns the new element\'s index, the DOM operations, and moves pins past the insertion', () => {
+    const e = env('<body><p id="a">1</p><p id="b">2</p></body>');
+    const pins = [{ selector: '/html[1]/body[1]/p[2]', property: 'font-size', environment: 'phone' as const, value: '10px' }];
+    const r = applyEdit(e.model, { op: 'insert', kind: 'text', anchor: e.at('#a'), placement: 'before' }, e.probe, { pins });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.selected).toBe(e.at('#a'));
+    expect(r.dom.some((o) => o.type === 'insert' && o.position === 'beforebegin')).toBe(true);
+    expect(r.state?.pins[0]!.selector).toBe('/html[1]/body[1]/p[3]');
+  });
+  it('a note on the anchor stays attached when something is inserted before it', () => {
+    const src = '<html><body>\n  <p id="a">1</p>\n  <p id="b">2</p>\n</body></html>';
+    const e = env(src);
+    const noted = e.out(e.run({ op: 'note', target: e.at('#b'), text: 'keep me with B' }));
+    const e2 = env(noted);
+    const out = e2.out(e2.run({ op: 'insert', kind: 'rect', anchor: e2.at('#b'), placement: 'before' }));
+    expect(out.indexOf('<div class="new-box-1">')).toBeLessThan(out.indexOf('<!-- NOTE FOR AI: keep me with B -->'));
+    expect(out.indexOf('<!-- NOTE FOR AI: keep me with B -->')).toBeLessThan(out.indexOf('<p id="b">'));
+  });
+});

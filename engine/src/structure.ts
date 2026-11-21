@@ -1,8 +1,9 @@
 import { createModel, describe, select, sources } from './model';
-import { blockOf, no } from './edit';
+import { Refused, blockOf, no } from './edit';
 import { contentEnd } from './markup';
 import { exportFiles } from './patch';
-import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNode, Model, NoteList, Patch, Pin } from './types';
+import { appendCss } from './responsive';
+import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNode, InsertKind, Model, NoteList, Patch, Pin } from './types';
 
 /**
  * Content edits: `insert` (a new element in document order), `text` (an element's text), `remove` (delete an element) and
@@ -14,15 +15,16 @@ import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNod
  */
 export function applyContentEdit(model: Model, edit: ContentEdit, state: EditState, warnings: string[]): EditResult {
   switch (edit.op) {
+    case 'insert':
+      return insertEdit(model, edit.kind, edit.anchor, edit.placement, state, warnings);
     case 'text':
       return textEdit(model, edit.target, edit.text, warnings);
     case 'remove':
       return removeEdit(model, edit.target, state, warnings);
     case 'note':
       return noteEdit(model, edit.target, edit.text, warnings);
-    default:
-      return no('not-implemented', `edit kind "${edit.op}" is not available yet`) as never;
   }
+  return no('unknown-edit', `unknown edit kind "${(edit as { op: string }).op}"`);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -340,6 +342,145 @@ export function listNotes(model: Model): NoteList {
     page: page ? { text: text(page, PAGE_NOTE_PREFIX) } : null,
     notes: comments.filter((c) => c.precedes >= 0 && c.data.startsWith(NOTE_PREFIX)).map((c) => ({ index: c.precedes, path: describe(model, c.precedes), text: text(c, NOTE_PREFIX) })),
   };
+}
+
+// ---------------------------------------------------------------------------------------------
+// insert
+// ---------------------------------------------------------------------------------------------
+
+interface KindInfo { tag: 'p' | 'div' | 'button'; prefix: string; decls: string[]; inner: string }
+const BOX = ['box-sizing: border-box', 'width: 200px', 'max-width: 100%', 'height: 120px', 'background: #d9d9d9', 'border: 1px solid #999999'];
+const KINDS: Record<InsertKind, KindInfo> = {
+  text: { tag: 'p', prefix: 'new-text', decls: ['max-width: 100%', 'overflow-wrap: break-word'], inner: 'Text' },
+  rect: { tag: 'div', prefix: 'new-box', decls: BOX, inner: '' },
+  rounded: { tag: 'div', prefix: 'new-box', decls: [...BOX, 'border-radius: 12px'], inner: '' },
+  ellipse: { tag: 'div', prefix: 'new-box', decls: [...BOX, 'border-radius: 50%'], inner: '' },
+  button: { tag: 'button', prefix: 'new-button', decls: ['box-sizing: border-box', 'max-width: 100%', 'padding: 8px 16px', 'font: inherit', 'cursor: pointer'], inner: 'Button' },
+};
+/** Parents that cannot hold a <p>, <div> or <button> directly (the parser moves it, drops it, or the content model forbids it). */
+const NO_DIRECT_CHILDREN = new Set(['table', 'thead', 'tbody', 'tfoot', 'tr', 'colgroup', 'select', 'optgroup', 'datalist', 'ul', 'ol', 'menu', 'dl', 'html']);
+
+/** The smallest N for which neither a class nor a rule selector in the document already uses `PREFIX-N` (so replay is deterministic). */
+function nextName(model: Model, prefix: string): string {
+  const used = new Set<number>();
+  const re = new RegExp(`(?:^|[^\\w-])${prefix}-(\\d+)(?![\\w-])`, 'g');
+  const scan = (t: string) => { for (const m of t.matchAll(re)) used.add(Number(m[1])); };
+  for (const e of model.primary.elements) scan(e.attrs.find((a) => a.lname === 'class')?.value ?? '');
+  for (const sheet of model.sheets) for (const r of sheet.rules) scan(r.selector);
+  let n = 1;
+  while (used.has(n)) n++;
+  return `${prefix}-${n}`;
+}
+
+const sizeOf = (e: ElementNode): number => 1 + e.children.reduce((n, c) => n + sizeOf(c), 0);
+const indentAt = (src: string, offset: number): string => /^[ \t]*/.exec(src.slice(src.lastIndexOf('\n', offset - 1) + 1))![0];
+/** The file's indentation unit: a tab if indented lines start with one, else the smallest indent used. */
+function indentUnit(src: string): string {
+  let min = 99;
+  for (const m of src.matchAll(/^([ \t]+)\S/gm)) {
+    if (m[1]![0] === '\t') return '\t';
+    min = Math.min(min, m[1]!.length);
+  }
+  return ' '.repeat(min === 99 ? 2 : Math.min(min, 8));
+}
+
+type Placement = 'before' | 'after' | 'first-child' | 'last-child';
+
+function insertEdit(model: Model, kind: InsertKind, anchorIdx: number, placement: Placement, state: EditState, warnings: string[]): EditResult {
+  if (model.primary.kind === 'svg') no('svg-insert', 'insert is not supported in SVG files in this version: only HTML elements can be inserted');
+  const info = KINDS[kind];
+  if (!info) no('unknown-kind', `unknown insert kind "${String(kind)}"`);
+  const src = model.primary.source;
+  const file = model.primary.file;
+  const eol = eolOf(src);
+  const anchor = model.primary.elements[anchorIdx];
+  if (!anchor) return no('no-element', `no element with index ${anchorIdx}`);
+  if (anchor.implied) no('implied-anchor', `<${anchor.tag}> is created by the parser and has no source text to place a new element next to`);
+  const inside = placement === 'first-child' || placement === 'last-child';
+  if (!inside && placement !== 'before' && placement !== 'after') no('unknown-placement', `unknown placement "${String(placement)}"`);
+  const cont = inside ? anchor : anchor.parent;
+  if (!cont) return no('invalid-parent', `<${anchor.tag}> is the root element: a new element cannot go next to it`);
+  if (inside && cont.implied) no('implied-anchor', `<${cont.tag}> is created by the parser and has no source text to place a new element in`);
+  if (cont.namespace !== 'html') no('invalid-parent', `a new HTML element cannot go inside <${cont.tag}> (SVG or MathML content)`);
+  if (VOID.has(cont.ltag)) no('void-element', `<${cont.tag}> is a void element and cannot contain anything`);
+  if (['script', 'style', 'textarea', 'title'].includes(cont.ltag)) no('raw-text-container', `<${cont.tag}> holds raw text, not elements`);
+  if (NO_DIRECT_CHILDREN.has(cont.ltag)) no('invalid-parent', `a <${info.tag}> cannot go directly inside <${cont.tag}>: the parser moves it elsewhere or the content model forbids it`);
+
+  const cls = nextName(model, info.prefix);
+  const decls = info.decls.join('; ');
+  let rule: { patch: Patch; dom: DomOp } | null = null;
+  if (model.sheets.length > 0) {
+    try {
+      const r = appendCss(model, [`.${cls} { ${decls}; }`]);
+      let patch = r.patch;
+      // a rule written where the file has no final newline (or right before </style> on the same line) is written without a trailing
+      // newline of its own, so that removing it restores the exact original bytes
+      if (patch.text.startsWith('\n') && patch.text.endsWith('\n') && patch.text.indexOf('\n', 1) === patch.text.length - 1) patch = { ...patch, text: patch.text.slice(0, -1) };
+      rule = { patch, dom: r.dom };
+    } catch (e) {
+      if (!(e instanceof Refused)) throw e; // no usable stylesheet: the styles go inline instead
+    }
+  }
+  const open = info.tag === 'button' ? `<button type="button" class="${cls}"` : `<${info.tag} class="${cls}"`;
+  const markup = `${open}${rule ? '' : ` style="${decls};"`}>${info.inner}</${info.tag}>`;
+
+  // where the text goes, mimicking the neighbours: whole lines next to a line-formatted neighbour, no invented whitespace otherwise
+  let at = 0;
+  let text = markup;
+  const ownLine = (offset: number, indent: string) => { at = offset; text = `${indent}${markup}${eol}`; };
+  let newIdx: number;
+  let position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend';
+  if (placement === 'before' || placement === 'after') {
+    const blk = blockWithNote(model, anchor);
+    const indent = /^[ \t]*/.exec(src.slice(blk.start))![0];
+    if (placement === 'before') {
+      if (blk.line) ownLine(blk.start, indent); else at = blk.start;
+      newIdx = anchor.index; position = 'beforebegin';
+    } else {
+      if (blk.line) ownLine(blk.end, indent); else at = blk.end;
+      newIdx = anchor.index + sizeOf(anchor); position = 'afterend';
+    }
+  } else if (placement === 'first-child') {
+    const [a, b] = innerRange(src, cont);
+    const inner = src.slice(a, b);
+    const nl = /^[ \t]*\r?\n/.exec(inner);
+    if (nl) {
+      const first = /^([ \t]*)\S/.exec(inner.slice(nl[0].length));
+      ownLine(a + nl[0].length, first ? first[1]! : indentAt(src, cont.start) + indentUnit(src));
+    } else at = a;
+    newIdx = cont.index + 1; position = 'afterbegin';
+  } else {
+    const [a, b] = innerRange(src, cont);
+    const inner = src.slice(a, b);
+    const endOwn = cont.endTagStart !== -1 ? /\r?\n[ \t]*$/.exec(inner) : null;
+    if (endOwn) {
+      const last = inner.slice(0, endOwn.index).split('\n').pop()!;
+      ownLine(src.lastIndexOf('\n', b - 1) + 1, last.trim() === '' ? indentAt(src, cont.start) + indentUnit(src) : /^[ \t]*/.exec(last)![0]);
+    } else at = b;
+    newIdx = cont.index + sizeOf(cont); position = 'beforeend';
+  }
+  const patches: Patch[] = [{ file, start: at, end: at, text }];
+  if (rule) patches.push(rule.patch);
+
+  // The patched text is parsed again: the new element must be exactly where it was asked to be and nothing else may have moved.
+  const after = patchedModel(model, patches).model;
+  const els = after.primary.elements;
+  const old = model.primary.elements;
+  const mapOld = (i: number) => (i < newIdx ? i : i + 1);
+  const clsOf = (e: ElementNode | undefined) => e?.attrs.find((a) => a.lname === 'class')?.value;
+  let ok = els.length === old.length + 1 && els[newIdx]?.ltag === info.tag && els[newIdx]?.parent?.index === cont.index && clsOf(els[newIdx]) === cls;
+  for (let j = 0; ok && j < els.length; j++) {
+    if (j === newIdx) continue;
+    const o = old[j < newIdx ? j : j - 1]!;
+    if (els[j]!.ltag !== o.ltag || (els[j]!.parent ? els[j]!.parent!.index : -1) !== (o.parent ? mapOld(o.parent.index) : -1)) ok = false;
+  }
+  if (!ok) no('parser-moves-element', `the HTML parser would not keep the new <${info.tag}> where it was asked to be (${placement} <${anchor.tag}>, inside <${cont.tag}>): it would move it or change its parent`);
+
+  const dom: DomOp[] = [];
+  if (rule) dom.push(rule.dom);
+  dom.push({ type: 'insert', index: inside ? cont.index : anchor.index, position, html: markup });
+  const pins = remapPins(model, after, state.pins, mapOld);
+  return { ok: true, patches, dom, warnings, placement: `inserted <${info.tag} class="${cls}"> ${placement} <${anchor.tag}>`, state: { pins }, selected: newIdx, className: cls };
 }
 
 export const HEADER_TEXT = 'Exported from UI Editor. Comments starting "NOTE FOR AI:" are the designer\'s instructions for the element that follows. Implement them.';

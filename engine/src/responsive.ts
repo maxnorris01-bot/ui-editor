@@ -328,7 +328,7 @@ export function sourceMapStart(text: string): number {
   return m ? m.index : -1;
 }
 
-function appendCss(model: Model, lines: string[]): { patch: Patch; dom: DomOp } {
+export function appendCss(model: Model, lines: string[]): { patch: Patch; dom: DomOp } {
   const sheet = model.sheets[model.sheets.length - 1];
   if (!sheet) return no('no-stylesheet', 'the page has no <style> block or supplied stylesheet to add the override rules to');
   if (sheet.file === model.primary.file) {
