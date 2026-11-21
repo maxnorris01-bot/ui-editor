@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createModel } from '../src';
+import { applyEdit, createModel } from '../src';
 import { env } from './helpers';
 
 // Content edits (insert, text, remove, note). These tests use their own small pages, never the locked fixtures.
@@ -68,5 +68,61 @@ describe('text', () => {
     const e = env(page);
     const r = e.run({ op: 'explode', target: 0 } as never);
     expect(!r.ok && r.refusal.code).toBe('unknown-edit');
+  });
+});
+
+describe('remove', () => {
+  const page = '<!DOCTYPE html>\n<html>\n<head><style>\n  .new-box-1 { width: 10px; }\n</style></head>\n<body>\n  <div id="keep">\n    <p id="a">One</p>\n    <p id="b" class="new-box-1">Two</p>\n    <p id="c">Three <b>x</b></p>\n  </div>\n  <span id="s1">A</span><span id="s2">B</span>\n</body>\n</html>\n';
+  it('removes a line-formatted element with its lines', () => {
+    const e = env(page);
+    expect(e.out(e.run({ op: 'remove', target: e.at('#a') }))).toBe(page.replace('    <p id="a">One</p>\n', ''));
+  });
+  it('removes an inline element without inventing whitespace', () => {
+    const e = env(page);
+    expect(e.out(e.run({ op: 'remove', target: e.at('#s1') }))).toBe(page.replace('<span id="s1">A</span>', ''));
+  });
+  it('removes the element subtree and its engine rule', () => {
+    const e = env(page);
+    const r = e.run({ op: 'remove', target: e.at('#b') });
+    expect(e.out(r)).toBe(page.replace('    <p id="b" class="new-box-1">Two</p>\n', '').replace('  .new-box-1 { width: 10px; }\n', ''));
+  });
+  it('keeps a rule that other elements still use', () => {
+    const shared = page.replace('<p id="a">', '<p id="a" class="new-box-1">');
+    const e = env(shared);
+    expect(e.out(e.run({ op: 'remove', target: e.at('#b') }))).toBe(shared.replace('    <p id="b" class="new-box-1">Two</p>\n', ''));
+  });
+  it('refuses html, head, body, parser-made elements and an SVG root', () => {
+    const e = env(page);
+    for (const t of ['html', 'head', 'body']) {
+      const r = e.run({ op: 'remove', target: e.model.primary.elements.findIndex((x) => x.ltag === t) });
+      expect(!r.ok && r.refusal.code).toBe('protected-element');
+    }
+    const frag = env('<p id="a">x</p>');
+    const body = frag.model.primary.elements.find((x) => x.ltag === 'body')!;
+    expect((() => { const r = frag.run({ op: 'remove', target: body.index }); return !r.ok && r.refusal.code; })()).toBe('implied');
+    const svg = env('<svg xmlns="http://www.w3.org/2000/svg"><rect id="r" width="1" height="1"/></svg>', 'svg');
+    const r = svg.run({ op: 'remove', target: 0 });
+    expect(!r.ok && r.refusal.code).toBe('protected-element');
+  });
+  it('refuses to remove an SVG element that something references', () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g"/></defs><rect id="r" fill="url(#g)" width="1" height="1"/></svg>';
+    const e = env(svg, 'svg');
+    const r = e.run({ op: 'remove', target: e.at('#g') });
+    expect(!r.ok && r.refusal.code).toBe('referenced');
+    expect(e.out(e.run({ op: 'remove', target: e.at('#r') }))).toBe(svg.replace('<rect id="r" fill="url(#g)" width="1" height="1"/>', ''));
+  });
+  it('moves the pins of an edit list: later elements shift, removed elements drop', () => {
+    const e = env('<body><p id="a">1</p><p id="b">2</p><p id="c">3</p></body>');
+    const pins = [
+      { selector: '/html[1]/body[1]/p[2]', property: 'font-size', environment: 'phone' as const, value: '10px' },
+      { selector: '/html[1]/body[1]/p[3]', property: 'font-size', environment: 'phone' as const, value: '20px' },
+    ];
+    const r = applyEdit(e.model, { op: 'remove', target: e.at('#a') }, e.probe, { pins });
+    expect(r.ok && r.state?.pins).toEqual([
+      { selector: '/html[1]/body[1]/p[1]', property: 'font-size', environment: 'phone', value: '10px' },
+      { selector: '/html[1]/body[1]/p[2]', property: 'font-size', environment: 'phone', value: '20px' },
+    ]);
+    const r2 = applyEdit(e.model, { op: 'remove', target: e.at('#b') }, e.probe, { pins });
+    expect(r2.ok && r2.state?.pins).toEqual([{ selector: '/html[1]/body[1]/p[2]', property: 'font-size', environment: 'phone', value: '20px' }]);
   });
 });

@@ -1,8 +1,8 @@
-import { createModel, sources } from './model';
-import { no } from './edit';
+import { createModel, describe, select, sources } from './model';
+import { blockOf, no } from './edit';
 import { contentEnd } from './markup';
 import { exportFiles } from './patch';
-import type { ContentEdit, DomOp, EditResult, EditState, ElementNode, Model, Patch } from './types';
+import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNode, Model, Patch, Pin } from './types';
 
 /**
  * Content edits: `insert` (a new element in document order), `text` (an element's text), `remove` (delete an element) and
@@ -16,6 +16,8 @@ export function applyContentEdit(model: Model, edit: ContentEdit, state: EditSta
   switch (edit.op) {
     case 'text':
       return textEdit(model, edit.target, edit.text, warnings);
+    case 'remove':
+      return removeEdit(model, edit.target, state, warnings);
     default:
       return no('not-implemented', `edit kind "${edit.op}" is not available yet`) as never;
   }
@@ -92,3 +94,127 @@ function textEdit(model: Model, target: number, typedRaw: string, warnings: stri
   return { ok: true, patches, dom, warnings, placement: `text of <${el.tag}> replaced` };
 }
 
+
+// ---------------------------------------------------------------------------------------------
+// Notes (the part remove and reorder need: which comment belongs to which element)
+// ---------------------------------------------------------------------------------------------
+
+export const NOTE_PREFIX = ' NOTE FOR AI: ';
+export const PAGE_NOTE_PREFIX = ' NOTE FOR AI (whole page): ';
+
+/** The note comment directly before an element, if there is one. */
+export function noteOf(model: Model, el: ElementNode): CommentInfo | undefined {
+  return model.primary.comments.find((c) => c.precedes === el.index && c.data.startsWith(NOTE_PREFIX));
+}
+
+/** Source block of an element for moving or deleting: the element (see `blockOf`) together with its note, when it has one. */
+export function blockWithNote(model: Model, el: ElementNode): { start: number; end: number; line: boolean } {
+  const note = noteOf(model, el);
+  return blockOf(model.primary.source, el, note ? note.start : undefined);
+}
+
+// ---------------------------------------------------------------------------------------------
+// remove
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Range to delete for something that was written on its own line(s) or inline: a thing that is alone on its line goes with its
+ * line break (and the newline before it when it was the last line of a file with no final newline); otherwise only itself.
+ */
+export function removalRange(src: string, start: number, end: number): [number, number] {
+  const ls = src.lastIndexOf('\n', start - 1) + 1;
+  const lead = src.slice(ls, start);
+  const m = /^[ \t]*(\r?\n|$)/.exec(src.slice(end));
+  if (/^[ \t]*$/.test(lead) && m) {
+    if (m[1] === '' && ls > 0) return [src[ls - 2] === '\r' ? ls - 2 : ls - 1, src.length];
+    return [ls, end + m[0].length];
+  }
+  return [start, end];
+}
+
+const subtreeOf = (el: ElementNode): ElementNode[] => [el, ...el.children.flatMap(subtreeOf)];
+const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Move the pins of an edit-list state through a structural edit: `map` gives an element's new index, or null when it is gone. */
+export function remapPins(oldModel: Model, newModel: Model, pins: Pin[], map: (i: number) => number | null): Pin[] {
+  const out: Pin[] = [];
+  for (const p of pins) {
+    const i = select(oldModel, p.selector);
+    if (i < 0) { out.push(p); continue; }
+    const j = map(i);
+    if (j === null) continue;
+    out.push({ ...p, selector: describe(newModel, j) });
+  }
+  return out;
+}
+
+const MANAGED_CLASS = /^new-(box|text|button)-\d+$/;
+
+function removeEdit(model: Model, target: number, state: EditState, warnings: string[]): EditResult {
+  const el = elementAt(model, target);
+  const src = model.primary.source;
+  const file = model.primary.file;
+  if (!el.parent || (el.namespace === 'html' && ['html', 'head', 'body'].includes(el.ltag))) {
+    no('protected-element', `<${el.tag}> is the document root (or <head>/<body>): removing it would remove the page itself`);
+  }
+  const sub = subtreeOf(el);
+  const inSub = new Set(sub.map((x) => x.index));
+  if (el.namespace === 'svg') {
+    for (const x of sub) {
+      const id = x.attrs.find((a) => a.lname === 'id')?.value;
+      if (!id) continue;
+      const re = new RegExp(`#${escRe(id)}(?![\\w-])`);
+      for (const o of model.primary.elements) {
+        if (inSub.has(o.index) || o.implied) continue;
+        const hit = o.attrs.find((a) => a.value !== null && re.test(a.value));
+        if (hit) no('referenced', `the element with id "${id}" is used by <${o.tag} ${hit.name}="${hit.value}">: removing it would leave that reference pointing at nothing`);
+      }
+    }
+  }
+  const blk = blockWithNote(model, el);
+  const patches: Patch[] = [{ file, start: blk.start, end: blk.end, text: '' }];
+  const dom: DomOp[] = [{ type: 'remove', index: el.index }];
+
+  // The rule the engine appended for an inserted element goes with it (only a rule that is exactly `.new-...-N` and unused elsewhere).
+  const used = new Map<string, number>();
+  for (const o of model.primary.elements) if (!inSub.has(o.index)) for (const t of (o.attrs.find((a) => a.lname === 'class')?.value ?? '').split(/\s+/)) if (t) used.set(t, (used.get(t) ?? 0) + 1);
+  for (const x of sub) {
+    for (const tok of (x.attrs.find((a) => a.lname === 'class')?.value ?? '').split(/\s+/)) {
+      if (!MANAGED_CLASS.test(tok) || used.has(tok)) continue;
+      for (const sheet of model.sheets) {
+        for (const rule of sheet.rules) {
+          if (rule.conditional || rule.selector.trim() !== `.${tok}`) continue;
+          const text = sheet.file === file ? src : model.companions[sheet.file]!.source;
+          let [s, e] = removalRange(text, rule.start, rule.end);
+          if (s === rule.start && text[s - 1] === '\n' && text.startsWith('</', e)) s -= 1; // the newline the engine added before a rule written right before </style>
+          patches.push({ file: sheet.file, start: s, end: e, text: '' });
+          dom.push({ type: 'css-remove', index: sheet.elementIndex, text: text.slice(rule.start, rule.end) });
+        }
+      }
+    }
+  }
+  // The header exists only while a note does: if this was the last one, it goes too.
+  const gone = (c: CommentInfo) => c.start >= blk.start && c.end <= blk.end;
+  const remaining = model.primary.comments.filter((c) => !gone(c) && (c.data.startsWith(NOTE_PREFIX) || c.data.startsWith(PAGE_NOTE_PREFIX)));
+  const header = model.primary.comments.find((c) => c.data === HEADER_DATA);
+  if (header && !gone(header) && remaining.length === 0) {
+    const [s, e] = removalRange(src, header.start, header.end);
+    patches.push({ file, start: s, end: e, text: '' });
+  }
+
+  const after = patchedModel(model, patches).model;
+  const n = sub.length;
+  const want = tagSequence(model).filter((_, i) => i < el.index || i >= el.index + n);
+  const map = (i: number): number | null => (i >= el.index && i < el.index + n ? null : i >= el.index + n ? i - n : i);
+  const okParents = after.primary.elements.length === model.primary.elements.length - n && after.primary.elements.every((x, j) => {
+    const old = j < el.index ? j : j + n;
+    const op = model.primary.elements[old]!.parent;
+    return (op ? map(op.index) : -1) === (x.parent ? x.parent.index : -1);
+  });
+  if (!sameList(want, tagSequence(after)) || !okParents) no('parser-reinterprets', `the HTML parser would read the file differently once <${el.tag}> is removed`);
+  const pins = remapPins(model, after, state.pins, map);
+  return { ok: true, patches, dom, warnings, placement: blk.line ? 'removed whole lines' : 'removed element text', state: { pins } };
+}
+
+export const HEADER_TEXT = 'Exported from UI Editor. Comments starting "NOTE FOR AI:" are the designer\'s instructions for the element that follows. Implement them.';
+export const HEADER_DATA = ` ${HEADER_TEXT} `;

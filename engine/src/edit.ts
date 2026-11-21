@@ -495,8 +495,8 @@ interface Block {
  * element's own text. Elements without an end tag have their trailing whitespace trimmed first
  * (the parser includes it in the element's range).
  */
-export function blockOf(src: string, el: ElementNode): Block {
-  const s = el.start;
+export function blockOf(src: string, el: ElementNode, startOverride?: number): Block {
+  const s = startOverride ?? el.start;
   const e = contentEnd(src, el);
   const lineStart = src.lastIndexOf('\n', s - 1) + 1;
   const nl = src.indexOf('\n', e);
