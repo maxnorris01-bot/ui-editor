@@ -1,6 +1,6 @@
 import { parse as parse5 } from 'parse5';
 import type { DefaultTreeAdapterMap } from 'parse5';
-import type { Attr, ElementNode, Kind, ParsedFile } from './types';
+import type { Attr, CommentInfo, ElementNode, Kind, ParsedFile } from './types';
 
 type P5Node = DefaultTreeAdapterMap['node'];
 type P5Element = DefaultTreeAdapterMap['element'];
@@ -75,6 +75,7 @@ export function parseMarkup(file: string, source: string, kind: Exclude<Kind, 'c
   const errors: unknown[] = [];
   const doc = parse5(source, { sourceCodeLocationInfo: true, onParseError: (e) => errors.push(e) });
   const elements: ElementNode[] = [];
+  const nodeOf = new Map<P5Element, ElementNode>();
 
   const walk = (n: P5Element, parent: ElementNode | null): ElementNode => {
     const loc = n.sourceCodeLocation;
@@ -113,6 +114,7 @@ export function parseMarkup(file: string, source: string, kind: Exclude<Kind, 'c
       children: [],
     };
     elements.push(el);
+    nodeOf.set(n, el);
     for (const c of n.childNodes) if (isElement(c)) el.children.push(walk(c, el));
     return el;
   };
@@ -136,5 +138,34 @@ export function parseMarkup(file: string, source: string, kind: Exclude<Kind, 'c
   } else {
     for (const c of doc.childNodes) if (isElement(c)) walk(c, null);
   }
-  return { file, kind, source, elements, rules: [], parseErrors: errors.length };
+  return { file, kind, source, elements, rules: [], parseErrors: errors.length, comments: collectComments(doc, nodeOf, elements) };
+}
+
+type P5Parent = DefaultTreeAdapterMap['parentNode'];
+
+/** Every comment node with its source range and the element it directly precedes (only whitespace text between). */
+function collectComments(doc: P5Parent, nodeOf: Map<P5Element, ElementNode>, elements: ElementNode[]): CommentInfo[] {
+  const byStart = new Map<number, ElementNode>();
+  for (const e of elements) if (!e.implied) byStart.set(e.start, e);
+  const out: CommentInfo[] = [];
+  const visit = (n: P5Parent, parent: ElementNode | null) => {
+    const kids = n.childNodes;
+    for (let i = 0; i < kids.length; i++) {
+      const c = kids[i]!;
+      if (c.nodeName === '#comment') {
+        const loc = (c as { sourceCodeLocation?: { startOffset: number; endOffset: number } | null }).sourceCodeLocation;
+        if (!loc) continue;
+        let j = i + 1;
+        while (j < kids.length && kids[j]!.nodeName === '#text' && /^\s*$/.test((kids[j] as unknown as { value: string }).value)) j++;
+        const next = kids[j];
+        const nl = next && isElement(next) ? next.sourceCodeLocation : null;
+        out.push({ start: loc.startOffset, end: loc.endOffset, data: (c as unknown as { data: string }).data, parent: parent ? parent.index : -1, precedes: nl ? (byStart.get(nl.startOffset)?.index ?? -1) : -1 });
+      } else if (isElement(c)) {
+        const mine = nodeOf.get(c);
+        if (mine) visit(c, mine);
+      }
+    }
+  };
+  visit(doc, null);
+  return out.sort((a, b) => a.start - b.start);
 }
