@@ -138,31 +138,31 @@ export function parseMarkup(file: string, source: string, kind: Exclude<Kind, 'c
   } else {
     for (const c of doc.childNodes) if (isElement(c)) walk(c, null);
   }
-  return { file, kind, source, elements, rules: [], parseErrors: errors.length, comments: collectComments(doc, nodeOf, elements) };
+  return { file, kind, source, elements, rules: [], parseErrors: errors.length, comments: collectComments(source, doc, nodeOf, elements) };
 }
 
 type P5Parent = DefaultTreeAdapterMap['parentNode'];
 
-/** Every comment node with its source range and the element it directly precedes (only whitespace text between). */
-function collectComments(doc: P5Parent, nodeOf: Map<P5Element, ElementNode>, elements: ElementNode[]): CommentInfo[] {
+/**
+ * Every comment node with its source range and the element it directly precedes. "Directly precedes" is decided on the SOURCE text
+ * (only whitespace between the end of the comment and the start tag of the element), not on the parser's tree: the parser puts a
+ * comment before the first element of a fragment at document level, but the note still sits directly before its element in the file.
+ */
+function collectComments(source: string, doc: P5Parent, nodeOf: Map<P5Element, ElementNode>, elements: ElementNode[]): CommentInfo[] {
   const byStart = new Map<number, ElementNode>();
   for (const e of elements) if (!e.implied) byStart.set(e.start, e);
   const out: CommentInfo[] = [];
   const visit = (n: P5Parent, parent: ElementNode | null) => {
-    const kids = n.childNodes;
-    for (let i = 0; i < kids.length; i++) {
-      const c = kids[i]!;
+    for (const c of n.childNodes) {
       if (c.nodeName === '#comment') {
         const loc = (c as { sourceCodeLocation?: { startOffset: number; endOffset: number } | null }).sourceCodeLocation;
         if (!loc) continue;
-        let j = i + 1;
-        while (j < kids.length && kids[j]!.nodeName === '#text' && /^\s*$/.test((kids[j] as unknown as { value: string }).value)) j++;
-        const next = kids[j];
-        const nl = next && isElement(next) ? next.sourceCodeLocation : null;
-        out.push({ start: loc.startOffset, end: loc.endOffset, data: (c as unknown as { data: string }).data, parent: parent ? parent.index : -1, precedes: nl ? (byStart.get(nl.startOffset)?.index ?? -1) : -1 });
+        let next = loc.endOffset;
+        while (next < source.length && /\s/.test(source[next]!)) next++;
+        out.push({ start: loc.startOffset, end: loc.endOffset, data: (c as unknown as { data: string }).data, parent: parent ? parent.index : -1, precedes: byStart.get(next)?.index ?? -1 });
       } else if (isElement(c)) {
-        const mine = nodeOf.get(c);
-        if (mine) visit(c, mine);
+        // (for an SVG file the html/body wrappers the parser adds are not in the model: look through them)
+        visit(c, nodeOf.get(c) ?? parent);
       }
     }
   };

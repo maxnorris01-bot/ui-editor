@@ -11,7 +11,7 @@ import {
 } from './patch';
 import { emptyState, htmlSetResponsive, htmlUnlinkedOffset, htmlUnlinkedReorder } from './responsive';
 import { specificity } from './specificity';
-import { applyContentEdit } from './structure';
+import { applyContentEdit, blockWithNote } from './structure';
 import type { Attr, Decl, DomOp, Edit, EditResult, EditState, ElementEdit, ElementNode, Model, Patch, Probe, RuleNode } from './types';
 
 /**
@@ -521,8 +521,8 @@ export function reorder(model: Model, edit: Extract<Edit, { op: 'reorder' }>, el
   if ((edit.placement === 'before' && ei === si - 1) || (edit.placement === 'after' && ei === si + 1)) {
     return { ok: true, patches: [], dom: [], warnings, placement: 'already in place' };
   }
-  const mb = blockOf(src, el);
-  const ab = blockOf(src, sib);
+  const mb = blockWithNote(model, el);
+  const ab = blockWithNote(model, sib);
   const at = edit.placement === 'before' ? ab.start : ab.end;
   const moved = src.slice(mb.start, mb.end);
   const patches: Patch[] = [
