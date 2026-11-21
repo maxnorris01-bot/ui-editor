@@ -131,6 +131,24 @@ new behaviour (inline style for a linked colour edit).
 - **My choice, flex-grow above 0: REFUSE** (not `flex-grow: 0`), because `flex-grow: 0` changes how siblings share space.
 - **Result (run sflex1): PASS**, all seven items met. Z17 to Z21 pass; Z22 (`flex: 1`) is REFUSED with a true reason.
 
+## Insert and Comments engine spike (2026-11-21)
+
+- **Decisions (Max, 2026-11-19):** insert places in document order (before, after, first or last child), no coordinates; five HTML kinds
+  (text, rect, rounded, ellipse, button); SVG insert refused; readable unique class names; styles in the page's last stylesheet else
+  inline; notes are comments directly before their element with a locked header; a note travels with its element.
+- **Rules, 36 specs and fixtures locked first** (`f777429`); amendment 1 (`66bf0e6`) fixed three ambiguities before anything was scored.
+- **My choices, for Max to confirm or change:** the neutralising rule (a run of 2+ hyphens gets a space between each pair; nothing else
+  changes, not even the ends); class prefixes `new-box-`, `new-text-`, `new-button-` with the smallest unused number; default styles
+  (boxes 200 x 120 px grey with `max-width: 100%`, text and button defaults); one note per element plus one page note; blank text
+  deletes a note; a note belongs to an element by source adjacency; `ul`/`ol`/`dl`/`menu` refuse direct children (stricter than the parser).
+- **Result (run i2): PASS**, all eight pass-line items met (30 PASS and 6 REFUSED as declared, 0 FAIL; regression 111/111 byte-identical).
+  Run i1 on the earlier commit was FAIL on item 5 only, because the new verdict script had a typecheck error and read the test count
+  wrongly; no engine change between i1 and i2. See `docs/sessions/2026-11-21-insert-comments-engine.md`.
+- **Pins:** measured. Insert and remove make a pin name the wrong element (a later linked edit scaled 20 px to 50 px); fixed by remapping
+  pins on insert and remove, covered by locked spec I33. **Reorder has the same flaw and is not fixed** (outside the brief); Max decides.
+- **Finding:** the old dispatch sent any unknown edit kind on an SVG file to the offset code (wrote `x="NaN"`); unknown kinds are now
+  refused (`unknown-edit`).
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.
