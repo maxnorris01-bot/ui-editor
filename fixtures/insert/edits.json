@@ -1,0 +1,1587 @@
+{
+ "version": 1,
+ "header": "Exported from UI Editor. Comments starting \"NOTE FOR AI:\" are the designer's instructions for the element that follows. Implement them.",
+ "tolerance": {
+  "px": 0.5,
+  "bboxPx": 1
+ },
+ "viewportHeight": 800,
+ "specs": [
+  {
+   "id": "I01",
+   "title": "insert a text paragraph after the lead paragraph; rule goes to the companion CSS",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": ".lead",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": ".hero-copy",
+      "index": 2,
+      "text": "Text"
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-text-1"
+   }
+  },
+  {
+   "id": "I02",
+   "title": "insert a rectangle before the first card (flex row, line-formatted); rule goes to the companion CSS",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#card-plan",
+     "placement": "before"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": "#plans",
+      "index": 0,
+      "text": ""
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-box-1"
+   }
+  },
+  {
+   "id": "I03",
+   "title": "insert a rounded rectangle as first child of the hero copy",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rounded",
+     "anchor": ".hero-copy",
+     "placement": "first-child"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": ".hero-copy",
+      "index": 0,
+      "text": ""
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-box-1"
+   }
+  },
+  {
+   "id": "I04",
+   "title": "insert an ellipse as last child of the footer",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "ellipse",
+     "anchor": "#footer",
+     "placement": "last-child"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": "#footer",
+      "index": 1,
+      "text": ""
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-box-1"
+   }
+  },
+  {
+   "id": "I05",
+   "title": "insert a button after the call-to-action link; it is a real button with type=\"button\"",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "button",
+     "anchor": "#cta",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-button-1",
+      "tag": "button",
+      "parent": ".hero-copy",
+      "index": 3,
+      "text": "Button",
+      "attrs": {
+       "type": "button"
+      }
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-button-1"
+   }
+  },
+  {
+   "id": "I06",
+   "title": "insert a rectangle into a page whose only stylesheet is a style block; the rule lands in that block",
+   "fixture": "style-only.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#intro",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": "#main",
+      "index": 2,
+      "text": ""
+     }
+    ],
+    "ruleIn": "document",
+    "cls": "new-box-1",
+    "styleElements": 1
+   }
+  },
+  {
+   "id": "I07",
+   "title": "insert a text paragraph into a page with no stylesheet; the styles go inline",
+   "fixture": "no-style.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#para",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": "#box",
+      "index": 2,
+      "text": "Text"
+     }
+    ],
+    "ruleIn": "inline",
+    "cls": "new-text-1",
+    "styleElements": 0
+   }
+  },
+  {
+   "id": "I08",
+   "title": "the page already uses new-box-1, so the new rectangle is new-box-2 and the old rule is untouched",
+   "fixture": "collision.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#existing",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-box-2",
+      "tag": "div",
+      "parent": "body",
+      "index": 1,
+      "text": ""
+     }
+    ],
+    "ruleIn": "document",
+    "cls": "new-box-2",
+    "countOf": {
+     ".new-box-1": 1
+    }
+   }
+  },
+  {
+   "id": "I09",
+   "title": "same-line neighbour: a button between two spans on one line; no whitespace is invented",
+   "fixture": "inline.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "button",
+     "anchor": "#a",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "inline",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-button-1",
+      "tag": "button",
+      "parent": "#row",
+      "index": 1,
+      "text": "Button",
+      "attrs": {
+       "type": "button"
+      }
+     }
+    ],
+    "ruleIn": "document",
+    "cls": "new-button-1"
+   }
+  },
+  {
+   "id": "I10",
+   "title": "table email: a rectangle inside a table cell is allowed",
+   "fixture": "email.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#fine",
+     "placement": "last-child"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "inline",
+    "bytes": "additive",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": "#fine",
+      "index": 0,
+      "text": ""
+     }
+    ],
+    "ruleIn": "document",
+    "cls": "new-box-1",
+    "styleElements": 1
+   }
+  },
+  {
+   "id": "I11",
+   "title": "table email: inserting directly inside a table row is refused",
+   "fixture": "email.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#picks",
+     "placement": "first-child"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "invalid-parent",
+    "reasonCheck": {
+     "selector": "#picks",
+     "tag": "tr"
+    }
+   }
+  },
+  {
+   "id": "I12",
+   "title": "SVG insert is refused in this version",
+   "fixture": "chart.svg",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#bar-mon",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "svg-insert",
+    "reasonCheck": {
+     "documentRoot": "svg"
+    }
+   }
+  },
+  {
+   "id": "I13",
+   "title": "a div inside a paragraph: the parser would move it out, so the insert is refused",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": ".lead",
+     "placement": "first-child"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "parser-moves-element",
+    "reasonCheck": {
+     "selector": ".lead",
+     "tag": "p"
+    }
+   }
+  },
+  {
+   "id": "I14",
+   "title": "inserting directly inside a list is refused",
+   "fixture": "style-only.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#list",
+     "placement": "first-child"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "invalid-parent",
+    "reasonCheck": {
+     "selector": "#list",
+     "tag": "ul"
+    }
+   }
+  },
+  {
+   "id": "I15",
+   "title": "text edit on a paragraph; & < > are escaped",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "text",
+     "target": ".lead",
+     "text": "Hello & goodbye <team>"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "replace": [
+      "Fernhill Studio designs small, reliable tools that stay out of your way.",
+      "Hello &amp; goodbye &lt;team&gt;"
+     ]
+    },
+    "textEquals": [
+     {
+      "selector": ".lead",
+      "text": "Hello & goodbye <team>"
+     }
+    ],
+    "legit": "text"
+   }
+  },
+  {
+   "id": "I16",
+   "title": "empty text on a table cell",
+   "fixture": "email.html",
+   "steps": [
+    {
+     "op": "text",
+     "target": "#fine",
+     "text": ""
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "replace": [
+      "You are reading this note because you asked to hear about new books.",
+      ""
+     ]
+    },
+    "textEquals": [
+     {
+      "selector": "#fine",
+      "text": ""
+     }
+    ],
+    "legit": "text"
+   }
+  },
+  {
+   "id": "I17",
+   "title": "text edit on an SVG text element",
+   "fixture": "chart.svg",
+   "steps": [
+    {
+     "op": "text",
+     "target": "#heading",
+     "text": "Q&A <b> \"5 > 3\""
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "replace": [
+      "fill=\"#264653\">Visits per weekday</text>",
+      "fill=\"#264653\">Q&amp;A &lt;b&gt; \"5 &gt; 3\"</text>"
+     ]
+    },
+    "textEquals": [
+     {
+      "selector": "#heading",
+      "text": "Q&A <b> \"5 > 3\""
+     }
+    ],
+    "svgWellFormed": true,
+    "legit": "text"
+   }
+  },
+  {
+   "id": "I18",
+   "title": "text edit on an element that has child elements is refused (mixed content)",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "text",
+     "target": ".hero-copy",
+     "text": "x"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "mixed-content",
+    "reasonCheck": {
+     "selector": ".hero-copy",
+     "hasChildElements": true
+    }
+   }
+  },
+  {
+   "id": "I19",
+   "title": "hostile strings as text: nothing becomes markup and the text reads back exactly",
+   "fixture": "hostile.html",
+   "steps": [
+    {
+     "op": "text",
+     "target": "#h1",
+     "text": "-->",
+     "read": "- ->"
+    },
+    {
+     "op": "text",
+     "target": "#h2",
+     "text": "--",
+     "read": "- -"
+    },
+    {
+     "op": "text",
+     "target": "#h3",
+     "text": "--!>",
+     "read": "- -!>"
+    },
+    {
+     "op": "text",
+     "target": "#h4",
+     "text": "<!--",
+     "read": "<!- -"
+    },
+    {
+     "op": "text",
+     "target": "#h5",
+     "text": "> starts with a greater-than",
+     "read": "> starts with a greater-than"
+    },
+    {
+     "op": "text",
+     "target": "#h6",
+     "text": "-> starts with an arrow",
+     "read": "-> starts with an arrow"
+    },
+    {
+     "op": "text",
+     "target": "#h7",
+     "text": "ends with a hyphen-",
+     "read": "ends with a hyphen-"
+    },
+    {
+     "op": "text",
+     "target": "#h8",
+     "text": "<script>alert(1)</script>",
+     "read": "<script>alert(1)</script>"
+    },
+    {
+     "op": "text",
+     "target": "#h9",
+     "text": "</style>",
+     "read": "</style>"
+    },
+    {
+     "op": "text",
+     "target": "#h10",
+     "text": "\"><img src=x onerror=1>",
+     "read": "\"><img src=x onerror=1>"
+    },
+    {
+     "op": "text",
+     "target": "#h11",
+     "text": "&amp;",
+     "read": "&amp;"
+    },
+    {
+     "op": "text",
+     "target": "#h12",
+     "text": "Привет 你好 مرحبا 🎉",
+     "read": "Привет 你好 مرحبا 🎉"
+    },
+    {
+     "op": "text",
+     "target": "#h13",
+     "text": {
+      "repeat": "abcdefghi ",
+      "times": 500
+     },
+     "read": {
+      "same": true
+     }
+    },
+    {
+     "op": "text",
+     "target": "#h14",
+     "text": "line one\nline two\n\nline four",
+     "read": "line one\nline two\n\nline four"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "innerOf": [
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "h7",
+      "h8",
+      "h9",
+      "h10",
+      "h11",
+      "h12",
+      "h13",
+      "h14"
+     ]
+    },
+    "textEquals": [
+     {
+      "selector": "#h1",
+      "text": "-->"
+     },
+     {
+      "selector": "#h2",
+      "text": "--"
+     },
+     {
+      "selector": "#h3",
+      "text": "--!>"
+     },
+     {
+      "selector": "#h4",
+      "text": "<!--"
+     },
+     {
+      "selector": "#h5",
+      "text": "> starts with a greater-than"
+     },
+     {
+      "selector": "#h6",
+      "text": "-> starts with an arrow"
+     },
+     {
+      "selector": "#h7",
+      "text": "ends with a hyphen-"
+     },
+     {
+      "selector": "#h8",
+      "text": "<script>alert(1)</script>"
+     },
+     {
+      "selector": "#h9",
+      "text": "</style>"
+     },
+     {
+      "selector": "#h10",
+      "text": "\"><img src=x onerror=1>"
+     },
+     {
+      "selector": "#h11",
+      "text": "&amp;"
+     },
+     {
+      "selector": "#h12",
+      "text": "Привет 你好 مرحبا 🎉"
+     },
+     {
+      "selector": "#h13",
+      "text": {
+       "repeat": "abcdefghi ",
+       "times": 500
+      }
+     },
+     {
+      "selector": "#h14",
+      "text": "line one\nline two\n\nline four"
+     }
+    ],
+    "hostile": true,
+    "legit": "text"
+   }
+  },
+  {
+   "id": "I20",
+   "title": "remove a line-formatted element (the third card)",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "remove",
+     "target": "#card-ship"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "removed": [
+      "      <article class=\"card\" id=\"card-ship\">\n        <h3>Ship</h3>\n        <p>Release on a quiet schedule and tell people what changed.</p>\n      </article>\n"
+     ]
+    },
+    "gone": [
+     "#card-ship"
+    ],
+    "elementDelta": -3,
+    "legit": "remove"
+   }
+  },
+  {
+   "id": "I21",
+   "title": "remove an element that carries a note: the note, and the header it needed, go with it",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#card-build",
+     "text": "This card will become a pricing card."
+    },
+    {
+     "op": "remove",
+     "target": "#card-build"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "removed": [
+      "      <article class=\"card\" id=\"card-build\">\n        <h3>Build</h3>\n        <p>Keep every change small, reviewed and easy to undo.</p>\n      </article>\n"
+     ]
+    },
+    "gone": [
+     "#card-build"
+    ],
+    "elementDelta": -3,
+    "headerCount": 0,
+    "notes": [],
+    "legit": "remove"
+   }
+  },
+  {
+   "id": "I22",
+   "title": "insert then remove the inserted rectangle returns the original bytes exactly (including the rule)",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#card-plan",
+     "placement": "after"
+    },
+    {
+     "op": "remove",
+     "target": ".new-box-1"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "equals-original",
+    "gone": [
+     ".new-box-1"
+    ],
+    "legit": "remove"
+   }
+  },
+  {
+   "id": "I23",
+   "title": "removing body is refused",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "remove",
+     "target": "body"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "protected-element",
+    "reasonCheck": {
+     "selector": "body",
+     "tag": "body"
+    }
+   }
+  },
+  {
+   "id": "I24",
+   "title": "remove an SVG element",
+   "fixture": "chart.svg",
+   "steps": [
+    {
+     "op": "remove",
+     "target": "#bar-mon"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "removed": [
+      "    <rect id=\"bar-mon\" x=\"16\" y=\"110\" width=\"48\" height=\"90\" fill=\"#2a9d8f\"/>\n"
+     ]
+    },
+    "gone": [
+     "#bar-mon"
+    ],
+    "elementDelta": -1,
+    "svgWellFormed": true,
+    "legit": "remove"
+   }
+  },
+  {
+   "id": "I25",
+   "title": "a note before an element: the header appears once, right after the DOCTYPE",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "Make this headline shorter and friendlier."
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "notes": [
+     {
+      "target": "#headline",
+      "read": "Make this headline shorter and friendlier."
+     }
+    ],
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I26",
+   "title": "a second note adds no second header",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "Make this headline shorter and friendlier."
+    },
+    {
+     "op": "note",
+     "target": "#cta",
+     "text": "Link this button to the pricing page."
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "notes": [
+     {
+      "target": "#headline",
+      "read": "Make this headline shorter and friendlier."
+     },
+     {
+      "target": "#cta",
+      "read": "Link this button to the pricing page."
+     }
+    ],
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I27",
+   "title": "deleting the last note (empty text) returns the original bytes exactly",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "Temporary thought."
+    },
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": ""
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "equals-original",
+    "headerCount": 0,
+    "notes": [],
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I28",
+   "title": "a page note sits right after the header; setting a note again replaces it",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "page",
+     "text": "This is a calm landing page for a small studio."
+    },
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "First thought."
+    },
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "Second thought."
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "pageNote": {
+     "read": "This is a calm landing page for a small studio."
+    },
+    "notes": [
+     {
+      "target": "#headline",
+      "read": "Second thought."
+     }
+    ],
+    "noteCount": 2,
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I29",
+   "title": "a note on an SVG element; the header goes at the very start (no XML declaration)",
+   "fixture": "chart.svg",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#bar-wed",
+     "text": "Highlight this bar in the accent colour."
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "start",
+    "notes": [
+     {
+      "target": "#bar-wed",
+      "read": "Highlight this bar in the accent colour."
+     }
+    ],
+    "svgWellFormed": true,
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I30",
+   "title": "a note travels with its element when it is reordered",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#card-build",
+     "text": "This card will become a pricing card."
+    },
+    {
+     "op": "reorder",
+     "target": "#card-build",
+     "placement": "before",
+     "sibling": "#card-plan"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": {
+     "stripNotesThen": {
+      "moveBefore": {
+       "lines": "      <article class=\"card\" id=\"card-build\">\n        <h3>Build</h3>\n        <p>Keep every change small, reviewed and easy to undo.</p>\n      </article>\n",
+       "before": "      <article class=\"card\" id=\"card-plan\">\n"
+      }
+     }
+    },
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "notes": [
+     {
+      "target": "#card-build",
+      "read": "This card will become a pricing card."
+     }
+    ],
+    "order": {
+     "parent": "#plans",
+     "ids": [
+      "card-build",
+      "card-plan",
+      "card-ship"
+     ]
+    },
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I31",
+   "title": "hostile strings as notes (HTML): every note is one comment that cannot break out",
+   "fixture": "hostile.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#h1",
+     "text": "-->",
+     "read": "- ->"
+    },
+    {
+     "op": "note",
+     "target": "#h2",
+     "text": "--",
+     "read": "- -"
+    },
+    {
+     "op": "note",
+     "target": "#h3",
+     "text": "--!>",
+     "read": "- -!>"
+    },
+    {
+     "op": "note",
+     "target": "#h4",
+     "text": "<!--",
+     "read": "<!- -"
+    },
+    {
+     "op": "note",
+     "target": "#h5",
+     "text": "> starts with a greater-than",
+     "read": "> starts with a greater-than"
+    },
+    {
+     "op": "note",
+     "target": "#h6",
+     "text": "-> starts with an arrow",
+     "read": "-> starts with an arrow"
+    },
+    {
+     "op": "note",
+     "target": "#h7",
+     "text": "ends with a hyphen-",
+     "read": "ends with a hyphen-"
+    },
+    {
+     "op": "note",
+     "target": "#h8",
+     "text": "<script>alert(1)</script>",
+     "read": "<script>alert(1)</script>"
+    },
+    {
+     "op": "note",
+     "target": "#h9",
+     "text": "</style>",
+     "read": "</style>"
+    },
+    {
+     "op": "note",
+     "target": "#h10",
+     "text": "\"><img src=x onerror=1>",
+     "read": "\"><img src=x onerror=1>"
+    },
+    {
+     "op": "note",
+     "target": "#h11",
+     "text": "&amp;",
+     "read": "&amp;"
+    },
+    {
+     "op": "note",
+     "target": "#h12",
+     "text": "Привет 你好 مرحبا 🎉",
+     "read": "Привет 你好 مرحبا 🎉"
+    },
+    {
+     "op": "note",
+     "target": "#h13",
+     "text": {
+      "repeat": "abcdefghi ",
+      "times": 500
+     },
+     "read": {
+      "same": true
+     }
+    },
+    {
+     "op": "note",
+     "target": "#h14",
+     "text": "line one\nline two\n\nline four",
+     "read": "line one\nline two\n\nline four"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "notes": [
+     {
+      "target": "#h1",
+      "read": "- ->"
+     },
+     {
+      "target": "#h2",
+      "read": "- -"
+     },
+     {
+      "target": "#h3",
+      "read": "- -!>"
+     },
+     {
+      "target": "#h4",
+      "read": "<!- -"
+     },
+     {
+      "target": "#h5",
+      "read": "> starts with a greater-than"
+     },
+     {
+      "target": "#h6",
+      "read": "-> starts with an arrow"
+     },
+     {
+      "target": "#h7",
+      "read": "ends with a hyphen-"
+     },
+     {
+      "target": "#h8",
+      "read": "<script>alert(1)</script>"
+     },
+     {
+      "target": "#h9",
+      "read": "</style>"
+     },
+     {
+      "target": "#h10",
+      "read": "\"><img src=x onerror=1>"
+     },
+     {
+      "target": "#h11",
+      "read": "&amp;"
+     },
+     {
+      "target": "#h12",
+      "read": "Привет 你好 مرحبا 🎉"
+     },
+     {
+      "target": "#h13",
+      "read": {
+       "same": true
+      }
+     },
+     {
+      "target": "#h14",
+      "read": "line one\nline two\n\nline four"
+     }
+    ],
+    "hostile": true,
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I32",
+   "title": "hostile strings as notes (SVG): the file stays well-formed XML",
+   "fixture": "chart.svg",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#paper",
+     "text": "-->",
+     "read": "- ->"
+    },
+    {
+     "op": "note",
+     "target": "#heading",
+     "text": "--",
+     "read": "- -"
+    },
+    {
+     "op": "note",
+     "target": "#plot",
+     "text": "--!>",
+     "read": "- -!>"
+    },
+    {
+     "op": "note",
+     "target": "#axis",
+     "text": "<!--",
+     "read": "<!- -"
+    },
+    {
+     "op": "note",
+     "target": "#bar-mon",
+     "text": "> starts with a greater-than",
+     "read": "> starts with a greater-than"
+    },
+    {
+     "op": "note",
+     "target": "#bar-tue",
+     "text": "-> starts with an arrow",
+     "read": "-> starts with an arrow"
+    },
+    {
+     "op": "note",
+     "target": "#bar-wed",
+     "text": "ends with a hyphen-",
+     "read": "ends with a hyphen-"
+    },
+    {
+     "op": "note",
+     "target": "#bar-thu",
+     "text": "<script>alert(1)</script>",
+     "read": "<script>alert(1)</script>"
+    },
+    {
+     "op": "note",
+     "target": "#bar-fri",
+     "text": "</style>",
+     "read": "</style>"
+    },
+    {
+     "op": "note",
+     "target": "#plot > text:nth-of-type(1)",
+     "text": "\"><img src=x onerror=1>",
+     "read": "\"><img src=x onerror=1>"
+    },
+    {
+     "op": "note",
+     "target": "#plot > text:nth-of-type(2)",
+     "text": "&amp;",
+     "read": "&amp;"
+    },
+    {
+     "op": "note",
+     "target": "#plot > text:nth-of-type(3)",
+     "text": "Привет 你好 مرحبا 🎉",
+     "read": "Привет 你好 مرحبا 🎉"
+    },
+    {
+     "op": "note",
+     "target": "#plot > text:nth-of-type(4)",
+     "text": {
+      "repeat": "abcdefghi ",
+      "times": 500
+     },
+     "read": {
+      "same": true
+     }
+    },
+    {
+     "op": "note",
+     "target": "#plot > text:nth-of-type(5)",
+     "text": "line one\nline two\n\nline four",
+     "read": "line one\nline two\n\nline four"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "start",
+    "notes": [
+     {
+      "target": "#paper",
+      "read": "- ->"
+     },
+     {
+      "target": "#heading",
+      "read": "- -"
+     },
+     {
+      "target": "#plot",
+      "read": "- -!>"
+     },
+     {
+      "target": "#axis",
+      "read": "<!- -"
+     },
+     {
+      "target": "#bar-mon",
+      "read": "> starts with a greater-than"
+     },
+     {
+      "target": "#bar-tue",
+      "read": "-> starts with an arrow"
+     },
+     {
+      "target": "#bar-wed",
+      "read": "ends with a hyphen-"
+     },
+     {
+      "target": "#bar-thu",
+      "read": "<script>alert(1)</script>"
+     },
+     {
+      "target": "#bar-fri",
+      "read": "</style>"
+     },
+     {
+      "target": "#plot > text:nth-of-type(1)",
+      "read": "\"><img src=x onerror=1>"
+     },
+     {
+      "target": "#plot > text:nth-of-type(2)",
+      "read": "&amp;"
+     },
+     {
+      "target": "#plot > text:nth-of-type(3)",
+      "read": "Привет 你好 مرحبا 🎉"
+     },
+     {
+      "target": "#plot > text:nth-of-type(4)",
+      "read": {
+       "same": true
+      }
+     },
+     {
+      "target": "#plot > text:nth-of-type(5)",
+      "read": "line one\nline two\n\nline four"
+     }
+    ],
+    "hostile": true,
+    "svgWellFormed": true,
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I33",
+   "title": "pins stay right: unlinked phone edits, then inserts and a remove before them, then a linked edit",
+   "fixture": "pins.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#t4",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": "#t2",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#t1",
+     "placement": "before"
+    },
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#t1",
+     "placement": "before"
+    },
+    {
+     "op": "remove",
+     "target": "#t2"
+    },
+    {
+     "op": "set",
+     "target": "#t4",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "none",
+    "measured": [
+     {
+      "selector": "#t4",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     },
+     {
+      "selector": "#t3",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[5]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     }
+    ],
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I34",
+   "title": "a linked font-size edit on an inserted element scales its phone value by the same ratio",
+   "fixture": "style-only.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#intro",
+     "placement": "after"
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "font-size": "24px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "none",
+    "created": [
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": "#main",
+      "index": 2,
+      "text": "Text"
+     }
+    ],
+    "measured": [
+     {
+      "selector": ".new-text-1",
+      "prop": "font-size",
+      "by": {
+       "hi": "24px",
+       "lo": "21px"
+      }
+     }
+    ],
+    "legit": "insert"
+   }
+  },
+  {
+   "id": "I35",
+   "title": "a file that already holds notes: listNotes reads them, and adding one adds no second header",
+   "fixture": "header-present.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#last",
+     "text": "Check the date format."
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "format": "lines",
+    "bytes": "additive",
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "listNotesOriginal": {
+     "page": null,
+     "notes": [
+      {
+       "target": "#pitch",
+       "read": "this paragraph should become the sign-up pitch."
+      }
+     ]
+    },
+    "notes": [
+     {
+      "target": "#pitch",
+      "read": "this paragraph should become the sign-up pitch."
+     },
+     {
+      "target": "#last",
+      "read": "Check the date format."
+     }
+    ],
+    "legit": "none"
+   }
+  },
+  {
+   "id": "I36",
+   "title": "mixed ordered list: insert, text, note, font-size, reorder, remove; notes-off and undo by replay hold",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": ".lead",
+     "placement": "after"
+    },
+    {
+     "op": "text",
+     "target": ".new-text-1",
+     "text": "Welcome home"
+    },
+    {
+     "op": "note",
+     "target": ".new-text-1",
+     "text": "Make this the main pitch."
+    },
+    {
+     "op": "set",
+     "target": "#headline",
+     "properties": {
+      "font-size": "52px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "reorder",
+     "target": "#card-ship",
+     "placement": "before",
+     "sibling": "#card-plan"
+    },
+    {
+     "op": "remove",
+     "target": "#art"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "none",
+    "created": [
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": ".hero-copy",
+      "index": 2,
+      "text": "Welcome home"
+     }
+    ],
+    "gone": [
+     "#art"
+    ],
+    "notes": [
+     {
+      "target": ".new-text-1",
+      "read": "Make this the main pitch."
+     }
+    ],
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "order": {
+     "parent": "#plans",
+     "ids": [
+      "card-ship",
+      "card-plan",
+      "card-build"
+     ]
+    },
+    "measured": [
+     {
+      "selector": "#headline",
+      "prop": "font-size",
+      "by": {
+       "hi": "52px",
+       "lo": "35.4545px"
+      }
+     }
+    ],
+    "notesOff": true,
+    "undo": true,
+    "legit": "none"
+   }
+  }
+ ]
+}
