@@ -227,10 +227,10 @@ function removeEdit(model: Model, target: number, state: EditState, warnings: st
 /**
  * One stated rule makes any text safe inside a comment: every run of two or more hyphens gets a space between each pair
  * (`--` becomes `- -`, `-->` becomes `- ->`, `<!--` becomes `<!- -`, `--!>` becomes `- -!>`); NUL is removed and carriage returns
- * become line feeds; the ends are trimmed. Because the comment is written `<!-- NOTE FOR AI: TEXT -->`, a leading `>` or `->` and a
+ * become line feeds; the rest of the text is as typed. Because the comment is written `<!-- NOTE FOR AI: TEXT -->`, a leading `>` or `->` and a
  * trailing `-` cannot close or break it, and XML comments (SVG), which forbid `--`, stay well-formed.
  */
-export const neutralise = (text: string): string => text.replace(/\u0000/g, '').replace(/\r\n?/g, '\n').replace(/-{2,}/g, (m) => m.split('').join(' ')).trim();
+export const neutralise = (text: string): string => text.replace(/\u0000/g, '').replace(/\r\n?/g, '\n').replace(/-{2,}/g, (m) => m.split('').join(' '));
 
 const eolOf = (src: string): string => (src.includes('\r\n') ? '\r\n' : '\n');
 
@@ -478,7 +478,8 @@ function insertEdit(model: Model, kind: InsertKind, anchorIdx: number, placement
 
   const dom: DomOp[] = [];
   if (rule) dom.push(rule.dom);
-  dom.push({ type: 'insert', index: inside ? cont.index : anchor.index, position, html: markup });
+  // the preview gets exactly the text the file gets (indent and line break included), so inline whitespace behaves the same
+  dom.push({ type: 'insert', index: inside ? cont.index : anchor.index, position, html: text });
   const pins = remapPins(model, after, state.pins, mapOld);
   return { ok: true, patches, dom, warnings, placement: `inserted <${info.tag} class="${cls}"> ${placement} <${anchor.tag}>`, state: { pins }, selected: newIdx, className: cls };
 }
