@@ -23,8 +23,10 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 
 ## Next
 
+- [ ] Max: ship branch `feat/engine-hardening` (run h2 PASS; h1 FAIL on the verdict script only) and confirm the one edited unit-test fixture. Max runs git.
+
 - [ ] Max: ship branch `feat/insert-comments-engine` (run i2 PASS; i1 FAIL on the verdict script only). Max runs git.
-- [ ] Max: decide whether reorder should remap pins too (measured flaw, `insert-check/results/pins-measurement.txt`), and the choices listed in the session note.
+- [x] Reorder pins: fixed in the hardening round.
 - [ ] If the engine spike is accepted: the `portfolio-site` job (vendor the engine, add the Insert menu and Comments UI). Not started; the page work was out of scope.
 - [ ] Max: ship the stack of five branches (see the session note) and decide what the README says about the two amendments.
 - [ ] Write the README from `docs/known-limits.md`.
@@ -35,6 +37,7 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 
 <!-- Move items here when done, newest first, with a one-line note on what happened. -->
 
+- [x] Engine hardening (2026-11-22): reorder pins, remove's rules, CRLF, neighbour selectors; 20 specs locked (`0398e65`), run h2 PASS.
 - [x] Insert and Comments engine spike (2026-11-21): rules and 36 specs locked (`f777429`), text/remove/note/insert/listNotes and pin remapping, run i2: 30 PASS + 6 REFUSED, regression 111/111 identical. Verdict PASS.
 - [x] Size scaling iteration 2 (2026-11-15): flex-basis written with size, Z17 to Z22 (5 PASS, Z22 REFUSED), gate 40/40. Verdict PASS.
 - [x] Size scaling run 1 (2026-11-12): rules locked (`909459a`), engine change, 16/16 new specs PASS, but gate 39/40 (E14). Verdict FAIL.

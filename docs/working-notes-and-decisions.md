@@ -149,6 +149,15 @@ new behaviour (inline style for a linked colour edit).
 - **Finding:** the old dispatch sent any unknown edit kind on an SVG file to the offset code (wrote `x="NaN"`); unknown kinds are now
   refused (`unknown-edit`).
 
+## Engine hardening (2026-11-22)
+
+- **Done:** reorder remaps pins (H1); remove takes an inserted element's engine-written rules and never a page-authored one (H2); every line break the engine adds
+  follows the file's own ending (H3); neighbour-selector pages checked against the browser's own answer, no engine change needed (H4). Rules and 20 specs locked in
+  `0398e65`; amendment 1 before scoring. Run `h2`: PASS (run `h1` FAIL on a verdict-script defect only). `docs/adr/0005-engine-hardening.md`.
+- **Choices (mine):** engine-inserted = class `new-*-N` plus a rule starting with the engine's default declarations; an ORIGINAL element's override rules are left; line
+  ending = nearest existing break; no line break in the file = LF.
+- **Open:** one existing unit test's fixture rule was changed (see the session note); Max confirms.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.
