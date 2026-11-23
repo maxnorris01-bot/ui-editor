@@ -250,7 +250,7 @@ export async function evaluateExport(browser: Browser, spec: Spec, inp: Input, f
     textSel: (ex.textEquals ?? []).map((t: { selector: string }) => t.selector),
     measured: (ex.measured ?? []).map((m: { selector: string; prop: string }) => ({ selector: m.selector, prop: m.prop })),
     boxSel: (ex.created ?? []).map((c: { selector: string }) => c.selector),
-    indexSel: (ex.notes ?? []).map((n: { target: string }) => n.target),
+    indexSel: [...(ex.notes ?? []).map((n: { target: string }) => n.target), ...(ex.created ?? []).map((c: { selector: string }) => c.selector)],
   };
   (params as Params & { order: unknown }).order = ex.order;
   const createdSel: string | null = ex.created?.[0]?.selector ?? null;
@@ -334,17 +334,18 @@ export async function evaluateExport(browser: Browser, spec: Spec, inp: Input, f
   // C: collateral and overflow
   const kinds = new Set(spec.steps.map((s) => s.op));
   const touchesOthers = spec.steps.some((s) => ['set', 'reorder', 'offset'].includes(s.op) && !String(s.target).startsWith('.new-'));
-  const mode: Mode = ex.bytes === 'equals-original' ? 'none' : kinds.has('remove') ? 'remove' : kinds.has('insert') ? 'insert' : kinds.has('text') ? 'text' : 'none';
+  const removesOriginal = spec.steps.some((s) => s.op === 'remove' && !String(s.target).startsWith('.new-'));
+  const mode: Mode = ex.bytes === 'equals-original' || ex.hbytes === 'equals-original' ? 'none' : removesOriginal ? 'remove' : kinds.has('insert') ? 'insert' : kinds.has('text') ? 'text' : kinds.has('remove') ? 'remove' : 'none';
   const pc: string[] = [];
   for (const w of widths) {
     const over = X[w]!.info.scrollWidth - Math.max(X[w]!.info.clientWidth, O[w]!.info.scrollWidth);
     if (over > 0.5) pc.push(`@${w}: horizontal overflow, scrollWidth ${X[w]!.info.scrollWidth} vs viewport ${X[w]!.info.clientWidth}`);
-    if (touchesOthers) continue;
+    if (touchesOthers || ex.noCollateral) continue;
     const od = O[w]!.dump!, xd = X[w]!.dump!;
     const skipX = new Set<number>(), skipO = new Set<number>();
     const sub = (d: Dump, i: number): number[] => [i, ...d.rows.map((r, k) => (r.parent === i ? k : -1)).filter((k) => k >= 0).flatMap((k) => sub(d, k))];
     let slot = -1;
-    if (mode === 'insert' && createdSel && xd.target >= 0) { sub(xd, xd.target).forEach((k) => skipX.add(k)); const par = xd.rows[xd.target]!.parent; slot = par; }
+    if (mode === 'insert' && createdSel) for (const c of (ex.created ?? []) as { selector: string }[]) { const ti = X[w]!.info.indexOf[c.selector] as number; if (ti >= 0) { sub(xd, ti).forEach((k) => skipX.add(k)); if (slot < 0) slot = xd.rows[ti]!.parent; } }
     if (mode === 'remove' && goneSel && od.target >= 0) { sub(od, od.target).forEach((k) => skipO.add(k)); slot = od.rows[od.target]!.parent; }
     const slots: number[] = [];
     if (mode === 'text') for (const st of spec.steps) { const probe = await loadAt(browser, dirO, inp.file, w, { ...baseParams, dumpTarget: st.target! }, true); slots.push(probe.dump!.target); }
@@ -355,7 +356,7 @@ export async function evaluateExport(browser: Browser, spec: Spec, inp: Input, f
     const bad = collateral(od, xd, skipO, skipX, mode, mode === 'text' ? slots : [slotO]);
     if (bad.length) pc.push(`@${w}: ${bad.length} element(s): ${bad.slice(0, 2).join(' || ')}`);
   }
-  add('C', pc.length === 0, pc.slice(0, 3).join(' | ') || `no other element changed at ${widths.length} widths${touchesOthers ? ' (collateral compare skipped: the list edits existing elements by design; overflow checked)' : ` (${mode})`}; no horizontal overflow`);
+  add('C', pc.length === 0, pc.slice(0, 3).join(' | ') || `no other element changed at ${widths.length} widths${touchesOthers || ex.noCollateral ? ' (collateral compare skipped: the list edits existing elements by design, or the spec uses the browser oracle; overflow checked)' : ` (${mode})`}; no horizontal overflow`);
 
   // D: hostile strings
   if (ex.hostile) {

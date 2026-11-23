@@ -37,3 +37,7 @@ size-check/raw/
 insert-check/tmp/
 insert-check/raw/
 .vitest/
+
+# Engine hardening: temp and raw output (exports are never committed)
+harden-check/tmp/
+harden-check/raw/
