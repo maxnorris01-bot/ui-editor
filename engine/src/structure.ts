@@ -3,7 +3,7 @@ import { Refused, blockOf, no } from './edit';
 import { contentEnd } from './markup';
 import { exportFiles } from './patch';
 import { appendCss } from './responsive';
-import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNode, InsertKind, Model, NoteList, Patch, Pin } from './types';
+import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNode, InsertKind, Model, NoteList, Patch, Pin, RuleNode } from './types';
 
 /**
  * Content edits: `insert` (a new element in document order), `text` (an element's text), `remove` (delete an element) and
@@ -139,6 +139,17 @@ export function removalRange(src: string, start: number, end: number): [number, 
 const subtreeOf = (el: ElementNode): ElementNode[] => [el, ...el.children.flatMap(subtreeOf)];
 const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/** Overlapping or touching deletions in one file become one (a rule on the last line of a file takes the break before it, which may touch the line above). */
+function mergeDeletes(patches: Patch[]): Patch[] {
+  const out: Patch[] = [];
+  for (const p of [...patches].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : a.start - b.start || a.end - b.end))) {
+    const last = out[out.length - 1];
+    if (last && last.file === p.file && p.start <= last.end) last.end = Math.max(last.end, p.end);
+    else out.push({ ...p });
+  }
+  return out;
+}
+
 /** Move the pins of an edit-list state through a structural edit: `map` gives an element's new index, or null when it is gone. */
 export function remapPins(oldModel: Model, newModel: Model, pins: Pin[], map: (i: number) => number | null): Pin[] {
   const out: Pin[] = [];
@@ -201,22 +212,47 @@ function removeEdit(model: Model, target: number, state: EditState, warnings: st
   const patches: Patch[] = [{ file, start: blk.start, end: blk.end, text: '' }];
   const dom: DomOp[] = [{ type: 'remove', index: el.index }];
 
-  // The rule the engine appended for an inserted element goes with it (only a rule that is exactly `.new-...-N` and unused elsewhere).
+  // H2: an element the engine inserted takes every rule the engine wrote for it. "Engine-inserted" means: a class `new-(box|text|button)-N`
+  // whose own rule begins with exactly the engine's default declarations. A page-authored rule that merely has such a class name never
+  // does, so it is never deleted. Rules written for an ORIGINAL element (`#id` or `[data-ue]` overrides) look like page-authored ones and stay.
   const used = new Map<string, number>();
   for (const o of model.primary.elements) if (!inSub.has(o.index)) for (const t of (o.attrs.find((a) => a.lname === 'class')?.value ?? '').split(/\s+/)) if (t) used.set(t, (used.get(t) ?? 0) + 1);
+  const textOf = (f: string) => (f === file ? src : model.companions[f]!.source);
+  const dropRule = (sheet: { file: string; elementIndex: number }, rule: RuleNode): void => {
+    const text = textOf(sheet.file);
+    let from = rule.start, to = rule.end;
+    if (rule.conditions.length > 0) {
+      // an engine-written conditional rule is one line: `@media (...) { SELECTOR { ... } }`; anything else is not ours to delete
+      const ls = text.lastIndexOf('\n', rule.start - 1) + 1;
+      const nl = text.indexOf('\n', rule.end);
+      const line = text.slice(ls, nl < 0 ? text.length : nl).replace(/\r$/, '');
+      const opens = (line.match(/\{/g) ?? []).length;
+      if (!/^\s*@/.test(line) || opens !== rule.conditions.length + 1 || opens !== (line.match(/\}/g) ?? []).length) return;
+      from = ls + (line.length - line.trimStart().length);
+      to = ls + line.length;
+    }
+    let [s, e] = removalRange(text, from, to);
+    if (s === from && text[s - 1] === '\n' && text.startsWith('</', e)) s -= 1; // the newline the engine added before a rule written right before </style>
+    patches.push({ file: sheet.file, start: s, end: e, text: '' });
+    dom.push({ type: 'css-remove', index: sheet.elementIndex, text: text.slice(from, to) });
+  };
   for (const x of sub) {
     for (const tok of (x.attrs.find((a) => a.lname === 'class')?.value ?? '').split(/\s+/)) {
       if (!MANAGED_CLASS.test(tok) || used.has(tok)) continue;
+      const def = KINDS_BY_PREFIX[tok.replace(/-\d+$/, '')];
+      let ours = false;
       for (const sheet of model.sheets) {
         for (const rule of sheet.rules) {
-          if (rule.conditional || rule.selector.trim() !== `.${tok}`) continue;
-          const text = sheet.file === file ? src : model.companions[sheet.file]!.source;
-          let [s, e] = removalRange(text, rule.start, rule.end);
-          if (s === rule.start && text[s - 1] === '\n' && text.startsWith('</', e)) s -= 1; // the newline the engine added before a rule written right before </style>
-          patches.push({ file: sheet.file, start: s, end: e, text: '' });
-          dom.push({ type: 'css-remove', index: sheet.elementIndex, text: text.slice(rule.start, rule.end) });
+          if (rule.conditional || rule.selector.trim() !== `.${tok}` || !def) continue;
+          if (!def.every((d, i) => rule.decls[i] && `${rule.decls[i]!.prop}: ${rule.decls[i]!.value}` === d)) continue;
+          ours = true;
+          dropRule(sheet, rule);
         }
       }
+      const hook = x.attrs.find((a) => a.lname === 'data-ue')?.value;
+      if (!ours || !hook || !/^\d+$/.test(hook)) continue;
+      const only = new RegExp(`^(\\[data-ue="${hook}"\\])+$`);
+      for (const sheet of model.sheets) for (const rule of sheet.rules) if (rule.selectors.length > 0 && rule.selectors.every((sl) => only.test(sl.trim()))) dropRule(sheet, rule);
     }
   }
   // The header exists only while a note does: if this was the last one, it goes too.
@@ -228,6 +264,7 @@ function removeEdit(model: Model, target: number, state: EditState, warnings: st
     patches.push({ file, start: s, end: e, text: '' });
   }
 
+  patches.splice(0, patches.length, ...mergeDeletes(patches));
   const after = patchedModel(model, patches).model;
   const n = sub.length;
   const want = tagSequence(model).filter((_, i) => i < el.index || i >= el.index + n);
@@ -508,3 +545,6 @@ function insertEdit(model: Model, kind: InsertKind, anchorIdx: number, placement
 
 export const HEADER_TEXT = 'Exported from UI Editor. Comments starting "NOTE FOR AI:" are the designer\'s instructions for the element that follows. Implement them.';
 export const HEADER_DATA = ` ${HEADER_TEXT} `;
+
+/** The default declarations of each prefix, in the order the engine writes them (see KINDS). */
+const KINDS_BY_PREFIX: Record<string, string[]> = { 'new-box': BOX, 'new-text': KINDS.text.decls, 'new-button': KINDS.button.decls };
