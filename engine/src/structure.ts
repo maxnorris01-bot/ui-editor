@@ -2,7 +2,7 @@ import { createModel, describe, select, sources } from './model';
 import { Refused, blockOf, no } from './edit';
 import { contentEnd } from './markup';
 import { exportFiles } from './patch';
-import { appendCss } from './responsive';
+import { appendCssLF } from './responsive';
 import type { CommentInfo, ContentEdit, DomOp, EditResult, EditState, ElementNode, InsertKind, Model, NoteList, Patch, Pin, RuleNode } from './types';
 
 /**
@@ -87,7 +87,7 @@ function textEdit(model: Model, target: number, typedRaw: string, warnings: stri
   const lead = /^\s*/.exec(inner)![0];
   const trail = lead.length === inner.length ? '' : /\s*$/.exec(inner)![0];
   const core = inner.slice(lead.length, inner.length - trail.length);
-  const written = escapeText(typed);
+  const written = escapeText(typed).replace(/\n/g, eolAt(src, a));
   if (core === written) return { ok: true, patches: [], dom: [], warnings, placement: 'text unchanged' };
   const patches: Patch[] = [{ file, start: a + lead.length, end: b - trail.length, text: written }];
   const after = patchedModel(model, patches).model;
@@ -291,7 +291,18 @@ function removeEdit(model: Model, target: number, state: EditState, warnings: st
  */
 export const neutralise = (text: string): string => text.replace(/\u0000/g, '').replace(/\r\n?/g, '\n').replace(/-{2,}/g, (m) => m.split('').join(' '));
 
-const eolOf = (src: string): string => (src.includes('\r\n') ? '\r\n' : '\n');
+/**
+ * The line ending for a break added at `offset`: that of the nearest existing line break (the one that ends the line before `offset`;
+ * if there is none, the first one after it); LF for a file with no line break at all. Mixed files are never normalised: each added
+ * break follows its neighbour.
+ */
+export function eolAt(src: string, offset: number): string {
+  const i = offset > 0 ? src.lastIndexOf('\n', offset - 1) : -1;
+  if (i >= 0) return src[i - 1] === '\r' ? '\r\n' : '\n';
+  const j = src.indexOf('\n', offset);
+  if (j >= 0) return src[j - 1] === '\r' ? '\r\n' : '\n';
+  return '\n';
+}
 
 /**
  * Where the header goes: right after the DOCTYPE or XML declaration (skipping blanks and comments before them), on its own line when
@@ -327,12 +338,12 @@ function noteEdit(model: Model, targetArg: number | 'page', textRaw: string, war
   const el = page ? null : elementAt(model, targetArg);
   const header = comments.find((c) => c.data === HEADER_DATA);
   const existing = page ? comments.find((c) => c.data.startsWith(PAGE_NOTE_PREFIX)) : noteOf(model, el!);
-  const eol = eolOf(src);
   const patches: Patch[] = [];
   const del = textRaw.trim() === '';
   const body = neutralise(textRaw);
   const prefix = page ? PAGE_NOTE_PREFIX : NOTE_PREFIX;
-  const comment = `<!--${prefix}${body} -->`;
+  // the typed line breaks (and every break the note adds) follow the file's own ending at the place the note is written
+  const mk = (at: number) => `<!--${prefix}${body.replace(/\n/g, eolAt(src, at))} -->`;
   let placement: string;
 
   if (del) {
@@ -345,6 +356,7 @@ function noteEdit(model: Model, targetArg: number | 'page', textRaw: string, war
     }
     placement = 'note deleted';
   } else if (existing) {
+    const comment = mk(existing.start);
     if (src.slice(existing.start, existing.end) === comment) return { ok: true, patches: [], dom: [], warnings, placement: 'note unchanged' };
     patches.push({ file, start: existing.start, end: existing.end, text: comment });
     placement = 'note replaced';
@@ -352,18 +364,19 @@ function noteEdit(model: Model, targetArg: number | 'page', textRaw: string, war
     let pageAt = -1;
     if (!page) {
       const blk = blockOf(src, el!);
-      if (blk.line) patches.push({ file, start: blk.start, end: blk.start, text: `${src.slice(blk.start, el!.start)}${comment}${eol}` });
-      else patches.push({ file, start: el!.start, end: el!.start, text: comment });
+      if (blk.line) patches.push({ file, start: blk.start, end: blk.start, text: `${src.slice(blk.start, el!.start)}${mk(blk.start)}${eolAt(src, blk.start)}` });
+      else patches.push({ file, start: el!.start, end: el!.start, text: mk(el!.start) });
     } else if (header) {
       const [hs, he] = removalRange(src, header.start, header.end);
       const whole = he !== header.end || hs !== header.start;
       pageAt = whole ? he : header.end;
-      patches.push({ file, start: pageAt, end: pageAt, text: whole ? `${src.slice(src.lastIndexOf('\n', header.start - 1) + 1, header.start)}${comment}${eol}` : comment });
+      patches.push({ file, start: pageAt, end: pageAt, text: whole ? `${src.slice(src.lastIndexOf('\n', header.start - 1) + 1, header.start)}${mk(pageAt)}${eolAt(src, pageAt)}` : mk(pageAt) });
     }
     if (!header) {
       const hp = headerPoint(src);
       const head = `<!-- ${HEADER_TEXT} -->`;
-      const text = (hp.line ? `${head}${eol}` : head) + (page ? (hp.line ? `${comment}${eol}` : comment) : '');
+      const eol = eolAt(src, hp.at);
+      const text = (hp.line ? `${head}${eol}` : head) + (page ? (hp.line ? `${mk(hp.at)}${eol}` : mk(hp.at)) : '');
       patches.push({ file, start: hp.at, end: hp.at, text });
     }
     placement = page ? 'page note added' : 'note added before the element';
@@ -451,7 +464,6 @@ function insertEdit(model: Model, kind: InsertKind, anchorIdx: number, placement
   if (!info) no('unknown-kind', `unknown insert kind "${String(kind)}"`);
   const src = model.primary.source;
   const file = model.primary.file;
-  const eol = eolOf(src);
   const anchor = model.primary.elements[anchorIdx];
   if (!anchor) return no('no-element', `no element with index ${anchorIdx}`);
   if (anchor.implied) no('implied-anchor', `<${anchor.tag}> is created by the parser and has no source text to place a new element next to`);
@@ -470,11 +482,13 @@ function insertEdit(model: Model, kind: InsertKind, anchorIdx: number, placement
   let rule: { patch: Patch; dom: DomOp } | null = null;
   if (model.sheets.length > 0) {
     try {
-      const r = appendCss(model, [`.${cls} { ${decls}; }`]);
+      const r = appendCssLF(model, [`.${cls} { ${decls}; }`]);
       let patch = r.patch;
       // a rule written where the file has no final newline (or right before </style> on the same line) is written without a trailing
       // newline of its own, so that removing it restores the exact original bytes
       if (patch.text.startsWith('\n') && patch.text.endsWith('\n') && patch.text.indexOf('\n', 1) === patch.text.length - 1) patch = { ...patch, text: patch.text.slice(0, -1) };
+      const host = patch.file === file ? src : model.companions[patch.file]!.source;
+      patch = { ...patch, text: patch.text.replace(/\n/g, eolAt(host, patch.start)) };
       rule = { patch, dom: r.dom };
     } catch (e) {
       if (!(e instanceof Refused)) throw e; // no usable stylesheet: the styles go inline instead
@@ -486,7 +500,7 @@ function insertEdit(model: Model, kind: InsertKind, anchorIdx: number, placement
   // where the text goes, mimicking the neighbours: whole lines next to a line-formatted neighbour, no invented whitespace otherwise
   let at = 0;
   let text = markup;
-  const ownLine = (offset: number, indent: string) => { at = offset; text = `${indent}${markup}${eol}`; };
+  const ownLine = (offset: number, indent: string) => { at = offset; text = `${indent}${markup}${eolAt(src, offset)}`; };
   let newIdx: number;
   let position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend';
   if (placement === 'before' || placement === 'after') {
