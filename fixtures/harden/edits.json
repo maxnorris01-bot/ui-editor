@@ -1,0 +1,1243 @@
+{
+ "version": 1,
+ "tolerance": {
+  "px": 0.5,
+  "bboxPx": 1
+ },
+ "viewportHeight": 800,
+ "specs": [
+  {
+   "id": "H01",
+   "title": "pin on the moved element: reorder to first, then a linked desktop edit keeps the pinned phone value",
+   "fixture": "pins.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#t3",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "reorder",
+     "target": "#t3",
+     "placement": "before",
+     "sibling": "#t1"
+    },
+    {
+     "op": "set",
+     "target": "#t3",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "selector": "#t3",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     },
+     {
+      "selector": "#t1",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[1]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     }
+    ],
+    "unlinkedIds": [
+     "t3"
+    ],
+    "order": {
+     "parent": "#wrap",
+     "ids": [
+      "t3",
+      "t1",
+      "t2",
+      "t4"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H02",
+   "title": "pins on the moved element and on the sibling it jumps over: reorder up by one, then linked edits on both",
+   "fixture": "pins.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#t3",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": "#t2",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "reorder",
+     "target": "#t3",
+     "placement": "before",
+     "sibling": "#t2"
+    },
+    {
+     "op": "set",
+     "target": "#t2",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": "#t3",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "selector": "#t3",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     },
+     {
+      "selector": "#t2",
+      "prop": "font-size",
+      "by": {
+       "hi": "30px",
+       "lo": "18px"
+      }
+     },
+     {
+      "selector": "#t1",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[2]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     },
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[3]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "18px"
+     }
+    ],
+    "unlinkedIds": [
+     "t3",
+     "t2"
+    ],
+    "order": {
+     "parent": "#wrap",
+     "ids": [
+      "t1",
+      "t3",
+      "t2",
+      "t4"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H03",
+   "title": "pins on a descendant of the moved element and of a jumped-over sibling: reorder down",
+   "fixture": "reorder.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#a1",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": "#a2",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "reorder",
+     "target": "#s1",
+     "placement": "after",
+     "sibling": "#s2"
+    },
+    {
+     "op": "set",
+     "target": "#a1",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": "#a2",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "selector": "#a1",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     },
+     {
+      "selector": "#a2",
+      "prop": "font-size",
+      "by": {
+       "hi": "30px",
+       "lo": "18px"
+      }
+     },
+     {
+      "selector": "#a3",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/section[1]/p[1]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "18px"
+     },
+     {
+      "selector": "/html[1]/body[1]/div[1]/section[2]/p[1]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     }
+    ],
+    "unlinkedIds": [
+     "a2",
+     "a1"
+    ],
+    "order": {
+     "parent": "#wrap",
+     "ids": [
+      "s2",
+      "s1",
+      "s3"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H04",
+   "title": "descendant pins when a section is moved to last",
+   "fixture": "reorder.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#a3",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": "#a2",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "reorder",
+     "target": "#s1",
+     "placement": "after",
+     "sibling": "#s3"
+    },
+    {
+     "op": "set",
+     "target": "#a3",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": "#a2",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "selector": "#a3",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     },
+     {
+      "selector": "#a2",
+      "prop": "font-size",
+      "by": {
+       "hi": "30px",
+       "lo": "18px"
+      }
+     },
+     {
+      "selector": "#a1",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/section[1]/p[1]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "18px"
+     },
+     {
+      "selector": "/html[1]/body[1]/div[1]/section[2]/p[1]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     }
+    ],
+    "unlinkedIds": [
+     "a2",
+     "a3"
+    ],
+    "order": {
+     "parent": "#wrap",
+     "ids": [
+      "s2",
+      "s3",
+      "s1"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H05",
+   "title": "insert, reorder and remove in one list, then a linked edit in the other environment; undo by replay gives the same bytes and pins",
+   "fixture": "pins.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#t4",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#t1",
+     "placement": "before"
+    },
+    {
+     "op": "reorder",
+     "target": "#t4",
+     "placement": "before",
+     "sibling": "#t2"
+    },
+    {
+     "op": "remove",
+     "target": "#t1"
+    },
+    {
+     "op": "set",
+     "target": "#t4",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "created": [
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": "#wrap",
+      "index": 0,
+      "text": "Text"
+     }
+    ],
+    "gone": [
+     "#t1"
+    ],
+    "measured": [
+     {
+      "selector": "#t4",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     },
+     {
+      "selector": "#t2",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     },
+     {
+      "selector": "#t3",
+      "prop": "font-size",
+      "by": {
+       "hi": "16px",
+       "lo": "14px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[2]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     }
+    ],
+    "unlinkedIds": [
+     "t4"
+    ],
+    "order": {
+     "parent": "#wrap",
+     "ids": [
+      "",
+      "t4",
+      "t2",
+      "t3"
+     ]
+    },
+    "undo": true,
+    "undoPins": true
+   }
+  },
+  {
+   "id": "H06",
+   "title": "reorder of an element that carries a note and a pin: both follow it",
+   "fixture": "pins.html",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#t3",
+     "text": "Keep this with the third paragraph."
+    },
+    {
+     "op": "set",
+     "target": "#t3",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "reorder",
+     "target": "#t3",
+     "placement": "before",
+     "sibling": "#t1"
+    },
+    {
+     "op": "set",
+     "target": "#t3",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "notes": [
+     {
+      "target": "#t3",
+      "read": "Keep this with the third paragraph."
+     }
+    ],
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "measured": [
+     {
+      "selector": "#t3",
+      "prop": "font-size",
+      "by": {
+       "hi": "40px",
+       "lo": "20px"
+      }
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[1]",
+      "property": "font-size",
+      "environment": "phone",
+      "value": "20px"
+     }
+    ],
+    "unlinkedIds": [
+     "t3"
+    ],
+    "order": {
+     "parent": "#wrap",
+     "ids": [
+      "t3",
+      "t1",
+      "t2",
+      "t4"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H07",
+   "title": "insert, linked and unlinked width/padding/margin/font-size/colour edits in both environments, remove: the original bytes",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": ".lead",
+     "placement": "after"
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "padding": "12px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "margin": "8px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "color": "#ff0000"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "width": "150px"
+     },
+     "environment": "desktop",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "padding": "4px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "color": "#00aa00"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "remove",
+     "target": ".new-box-1"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "equals-original",
+    "gone": [
+     ".new-box-1"
+    ]
+   }
+  },
+  {
+   "id": "H08",
+   "title": "the same on a page whose only stylesheet is a style block",
+   "fixture": "style-only.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#intro",
+     "placement": "after"
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "font-size": "24px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "margin": "6px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "color": "#0000ff"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "width": "200px"
+     },
+     "environment": "phone",
+     "link": false
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "desktop",
+     "link": false
+    },
+    {
+     "op": "remove",
+     "target": ".new-text-1"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "equals-original",
+    "gone": [
+     ".new-text-1"
+    ]
+   }
+  },
+  {
+   "id": "H09",
+   "title": "two inserted elements, edits on both, one removed: the bytes of the list that never had it",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": ".lead",
+     "placement": "after"
+    },
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#cta",
+     "placement": "after"
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "width": "300px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "set",
+     "target": ".new-text-1",
+     "properties": {
+      "font-size": "30px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "remove",
+     "target": ".new-text-1"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": {
+     "equalsRunWithout": [
+      2,
+      4,
+      5
+     ]
+    },
+    "gone": [
+     ".new-text-1"
+    ],
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": ".hero-copy",
+      "index": 2,
+      "text": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "H10",
+   "title": "H2 case B: an ORIGINAL element with engine-written override rules: the element goes, its override rules and the page's own rules stay",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#headline",
+     "properties": {
+      "font-size": "52px"
+     },
+     "environment": "desktop",
+     "link": true
+    },
+    {
+     "op": "remove",
+     "target": "#headline"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": {
+     "removed": [
+      "        <h1 id=\"headline\">Calm software for busy teams</h1>\n"
+     ],
+     "othersAdditive": true
+    },
+    "gone": [
+     "#headline"
+    ],
+    "elementDelta": -1
+   }
+  },
+  {
+   "id": "H11",
+   "title": "a page-authored rule that looks like the engine's (.new-box-1) is never deleted",
+   "fixture": "collision.html",
+   "steps": [
+    {
+     "op": "remove",
+     "target": "#existing"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": {
+     "removed": [
+      "  <div id=\"existing\" class=\"new-box-1\"></div>\n"
+     ]
+    },
+    "gone": [
+     "#existing"
+    ],
+    "elementDelta": -1
+   }
+  },
+  {
+   "id": "H12",
+   "title": "CRLF page and stylesheet: insert, a note with a line break, a page note (header) and the appended rule all use CRLF",
+   "fixture": "crlf/landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": ".lead",
+     "placement": "after"
+    },
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "Line one\nLine two"
+    },
+    {
+     "op": "note",
+     "target": "page",
+     "text": "Whole page"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "additive",
+    "format": "lines",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": ".hero-copy",
+      "index": 2,
+      "text": ""
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-box-1",
+    "notes": [
+     {
+      "target": "#headline",
+      "read": "Line one\nLine two"
+     }
+    ],
+    "pageNote": {
+     "read": "Whole page"
+    },
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "regionEol": {
+     "landing.html": [
+      "crlf",
+      "crlf",
+      "crlf",
+      "crlf"
+     ],
+     "landing.css": [
+      "crlf"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H13",
+   "title": "CRLF page: a text edit with a typed line break and a remove",
+   "fixture": "crlf/landing.html",
+   "steps": [
+    {
+     "op": "text",
+     "target": ".lead",
+     "text": "first\nsecond"
+    },
+    {
+     "op": "remove",
+     "target": "#card-ship"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": {
+     "replace": [
+      "Fernhill Studio designs small, reliable tools that stay out of your way.",
+      "first\r\nsecond"
+     ],
+     "removed": [
+      "      <article class=\"card\" id=\"card-ship\">\r\n        <h3>Ship</h3>\r\n        <p>Release on a quiet schedule and tell people what changed.</p>\r\n      </article>\r\n"
+     ]
+    },
+    "textEquals": [
+     {
+      "selector": ".lead",
+      "text": "first\nsecond"
+     }
+    ],
+    "gone": [
+     "#card-ship"
+    ],
+    "elementDelta": -3,
+    "noCollateral": true
+   }
+  },
+  {
+   "id": "H14",
+   "title": "CRLF SVG: a note with a line break and a page note, header at the very start",
+   "fixture": "crlf/chart.svg",
+   "steps": [
+    {
+     "op": "note",
+     "target": "#bar-wed",
+     "text": "Line one\nLine two"
+    },
+    {
+     "op": "note",
+     "target": "page",
+     "text": "Whole page"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "additive",
+    "format": "lines",
+    "notes": [
+     {
+      "target": "#bar-wed",
+      "read": "Line one\nLine two"
+     }
+    ],
+    "pageNote": {
+     "read": "Whole page"
+    },
+    "headerCount": 1,
+    "headerAfter": "start",
+    "svgWellFormed": true,
+    "regionEol": {
+     "chart.svg": [
+      "crlf",
+      "crlf",
+      "crlf"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H15",
+   "title": "mixed file (LF in the top half, CRLF in the bottom half): each added line break follows the nearest existing one; no byte is normalised",
+   "fixture": "mixed.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#first",
+     "placement": "after"
+    },
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#last",
+     "placement": "after"
+    },
+    {
+     "op": "note",
+     "target": "#last",
+     "text": "Zone note"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "additive",
+    "format": "lines",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": "body",
+      "index": 1,
+      "text": ""
+     },
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": "body",
+      "index": 4,
+      "text": "Text"
+     }
+    ],
+    "notes": [
+     {
+      "target": "#last",
+      "read": "Zone note"
+     }
+    ],
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "regionEol": {
+     "mixed.html": [
+      "lf",
+      "lf",
+      "lf",
+      "lf",
+      "crlf",
+      "crlf"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H16",
+   "title": "CRLF files with no trailing newline (page and stylesheet): the appended rule and lines use CRLF and no final newline is invented",
+   "fixture": "nonl/landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": ".lead",
+     "placement": "after"
+    },
+    {
+     "op": "note",
+     "target": "#headline",
+     "text": "n"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "additive",
+    "format": "lines",
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": ".hero-copy",
+      "index": 2,
+      "text": ""
+     }
+    ],
+    "ruleIn": "landing.css",
+    "cls": "new-box-1",
+    "notes": [
+     {
+      "target": "#headline",
+      "read": "n"
+     }
+    ],
+    "headerCount": 1,
+    "headerAfter": "doctype",
+    "regionEol": {
+     "landing.html": [
+      "crlf",
+      "crlf",
+      "crlf"
+     ],
+     "landing.css": [
+      "crlf"
+     ]
+    }
+   }
+  },
+  {
+   "id": "H17",
+   "title": "insert before the first child and after the last child of a container styled by :nth-child, :first-child and :last-child",
+   "fixture": "neighbours.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#b1",
+     "placement": "before"
+    },
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#b3",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "additive",
+    "format": "lines",
+    "oracle": true,
+    "noCollateral": true,
+    "created": [
+     {
+      "selector": ".new-box-1",
+      "tag": "div",
+      "parent": "#cards",
+      "index": 0,
+      "text": ""
+     },
+     {
+      "selector": ".new-box-2",
+      "tag": "div",
+      "parent": "#cards",
+      "index": 4,
+      "text": ""
+     }
+    ]
+   }
+  },
+  {
+   "id": "H18",
+   "title": "insert a paragraph between a heading and its following paragraphs (h2 + p and h2 ~ p)",
+   "fixture": "neighbours.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#h",
+     "placement": "after"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": "additive",
+    "format": "lines",
+    "oracle": true,
+    "noCollateral": true,
+    "created": [
+     {
+      "selector": ".new-text-1",
+      "tag": "p",
+      "parent": "body",
+      "index": 2,
+      "text": "Text"
+     }
+    ]
+   }
+  },
+  {
+   "id": "H19",
+   "title": "remove the first and the last child of the nth-child container",
+   "fixture": "neighbours.html",
+   "steps": [
+    {
+     "op": "remove",
+     "target": "#b1"
+    },
+    {
+     "op": "remove",
+     "target": "#b3"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": {
+     "removed": [
+      "    <p class=\"box\" id=\"b1\">Box one</p>\n",
+      "    <p class=\"box\" id=\"b3\">Box three</p>\n"
+     ]
+    },
+    "oracle": true,
+    "noCollateral": true,
+    "gone": [
+     "#b1",
+     "#b3"
+    ],
+    "elementDelta": -2
+   }
+  },
+  {
+   "id": "H20",
+   "title": "remove the heading that h2 + p and h2 ~ p depend on",
+   "fixture": "neighbours.html",
+   "steps": [
+    {
+     "op": "remove",
+     "target": "#h"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "hbytes": {
+     "removed": [
+      "  <h2 id=\"h\">Heading</h2>\n"
+     ]
+    },
+    "oracle": true,
+    "noCollateral": true,
+    "gone": [
+     "#h"
+    ],
+    "elementDelta": -1
+   }
+  }
+ ]
+}

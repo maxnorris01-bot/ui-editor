@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Neighbour selectors</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; font-size: 16px; }
+    #cards { padding: 8px; }
+    .box { margin: 0 0 6px; padding: 6px; background: #ffffff; }
+    .box:nth-child(odd) { background: #e8f0ff; padding-left: 20px; }
+    .box:first-child { border-top: 4px solid #336699; }
+    .box:last-child { border-bottom: 4px solid #993366; }
+    h2 + p { color: #cc0000; font-size: 20px; }
+    h2 ~ p { margin-left: 30px; }
+    @media (max-width: 640px) {
+      .box:nth-child(odd) { padding-left: 8px; }
+      h2 ~ p { margin-left: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="cards">
+    <p class="box" id="b1">Box one</p>
+    <p class="box" id="b2">Box two</p>
+    <p class="box" id="b3">Box three</p>
+  </div>
+  <h2 id="h">Heading</h2>
+  <p id="p1">Paragraph one</p>
+  <p id="p2">Paragraph two</p>
+  <p id="p3">Paragraph three</p>
+</body>
+</html>
