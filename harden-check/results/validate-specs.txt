@@ -1,0 +1,22 @@
+H01 ok  pins.html
+H02 ok  pins.html
+H03 ok  reorder.html
+H04 ok  reorder.html
+H05 ok  pins.html
+H06 ok  pins.html
+H07 ok  landing.html
+H08 ok  style-only.html
+H09 ok  landing.html
+H10 ok  landing.html
+H11 ok  collision.html
+H12 ok  crlf/landing.html
+H13 ok  crlf/landing.html
+H14 ok  crlf/chart.svg
+H15 ok  mixed.html
+H16 ok  nonl/landing.html
+H17 ok  neighbours.html
+H18 ok  neighbours.html
+H19 ok  neighbours.html
+H20 ok  neighbours.html
+
+all 20 specs consistent with their fixtures

@@ -144,11 +144,15 @@ a note for an AI. They apply at every screen width and ignore the Link switch.
   with child elements (`mixed-content`), one that contains a comment (`has-comment`), script, style, `textarea`, `title`, `pre`
   and similar raw-text elements (`raw-text-element`), and a self-closing SVG element (`self-closing`). `&`, `<` and `>` are
   written as entities; carriage returns become line feeds; a NUL character is refused.
-- **Remove** takes the element, its note and, for an inserted element, the rule the engine appended for it (only when no other
-  element uses that class). It leaves behind any `#id` or `data-ue` override rules that earlier size or spacing edits appended
-  for the element (harmless dead rules), and it does not check that something in an HTML page still links to the removed
-  element's id (`#section`); an SVG element that another element references (`<use>`, `url(#id)`) refuses (`referenced`).
-  It refuses `html`, `head`, `body` and the SVG root (`protected-element`).
+- **Remove** takes the element, its note and, for an element the engine inserted, every rule the engine wrote for it: its own rule and any
+  override rule from later size, spacing, font or colour edits, linked or unlinked (so insert, edits, remove gives back the original file).
+  The engine recognises its own element by its class (`new-box-N`, `new-text-N`, `new-button-N`) AND its rule starting with the engine's default
+  declarations, so a page-authored rule that merely has such a class name is never deleted. **For an ORIGINAL element** the override rules earlier
+  edits wrote for it (`#id` or `[data-ue]` rules) cannot be told from page-authored ones with certainty, so they stay in the file as harmless dead rules.
+  In a stylesheet with no final newline a later edit's rule line gets a trailing newline (existing behaviour), so insert, edit, remove there leaves
+  one extra final newline. Remove does not check that something in an HTML page still links to the removed element's id (`#section`); an SVG
+  element that another element references (`<use>`, `url(#id)`) refuses (`referenced`). It refuses `html`, `head`, `body` and the SVG root
+  (`protected-element`).
 - **Notes.** A note is the comment `<!-- NOTE FOR AI: ... -->` directly before its element, with one header comment after the DOCTYPE
   (or XML declaration, or at the start) while at least one note exists. One note per element plus one whole-page note. Empty (or
   blank) text deletes the note. A hand-written comment is only recognised as a note if it is spelled exactly like that; a note
@@ -158,12 +162,17 @@ a note for an AI. They apply at every screen width and ignore the Link switch.
   (line breaks, `<script>`, emoji) stays as typed and is inert inside a comment.
 - **A note travels with its element** when it is reordered or removed; an unlinked (phone-only or desktop-only) reorder only
   changes the CSS `order` and moves nothing in the file.
-- **Pins after structural edits.** Inserting or removing an element shifts the paths unlinked edits are recorded under; the engine
-  remaps them (a pin of a removed element is dropped). **Reorder does not**: after an unlinked edit on an element and then a
-  reorder of it, a later linked edit scales the pinned value (measured: 20 px became 50 px, `insert-check/results/pins-measurement.txt`).
-  Found while measuring; outside the brief, so not fixed. **(unsure)** how often this happens in practice.
-- **Not checked:** a page whose CSS uses `:nth-child`, `:first-child` or sibling selectors may restyle neighbours when an element
-  is inserted or removed (no fixture does); inserting into `<pre>`, `<textarea>`-like or custom-element content; very large
+- **Pins after structural edits.** Inserting, removing or reordering an element shifts the paths unlinked edits are recorded under; the engine
+  remaps them so a pin follows its element (a pin of a removed element is dropped). An unlinked (phone-only or desktop-only) reorder only changes the
+  CSS `order` and moves nothing in the file.
+- **Line endings.** A file with CRLF line breaks stays CRLF: every break the engine adds (inserted lines, a note's line breaks, the header, an appended
+  rule, a typed line break in a text edit) uses the ending of the nearest existing break, so a mixed file is never normalised and a file with no final
+  newline gets none. A note typed with line breaks in a CRLF file is written with CRLF and read back as LF by `listNotes` (and by a browser). A file with
+  no line break at all gets LF. **(unsure)** old Mac line endings (a lone CR) were not tested.
+- **Neighbour selectors.** Pages whose CSS uses `:nth-child`, `:first-child`, `:last-child`, `+` or `~` restyle neighbours when an element is inserted
+  or removed. That is the browser's own behaviour and the engine writes only the edit; the hardening specs compare the export with the browser's answer
+  for an inserted or removed element (a fixture with all five kinds of rule agrees).
+- **Not checked:** inserting into `<pre>`, `<textarea>`-like or custom-element content; very large
   documents beyond the speed fixtures.
 
 ## What was and was not tested

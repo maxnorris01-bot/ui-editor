@@ -8,6 +8,7 @@ window.runInsertSpec = async function (f, steps, opts) {
   var model = E.createModel(f.source, f.kind, f.companions, f.file);
   var preview = await E.createPreview(model, host);
   var stepFiles = [];
+  var stepUnlinked = [];
   var state = E.emptyState();
   var done = 0;
   try {
@@ -33,9 +34,10 @@ window.runInsertSpec = async function (f, steps, opts) {
       if (!r.ok) return { refused: Object.assign({ step: i + 1 }, r.refusal), stepFiles: stepFiles, done: done };
       state = run.state;
       stepFiles.push(run.files);
+      stepUnlinked.push(E.listUnlinked(state));
       done++;
     }
-    var out = { refused: null, files: stepFiles.length ? stepFiles[stepFiles.length - 1] : null, stepFiles: stepFiles, unlinked: E.listUnlinked(state) };
+    var out = { refused: null, files: stepFiles.length ? stepFiles[stepFiles.length - 1] : null, stepFiles: stepFiles, stepUnlinked: stepUnlinked, unlinked: E.listUnlinked(state) };
     out.notes = typeof E.listNotes === 'function' ? E.listNotes(preview.model) : null;
     // the preview's own measurements, to compare with the exported file
     out.preview = {};

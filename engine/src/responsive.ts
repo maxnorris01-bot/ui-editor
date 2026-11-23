@@ -1,6 +1,7 @@
 import { describe } from './model';
 import { addAttribute, replaceDeclValue } from './patch';
 import { specificity } from './specificity';
+import { eolAt } from './structure';
 import {
   attrOf,
   fmt,
@@ -328,7 +329,15 @@ export function sourceMapStart(text: string): number {
   return m ? m.index : -1;
 }
 
+/** Appends rule lines like `appendCssLF`, with every line break the engine adds in the file's own line ending (CRLF files stay CRLF). */
 export function appendCss(model: Model, lines: string[]): { patch: Patch; dom: DomOp } {
+  const r = appendCssLF(model, lines);
+  const host = r.patch.file === model.primary.file ? model.primary.source : model.companions[r.patch.file]!.source;
+  const eol = eolAt(host, r.patch.start);
+  return eol === '\n' ? r : { ...r, patch: { ...r.patch, text: r.patch.text.replace(/\n/g, eol) } };
+}
+
+export function appendCssLF(model: Model, lines: string[]): { patch: Patch; dom: DomOp } {
   const sheet = model.sheets[model.sheets.length - 1];
   if (!sheet) return no('no-stylesheet', 'the page has no <style> block or supplied stylesheet to add the override rules to');
   if (sheet.file === model.primary.file) {

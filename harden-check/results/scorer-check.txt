@@ -1,0 +1,58 @@
+Scorer check for docs/hardening-rules.md, run before any engine change (harness/controls-harden.ts).
+The engine cannot yet produce correct exports for the H1, H2 and H3 cases, so each export below is built by hand from the fixture (plain string operations) and given to the same scorer that scores the engine.
+
+OK   [H01] good H01 (reference export: the pin followed its element): must pass every check; failing checks: none
+OK   [H01] a pin not remapped after a reorder: the later linked edit scaled it (phone value 50px): must fail M; failing checks: M
+       M: @640 #t3 font-size 50px want 20px | @390 #t3 font-size 50px want 20px
+OK   [H01] a pin not remapped after a reorder: listUnlinked still names the old path: must fail U; failing checks: U
+       U: listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[3]","property":"font-size","environment":"phone","value":"20px"}] expected [{"selector":"/html[1]/body[1]/d
+OK   [H07] good H07 (the original bytes): must pass every check; failing checks: none
+OK   [H07] a leftover scoped rule after insert, set and remove (companion CSS): must fail BH; failing checks: BH
+       BH: landing.css: not byte-identical to the original (1375 bytes vs expected 1343)
+OK   [H07] a leftover own rule after insert and remove (companion CSS): must fail BH; failing checks: BH
+       BH: landing.css: not byte-identical to the original (1476 bytes vs expected 1343)
+OK   [H08] good H08 (the original bytes): must pass every check; failing checks: none
+OK   [H08] a leftover scoped rule in the page's style block: must fail BH; failing checks: BH
+       BH: style-only.html: not byte-identical to the original (817 bytes vs expected 751)
+OK   [H11] good H11 (the page rule stays): must pass every check; failing checks: none
+OK   [H11] a deleted page-authored rule (.new-box-1 written by the page): must fail BH; failing checks: BH
+       BH: collision.html: not the original with only the stated change(s) (269 bytes vs expected 336)
+OK   [H12] good H12 (reference export, every added break CRLF): must pass every check; failing checks: none
+OK   [H12] a lone LF added to a CRLF file (the header written with LF): must fail EOL; failing checks: EOL
+       EOL: landing.html: added comment #1 has 1 lone LF and 0 lone CR in a CRLF place
+OK   [H12] a lone LF added to a CRLF file (the appended rule written with LF): must fail EOL; failing checks: EOL
+       EOL: landing.css: added rule #1 has 1 lone LF and 0 lone CR in a CRLF place
+OK   [H12] a lone LF inside a note with a typed line break in a CRLF file: must fail EOL; failing checks: EOL
+       EOL: landing.html: added comment #3 has 1 lone LF and 0 lone CR in a CRLF place
+OK   [H15] good H15 (reference export, each added break follows the nearest one): must pass every check; failing checks: none
+OK   [H15] a CRLF added to an LF file (the header in the LF zone written with CRLF): must fail EOL; failing checks: EOL
+       EOL: mixed.html: added comment #1 has CR characters in an LF place
+OK   [H15] a mixed file normalised to LF: must fail BH and EOL; failing checks: BH, EOL
+       BH: mixed.html: after removing the permitted regions the file differs from the original (233 vs 237 bytes) | mixed.html: 4 removed text run(s): "\r"
+       EOL: mixed.html: added comment #5 has 1 lone LF and 0 lone CR in a CRLF place | mixed.html: added element #6 has 1 lone LF and 0 lone CR in a CRLF place
+OK   [H15] a mixed file normalised to CRLF: must fail BH and EOL; failing checks: BH, EOL
+       BH: mixed.html: after removing the permitted regions the file differs from the original (248 vs 237 bytes)
+       EOL: mixed.html: added comment #1 has CR characters in an LF place | mixed.html: added rule #2 has CR characters in an LF place | mixed.html: added rule #3 has CR ch
+OK   [H18] good H18 (reference export, the oracle agrees): must pass every check; failing checks: none
+OK   [H18] the H4 oracle given a wrong neighbour style (the next paragraph recoloured): must fail ORC; failing checks: BH, ORC
+       BH: neighbours.html: after removing the permitted regions the file differs from the original (1005 vs 977 bytes)
+       ORC: @1280: 1 element(s) differ from the browser's own answer: el#12 <p#p1> border-block-end-color: rgb(0, 0, 0) vs rgb(18, 52, 86); border-block-start-color: rgb(0,
+
+RESULT: all 20 controls behaved (every good export passed, every broken export failed the stated check).
+
+Note on the first draft: the reference ("good") export for H01 was first written with the pinned phone rule only before the base rule, and the scorer
+failed it (M: the phone value was 40px, not 20px). The scorer was right and my reference was wrong: the engine restates a pinned value after a new
+base rule (existing behaviour, `docs/adr/0003`). The reference was corrected; no scorer rule changed (amendment 1, item 5).
+
+Step 1, current engine (main at e93890f), run h0 in harden-check/results/harden-results.csv: 15 of the 20 H-specs FAIL, which proves the specs can fail:
+- H1 (reorder pins) H01 to H06 FAIL: the pinned phone value becomes 50px (H01, H04, H05, H06) and listUnlinked names stale paths (all six).
+- H2 H07, H08, H09, H11 FAIL: leftover `[data-ue]` rules after insert, set and remove (H07, H08), the wrong bytes (H09), and the page-authored
+  `.new-box-1` rule is deleted (H11, a defect of the merged remove). H10 (original element, override rules stay) PASSES on the current engine, as declared.
+- H3 H12 to H16 FAIL: the appended rule lines and a note's typed line break are LF in CRLF files, and the header is CRLF in the LF zone of the mixed file.
+- H4 H17 to H20 PASS on the current engine: no neighbour-selector defect (the oracle agrees), so no H4 engine change is expected.
+Baseline: 156 hashes (111 existing exports + 45 insert-spec exports) in results/harden/baseline-hashes.json, identical to the insert baseline.
+
+Earlier suites' faults re-run on the current engine (nothing written to the results CSVs): real-page noop/collateral/reformat fail E2+E3 / E4 / E5 on
+12/12 HTML and 8/8 SVG; responsive noop/collateral/reformat fail E2+E3 / E4 / E5 on 22; lastline and twonl (R09) fail E5; size noop/collateral/reformat 16/16;
+samewidth E2 14/16 and overflow 16/16; size-flex noop/collateral/reformat 6/6, samewidth 4/6 (Z18 and Z22 expected), overflow 6/6; the 25 insert scorer
+controls all behave; the 36 insert specs re-run with the edited insert scorer: 30 PASS + 6 REFUSED (run hpre).

@@ -72,7 +72,7 @@ describe('text', () => {
 });
 
 describe('remove', () => {
-  const page = '<!DOCTYPE html>\n<html>\n<head><style>\n  .new-box-1 { width: 10px; }\n</style></head>\n<body>\n  <div id="keep">\n    <p id="a">One</p>\n    <p id="b" class="new-box-1">Two</p>\n    <p id="c">Three <b>x</b></p>\n  </div>\n  <span id="s1">A</span><span id="s2">B</span>\n</body>\n</html>\n';
+  const page = '<!DOCTYPE html>\n<html>\n<head><style>\n  .new-box-1 { box-sizing: border-box; width: 200px; max-width: 100%; height: 120px; background: #d9d9d9; border: 1px solid #999999; }\n</style></head>\n<body>\n  <div id="keep">\n    <p id="a">One</p>\n    <p id="b" class="new-box-1">Two</p>\n    <p id="c">Three <b>x</b></p>\n  </div>\n  <span id="s1">A</span><span id="s2">B</span>\n</body>\n</html>\n';
   it('removes a line-formatted element with its lines', () => {
     const e = env(page);
     expect(e.out(e.run({ op: 'remove', target: e.at('#a') }))).toBe(page.replace('    <p id="a">One</p>\n', ''));
@@ -84,7 +84,7 @@ describe('remove', () => {
   it('removes the element subtree and its engine rule', () => {
     const e = env(page);
     const r = e.run({ op: 'remove', target: e.at('#b') });
-    expect(e.out(r)).toBe(page.replace('    <p id="b" class="new-box-1">Two</p>\n', '').replace('  .new-box-1 { width: 10px; }\n', ''));
+    expect(e.out(r)).toBe(page.replace('    <p id="b" class="new-box-1">Two</p>\n', '').replace('  .new-box-1 { box-sizing: border-box; width: 200px; max-width: 100%; height: 120px; background: #d9d9d9; border: 1px solid #999999; }\n', ''));
   });
   it('keeps a rule that other elements still use', () => {
     const shared = page.replace('<p id="a">', '<p id="a" class="new-box-1">');
