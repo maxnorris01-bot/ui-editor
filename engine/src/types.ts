@@ -113,6 +113,20 @@ export interface ParsedFile {
   rules: RuleNode[];
   /** Number of parse errors the parser reported. */
   parseErrors: number;
+  /** Every comment node of an HTML/SVG file in source order (empty for CSS). */
+  comments: CommentInfo[];
+}
+
+/** One comment node: its source range, its text between `<!--` and `-->`, and the element it directly precedes. */
+export interface CommentInfo {
+  start: number;
+  end: number;
+  /** The comment's data (the text between `<!--` and `-->`). */
+  data: string;
+  /** Index of the element the comment sits in, or -1 at document level. */
+  parent: number;
+  /** Index of the element that follows with only whitespace between, or -1 (another comment, text or nothing follows). */
+  precedes: number;
 }
 
 export interface Model {
@@ -135,10 +149,27 @@ export interface EditScope {
   link?: boolean;
 }
 
-export type Edit =
+/** The kinds of element `insert` can add (HTML only). */
+export type InsertKind = 'text' | 'rect' | 'rounded' | 'ellipse' | 'button';
+
+/** Edits that change how an existing element looks or where it sits. */
+export type ElementEdit =
   | ({ op: 'set'; target: number; properties: Record<string, string> } & EditScope)
   | ({ op: 'offset'; target: number; dx: number; dy: number } & EditScope)
   | ({ op: 'reorder'; target: number; placement: 'before' | 'after'; sibling: number } & EditScope);
+
+/**
+ * Edits that change the content of the file: add an element, change an element's text, delete an element, attach a note for an
+ * AI. They apply at every screen width (`environment` and `link` are accepted and ignored) and never create pins.
+ */
+export type ContentEdit =
+  | ({ op: 'insert'; kind: InsertKind; anchor: number; placement: 'before' | 'after' | 'first-child' | 'last-child' } & EditScope)
+  | ({ op: 'text'; target: number; text: string } & EditScope)
+  | ({ op: 'remove'; target: number } & EditScope)
+  /** `target` is an element index, or `'page'` for the whole-page note; empty text deletes the note. */
+  | ({ op: 'note'; target: number | 'page'; text: string } & EditScope);
+
+export type Edit = ElementEdit | ContentEdit;
 
 /** An unlinked value pinned in one environment (pure data; the review list is built from it). */
 export interface Pin {
@@ -169,7 +200,13 @@ export type DomOp =
   /** Replace the children of element `index` by parsing `html` (used for reorders). */
   | { type: 'html'; index: number; html: string }
   /** Append CSS text to the <style> element `index` (the preview's copy of a stylesheet). */
-  | { type: 'css'; index: number; text: string };
+  | { type: 'css'; index: number; text: string }
+  /** Remove the first occurrence of CSS text from the <style> element `index` (undoes an appended rule). */
+  | { type: 'css-remove'; index: number; text: string }
+  /** Parse `html` and insert it next to element `index` (`insertAdjacentHTML`), used by `insert`. */
+  | { type: 'insert'; index: number; position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend'; html: string }
+  /** Remove element `index` from the preview (its children go with it). */
+  | { type: 'remove'; index: number };
 
 export interface Refusal {
   code: string;
@@ -177,7 +214,18 @@ export interface Refusal {
 }
 
 export type EditResult =
-  | { ok: true; patches: Patch[]; dom: DomOp[]; warnings: string[]; placement: string; notes?: ScaleNote[]; state?: EditState }
+  | {
+      ok: true;
+      patches: Patch[];
+      dom: DomOp[];
+      warnings: string[];
+      placement: string;
+      notes?: ScaleNote[];
+      state?: EditState;
+      /** `insert`: index of the new element in the model of the PATCHED text (so the editor can select it), and its class name. */
+      selected?: number;
+      className?: string;
+    }
   | { ok: false; refusal: Refusal; warnings: string[] };
 
 /** What the engine needs to know from a live document. Implemented over the preview iframe. */
@@ -190,4 +238,20 @@ export interface Probe {
   screenMatrix(index: number): [number, number, number, number, number, number] | null;
   /** Screen matrix of the element's parent user space, or null. */
   parentScreenMatrix(index: number): [number, number, number, number, number, number] | null;
+}
+
+/** A note for an AI found in a file (see `listNotes`). */
+export interface NoteInfo {
+  /** Index of the element the note belongs to. */
+  index: number;
+  /** Stable element path (see `describe`). */
+  path: string;
+  /** The note text, without the leading `NOTE FOR AI: `. */
+  text: string;
+}
+
+export interface NoteList {
+  /** The whole-page note, or null. */
+  page: { text: string } | null;
+  notes: NoteInfo[];
 }

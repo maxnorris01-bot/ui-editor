@@ -32,3 +32,8 @@ new-exports/
 # Size scaling check: temp and raw output (exports are never committed)
 size-check/tmp/
 size-check/raw/
+
+# Insert and comments engine spike: temp and raw output (exports are never committed)
+insert-check/tmp/
+insert-check/raw/
+.vitest/

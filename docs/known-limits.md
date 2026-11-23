@@ -123,6 +123,49 @@ takes effect at every screen width.
   not framework components or build output. **(unsure)** this is a design boundary from the project brief, not
   something a gate tested.
 
+## Insert, text, remove and notes (content edits, 2026-11-21)
+
+These four edits (`docs/adr/0004-insert-text-remove-note.md`) add an element, change an element's text, delete an element and attach
+a note for an AI. They apply at every screen width and ignore the Link switch.
+
+- **Insert is HTML only, and only in document order.** A new element goes before, after, first inside or last inside an anchor
+  element; there are no coordinates and no `position: absolute`. Inserting into an SVG file refuses (`svg-insert`).
+- **Five kinds, fixed defaults:** text (a paragraph reading "Text"), rectangle, rounded rectangle, ellipse (boxes of 200 by 120 px,
+  grey) and a real button (`type="button"`, reading "Button"). Every one carries `max-width: 100%` so it cannot push a phone
+  sideways. Changing the default look is a later job.
+- **Where an insert refuses** (it says why and changes nothing): directly inside a table, table row, list, `select` or `<html>`
+  (`invalid-parent`); inside a void element such as `<br>` or a raw-text element such as `<script>` (`void-element`,
+  `raw-text-container`); next to or inside an element the parser invented (`implied-anchor`); anywhere the HTML parser would move
+  the new element, for example a `<div>` inside a `<p>` (`parser-moves-element`).
+- **Names and styles.** The new element gets a class `new-box-N`, `new-text-N` or `new-button-N` (the smallest number nothing in
+  the page already uses). Its styles are one rule appended to the page's last stylesheet (the last `<style>` block or the linked
+  CSS); with no stylesheet they go in an inline `style` attribute. If the last `<style>` block is not closed the styles go inline.
+- **Text edit** works on an element that holds only text: the text is replaced and the spaces around it stay. It refuses an element
+  with child elements (`mixed-content`), one that contains a comment (`has-comment`), script, style, `textarea`, `title`, `pre`
+  and similar raw-text elements (`raw-text-element`), and a self-closing SVG element (`self-closing`). `&`, `<` and `>` are
+  written as entities; carriage returns become line feeds; a NUL character is refused.
+- **Remove** takes the element, its note and, for an inserted element, the rule the engine appended for it (only when no other
+  element uses that class). It leaves behind any `#id` or `data-ue` override rules that earlier size or spacing edits appended
+  for the element (harmless dead rules), and it does not check that something in an HTML page still links to the removed
+  element's id (`#section`); an SVG element that another element references (`<use>`, `url(#id)`) refuses (`referenced`).
+  It refuses `html`, `head`, `body` and the SVG root (`protected-element`).
+- **Notes.** A note is the comment `<!-- NOTE FOR AI: ... -->` directly before its element, with one header comment after the DOCTYPE
+  (or XML declaration, or at the start) while at least one note exists. One note per element plus one whole-page note. Empty (or
+  blank) text deletes the note. A hand-written comment is only recognised as a note if it is spelled exactly like that; a note
+  followed by text instead of the element is not attached to anything.
+- **Notes are made safe, not copied.** A run of two or more hyphens in a note gets a space between each pair (`--` becomes
+  `- -`), so the comment can never end early; the AI reading the file sees `- -` where the user typed `--`. Everything else
+  (line breaks, `<script>`, emoji) stays as typed and is inert inside a comment.
+- **A note travels with its element** when it is reordered or removed; an unlinked (phone-only or desktop-only) reorder only
+  changes the CSS `order` and moves nothing in the file.
+- **Pins after structural edits.** Inserting or removing an element shifts the paths unlinked edits are recorded under; the engine
+  remaps them (a pin of a removed element is dropped). **Reorder does not**: after an unlinked edit on an element and then a
+  reorder of it, a later linked edit scales the pinned value (measured: 20 px became 50 px, `insert-check/results/pins-measurement.txt`).
+  Found while measuring; outside the brief, so not fixed. **(unsure)** how often this happens in practice.
+- **Not checked:** a page whose CSS uses `:nth-child`, `:first-child` or sibling selectors may restyle neighbours when an element
+  is inserted or removed (no fixture does); inserting into `<pre>`, `<textarea>`-like or custom-element content; very large
+  documents beyond the speed fixtures.
+
 ## What was and was not tested
 
 - Chromium only (headless Playwright, JavaScript off, 1280 by 800 and the responsive widths).

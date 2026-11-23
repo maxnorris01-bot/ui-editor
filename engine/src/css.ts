@@ -90,7 +90,7 @@ export function parseRules(file: string, src: string, base = 0, startOrder = 0, 
 
 export function parseCssFile(file: string, source: string): ParsedFile {
   const { rules } = parseRules(file, source, 0, 0);
-  return { file, kind: 'css', source, elements: [], rules, parseErrors: 0 };
+  return { file, kind: 'css', source, elements: [], rules, parseErrors: 0, comments: [] };
 }
 
 /** Parse the declarations of an inline `style` attribute value located at [valueStart, valueEnd). */

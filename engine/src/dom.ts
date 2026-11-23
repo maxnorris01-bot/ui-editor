@@ -163,6 +163,14 @@ export function applyDomOps(preview: Preview, ops: DomOp[]): void {
       el.setAttribute(op.name, op.value);
     } else if (op.type === 'css') {
       el.appendChild(el.ownerDocument.createTextNode(op.text));
+    } else if (op.type === 'css-remove') {
+      const text = el.textContent ?? '';
+      const at = text.indexOf(`${op.text}\n`) >= 0 ? text.indexOf(`${op.text}\n`) : text.indexOf(op.text);
+      if (at >= 0) el.textContent = text.slice(0, at) + text.slice(at + op.text.length + (text[at + op.text.length] === '\n' ? 1 : 0));
+    } else if (op.type === 'insert') {
+      el.insertAdjacentHTML(op.position, op.html);
+    } else if (op.type === 'remove') {
+      el.remove();
     } else {
       el.innerHTML = op.html;
     }

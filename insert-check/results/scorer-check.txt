@@ -1,0 +1,63 @@
+Scorer check for docs/insert-comments-rules.md, run before any engine change (harness/controls-insert.ts).
+No engine output exists yet, so each export below is built by hand from the fixture (plain string operations) and given to the same scorer (evaluateExport) that scores the engine.
+
+OK   [I01] good I01 (reference export): must pass every check; failing checks: none
+OK   [I01] insert at the wrong position (after the CTA link instead of after the lead): must fail A; failing checks: A
+       A: .new-text-1: position 3 among its siblings, expected 2
+OK   [I01] rule written inline although a companion CSS exists: must fail P1; failing checks: P1
+       P1: no rule for .new-text-1 with max-width: 100% in landing.css | the new element also carries an inline style attribute although its rule is in a stylesh
+OK   [I01] an extra space on a line outside the change: must fail B; failing checks: B
+       B: landing.html: after removing the permitted regions the file differs from the original (1280 vs 1279 bytes) | landing.html: 1 removed line hunk(s) (a n
+OK   [I01] a changed (re-indented) neighbouring line: must fail B; failing checks: B
+       B: landing.html: after removing the permitted regions the file differs from the original (1281 vs 1279 bytes) | landing.html: 1 removed line hunk(s) (a n
+OK   [I03] good I03 (reference export): must pass every check; failing checks: none
+OK   [I03] an insert that overflows the 390 px phone (800px wide, no max-width): must fail C; failing checks: P1, C
+       P1: no rule for .new-box-1 with max-width: 100% in landing.css
+       C: @768: horizontal overflow, scrollWidth 848 vs viewport 768 | @641: horizontal overflow, scrollWidth 848 vs viewport 641 | @640: horizontal overflow, s
+OK   [I05] good I05 (reference export): must pass every check; failing checks: none
+OK   [I05] a button without type="button": must fail A; failing checks: A
+       A: .new-button-1: attribute type=null, expected "button"
+OK   [I22] good I22 (the original bytes): must pass every check; failing checks: none
+OK   [I22] a remove that leaves its rule behind: must fail B; failing checks: B
+       B: landing.css: not byte-identical to the original (1476 bytes vs expected 1343)
+OK   [I25] good I25 (reference export): must pass every check; failing checks: none
+OK   [I25] a missing header (note without header): must fail E; failing checks: E
+       E: 0 header comment(s), expected 1
+OK   [I25] a header with the wrong text position (after <html>, not after the DOCTYPE): must fail E; failing checks: E
+       E: the header is not directly after the DOCTYPE
+OK   [I26] good I26 (reference export): must pass every check; failing checks: none
+OK   [I26] a duplicated header: must fail E; failing checks: E
+       E: 2 header comment(s), expected 1
+OK   [I30] good I30 (reference export, the note moved with its card): must pass every check; failing checks: none
+OK   [I30] a note not moved by a reorder (it stays where the card was): must fail E; failing checks: E
+       E: #card-build: comment before it is null, expected " NOTE FOR AI: This card will become a pricing card. "
+OK   [I31] good I31 (reference export, every note neutralised): must pass every check; failing checks: none
+OK   [I31] "-->" left un-neutralised in a comment: must fail E and B; failing checks: B, C, E
+       B: hostile.html: after removing the permitted regions the file differs from the original (684 vs 677 bytes) | an inserted element or comment does not occ
+       C: @1280: 16 element(s): el#0 <html> box [0,0,1280,336] -> [0,0,1280,354]; block-size: 336px -> 354px || el#5 <body> box [0,0,1280,330] -> [0,0,1280,348]
+OK   [I19] good I19 (reference export, every text escaped): must pass every check; failing checks: none
+OK   [I19] an unescaped <script> in edited text: must fail A and D; failing checks: E1, A, C, D
+       E1: element count 20 -> 21, expected 20
+       A: #h8: textContent "alert(1)" is not exactly the typed text "<script>alert(1)</script>"
+OK   an undo by replay that is exact passes
+OK   an undo that is one byte off fails (F2)
+OK   stripping the header from a file restores the plain file (notes-off comparison input)
+
+RESULT: all 25 controls behaved (every good export passed, every broken export failed the stated check).
+
+Note on one control's expectation: the "-->" control was first written to require a failure in E, B and D. D (comment-node count) cannot see
+a comment that was closed early and left text behind, so the control now states E and B (C also fails because the stray text moves boxes).
+This was recorded in docs/insert-comments-rules-amendment-1.md (item 4), committed before any run, and D itself was not changed.
+
+Step 1, old engine (main at 27065d8), run i0 in insert-check/results/insert-results.csv: all 36 specs FAIL. The engine has no insert, text, remove or
+note: the three HTML paths answer "no element with index undefined" (refusal code no-element) or throw a TypeError; a refusal with that code is not
+any declared code, so the six REFUSED specs fail too. Finding: in SVG documents the old dispatch sends every op that is not `set` to the offset
+code, so insert/text/remove/note edits on an SVG silently wrote x="NaN" y="NaN" (I17, I24, I29, I32 report new console errors). The new dispatch
+rejects an unknown op (a labelled change, made together with the new kinds).
+
+Earlier suites' faults re-run on the baseline engine (nothing written to the results CSVs):
+- real-page (20 edits: 12 HTML, 8 SVG): unchanged file (noop) fails E2 and E3 on 12/12 and 8/8; collateral CSS fails E4 on 12/12 and 8/8; one added space (reformat) fails E5 on 12/12 and 8/8.
+- responsive (20 specs + R01/R09 = 22): noop fails E2 and E3 on 22 (the other failures are the one expected refusal, S17); collateral fails E4 on 22; reformat fails E5 on 22; lastline (R09) fails E5; twonl (R09) fails E5.
+- size (16 specs): noop fails E2 and E3 on 16/16; collateral fails E4 on 16/16; reformat fails E5 on 16/16; samewidth fails E2 on 14/16 and E3 on 14/16 (Z09, Z12 are expected exceptions, as in size1); overflow fails E2 on 16/16.
+- size-flex (6 specs): noop fails E2 and E3 on 6/6; collateral fails E4 on 6/6; reformat fails E5 on 6/6; samewidth fails E2 on 4/6 (Z18, Z22 expected exceptions, as in iteration 2); overflow fails E2 on 6/6.
+- gate (40 edits): the gate harness has no sabotage mode; its checks are exercised by the real-page controls above (same scorer functions).

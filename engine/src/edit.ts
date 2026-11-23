@@ -11,7 +11,8 @@ import {
 } from './patch';
 import { emptyState, htmlSetResponsive, htmlUnlinkedOffset, htmlUnlinkedReorder } from './responsive';
 import { specificity } from './specificity';
-import type { Attr, Decl, DomOp, Edit, EditResult, EditState, ElementNode, Model, Patch, Probe, RuleNode } from './types';
+import { applyContentEdit, blockWithNote } from './structure';
+import type { Attr, Decl, DomOp, Edit, EditResult, EditState, ElementEdit, ElementNode, Model, Patch, Probe, RuleNode } from './types';
 
 /**
  * applyEdit(model, edit, probe)
@@ -51,6 +52,16 @@ import type { Attr, Decl, DomOp, Edit, EditResult, EditState, ElementNode, Model
  */
 export function applyEdit(model: Model, edit: Edit, probe: Probe, state: EditState = emptyState()): EditResult {
   const warnings = collectWarnings(model);
+  if (edit.op === 'insert' || edit.op === 'text' || edit.op === 'remove' || edit.op === 'note') {
+    try {
+      const r = applyContentEdit(model, edit, state, warnings);
+      return r.ok && !r.state ? { ...r, state } : r;
+    } catch (e) {
+      if (e instanceof Refused) return refuse(e.code, e.message, warnings);
+      throw e;
+    }
+  }
+  if (edit.op !== 'set' && edit.op !== 'offset' && edit.op !== 'reorder') return refuse('unknown-edit', `unknown edit kind "${(edit as { op: string }).op}"`, warnings);
   const el = model.primary.elements[edit.target];
   if (!el) return refuse('no-element', `no element with index ${edit.target}`, warnings);
   if (el.implied) return refuse('no-source', `<${el.tag}> is created by the parser and has no source text to edit`, warnings);
@@ -63,7 +74,7 @@ export function applyEdit(model: Model, edit: Edit, probe: Probe, state: EditSta
   }
 }
 
-function dispatch(model: Model, edit: Edit, el: ElementNode, probe: Probe, state: EditState, warnings: string[]): EditResult {
+function dispatch(model: Model, edit: ElementEdit, el: ElementNode, probe: Probe, state: EditState, warnings: string[]): EditResult {
   const unlinked = edit.link === false;
   if (model.primary.kind === 'svg') {
     if (unlinked) no('svg-unlinked', 'unlinked (environment-only) edits are not supported for SVG in v1: SVG has no media-scoped attribute form');
@@ -484,8 +495,8 @@ interface Block {
  * element's own text. Elements without an end tag have their trailing whitespace trimmed first
  * (the parser includes it in the element's range).
  */
-export function blockOf(src: string, el: ElementNode): Block {
-  const s = el.start;
+export function blockOf(src: string, el: ElementNode, startOverride?: number): Block {
+  const s = startOverride ?? el.start;
   const e = contentEnd(src, el);
   const lineStart = src.lastIndexOf('\n', s - 1) + 1;
   const nl = src.indexOf('\n', e);
@@ -510,8 +521,8 @@ export function reorder(model: Model, edit: Extract<Edit, { op: 'reorder' }>, el
   if ((edit.placement === 'before' && ei === si - 1) || (edit.placement === 'after' && ei === si + 1)) {
     return { ok: true, patches: [], dom: [], warnings, placement: 'already in place' };
   }
-  const mb = blockOf(src, el);
-  const ab = blockOf(src, sib);
+  const mb = blockWithNote(model, el);
+  const ab = blockWithNote(model, sib);
   const at = edit.placement === 'before' ? ab.start : ab.end;
   const moved = src.slice(mb.start, mb.end);
   const patches: Patch[] = [

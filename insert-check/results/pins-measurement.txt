@@ -1,0 +1,12 @@
+pin measurement, label: final engine (insert and remove remap pins; reorder does not)
+insert before #t1: #t4 font-size @1280 40px, @641 40px, @640 20px, @390 20px; listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[5]","property":"font-size","environment":"phone","value":"20px"}] => pin held
+remove #t1: #t4 font-size @1280 40px, @641 40px, @640 20px, @390 20px; listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[3]","property":"font-size","environment":"phone","value":"20px"}] => pin held
+reorder #t4 before #t1: #t4 font-size @1280 40px, @641 40px, @640 50px, @390 50px; listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[4]","property":"font-size","environment":"phone","value":"20px"}] => PIN LOST (the later linked edit scaled the pinned value)
+
+pin measurement, label: EXPERIMENT: insert and remove WITHOUT pin remapping (temporary edit, restored)
+insert before #t1: #t4 font-size @1280 40px, @641 40px, @640 50px, @390 50px; listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[4]","property":"font-size","environment":"phone","value":"20px"}] => PIN LOST (the later linked edit scaled the pinned value)
+remove #t1: #t4 font-size @1280 40px, @641 40px, @640 50px, @390 50px; listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[4]","property":"font-size","environment":"phone","value":"20px"}] => PIN LOST (the later linked edit scaled the pinned value)
+reorder #t4 before #t1: #t4 font-size @1280 40px, @641 40px, @640 50px, @390 50px; listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[4]","property":"font-size","environment":"phone","value":"20px"}] => PIN LOST (the later linked edit scaled the pinned value)
+
+Locked spec I33 with the remapping switched off (run ipins0 in insert-check/results/insert-results.csv): FAIL on M (the pinned phone value became 50px instead of 20px) and U (listUnlinked names the wrong paths). With the remapping on: PASS (runs idev1/idev2).
+Finding, not fixed (outside the brief): reorder shifts paths too and is NOT remapped: the pin is lost the same way (third line of the first block).
