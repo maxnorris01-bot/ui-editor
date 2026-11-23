@@ -152,6 +152,28 @@ export function remapPins(oldModel: Model, newModel: Model, pins: Pin[], map: (i
   return out;
 }
 
+/**
+ * Pins after a linked reorder: the moved subtree takes its new place in document order, so every element's index (and path) may change.
+ * Each pin is re-pointed at the same element; if the patched text does not have the expected structure the pins are left as they were.
+ */
+export function reorderPins(model: Model, el: ElementNode, sib: ElementNode, placement: 'before' | 'after', patches: Patch[], pins: Pin[]): Pin[] {
+  if (pins.length === 0) return pins;
+  const N = model.primary.elements.length;
+  const n = sizeOf(el);
+  const rest: number[] = [];
+  for (let i = 0; i < N; i++) if (i < el.index || i >= el.index + n) rest.push(i);
+  const anchor = placement === 'before' ? sib.index : sib.index + sizeOf(sib) - 1;
+  const pos = rest.indexOf(anchor) + (placement === 'before' ? 0 : 1);
+  const block = Array.from({ length: n }, (_, k) => el.index + k);
+  const order = [...rest.slice(0, pos), ...block, ...rest.slice(pos)];
+  const newOf: number[] = [];
+  order.forEach((old, k) => { newOf[old] = k; });
+  const after = patchedModel(model, patches).model;
+  const old = model.primary.elements, now = after.primary.elements;
+  if (now.length !== N || order.some((o, k) => now[k]!.ltag !== old[o]!.ltag)) return pins;
+  return remapPins(model, after, pins, (i) => newOf[i]!);
+}
+
 const MANAGED_CLASS = /^new-(box|text|button)-\d+$/;
 
 function removeEdit(model: Model, target: number, state: EditState, warnings: string[]): EditResult {
@@ -372,7 +394,7 @@ function nextName(model: Model, prefix: string): string {
   return `${prefix}-${n}`;
 }
 
-const sizeOf = (e: ElementNode): number => 1 + e.children.reduce((n, c) => n + sizeOf(c), 0);
+export const sizeOf = (e: ElementNode): number => 1 + e.children.reduce((n, c) => n + sizeOf(c), 0);
 const indentAt = (src: string, offset: number): string => /^[ \t]*/.exec(src.slice(src.lastIndexOf('\n', offset - 1) + 1))![0];
 /** The file's indentation unit: a tab if indented lines start with one, else the smallest indent used. */
 function indentUnit(src: string): string {
