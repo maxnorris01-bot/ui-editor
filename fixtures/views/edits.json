@@ -1,0 +1,1103 @@
+{
+ "version": 1,
+ "tolerance": {
+  "px": 0.5
+ },
+ "widthsBase": [
+  1280,
+  1024,
+  768,
+  390
+ ],
+ "specs": [
+  {
+   "id": "M01",
+   "title": "Desktop font-size 32 to 48: Tablet follows (48), the page's own Phone value 20 scales to 30",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "48px",
+      "phone": "30px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M02",
+   "title": "Desktop padding 24 to 36 (ratio 1.5): Tablet 36, the page's own Phone 12 becomes 18",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#card",
+     "properties": {
+      "padding": "36px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#card",
+      "prop": "padding-top",
+      "desktop": "36px",
+      "tablet": "36px",
+      "phone": "18px"
+     },
+     {
+      "sel": "#card",
+      "prop": "padding-left",
+      "desktop": "36px",
+      "tablet": "36px",
+      "phone": "18px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M03",
+   "title": "Desktop margin 0 0 18px: Tablet and Phone follow it (the page has no Phone margin)",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#card",
+     "properties": {
+      "margin": "0 0 18px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#card",
+      "prop": "margin-bottom",
+      "desktop": "18px",
+      "tablet": "18px",
+      "phone": "18px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M04",
+   "title": "Desktop width 600 to 450 (ratio 0.75): Tablet 450, the page's own Phone 300 becomes 225",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#box",
+     "properties": {
+      "width": "450px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#box",
+      "prop": "width",
+      "desktop": "450px",
+      "tablet": "450px",
+      "phone": "225px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M05",
+   "title": "Desktop height 200 to 300 (ratio 1.5): Tablet 300, the page's own Phone 120 becomes 180",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#box",
+     "properties": {
+      "height": "300px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#box",
+      "prop": "height",
+      "desktop": "300px",
+      "tablet": "300px",
+      "phone": "180px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M06",
+   "title": "A colour edit made in Desktop applies in every view",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(170, 0, 0)",
+      "phone": "rgb(170, 0, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M07",
+   "title": "A font-family edit made in Desktop applies in every view",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#para",
+     "properties": {
+      "font-family": "Georgia, serif"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#para",
+      "prop": "font-family",
+      "desktop": "Georgia, serif",
+      "tablet": "Georgia, serif",
+      "phone": "Georgia, serif"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M08",
+   "title": "A Tablet edit is custom: 40px only from B+1 to T; Desktop stays 32, Phone stays 20",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "40px",
+      "phone": "20px"
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/h1[1]",
+      "property": "font-size",
+      "environment": "tablet",
+      "value": "40px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M09",
+   "title": "A Phone edit is custom: 18px only up to B; Desktop and Tablet are unchanged (the old other-way-round scaling is gone)",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "32px",
+      "phone": "18px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M10",
+   "title": "A Phone edit sent with link true is still custom (the flag is ignored)",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone",
+     "link": true
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "32px",
+      "phone": "18px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M11",
+   "title": "Tablet custom 40, then Desktop 48: Tablet keeps 40, Desktop 48, Phone's own 20 scales to 30",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "40px",
+      "phone": "30px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M12",
+   "title": "Desktop 48, then Tablet custom 40: the same result in the other order",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "40px",
+      "phone": "30px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M13",
+   "title": "Tablet custom font-size, then a Desktop edit of a different property (margin): the Tablet value stays and the margin reaches every view",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "margin": "0 0 24px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "40px",
+      "phone": "20px"
+     },
+     {
+      "sel": "#title",
+      "prop": "margin-bottom",
+      "desktop": "24px",
+      "tablet": "24px",
+      "phone": "24px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M14",
+   "title": "Tablet and Phone customised, then Reset Tablet: Tablet returns to the Desktop default (32), Phone keeps 18",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "reset",
+     "env": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "32px",
+      "phone": "18px"
+     }
+    ],
+    "equalsSteps": [
+     2
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M15",
+   "title": "Both views customised, then Reset Phone and Reset Tablet: the original bytes",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "reset",
+     "env": "phone"
+    },
+    {
+     "op": "reset",
+     "env": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "equals-original",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "32px",
+      "phone": "20px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M16",
+   "title": "Reset when nothing is custom: the export is byte-identical to the export without the Reset",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "reset",
+     "env": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "equalsSteps": [
+     1
+    ],
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "48px",
+      "phone": "30px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M17",
+   "title": "Tablet custom 40, Desktop 48, then Reset Tablet: the later Desktop edit stays, Tablet follows it",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "reset",
+     "env": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "equalsSteps": [
+     2
+    ],
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "48px",
+      "phone": "30px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M18",
+   "title": "A Tablet offset is custom: the translate applies only in the tablet range",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "offset",
+     "target": "#card",
+     "dx": 10,
+     "dy": 5,
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#card",
+      "prop": "transform",
+      "desktop": "none",
+      "tablet": "matrix(1, 0, 0, 1, 10, 5)",
+      "phone": "none"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M19",
+   "title": "A Tablet reorder to first in a flex row is the CSS order property inside the tablet range only",
+   "fixture": "flex.html",
+   "steps": [
+    {
+     "op": "reorder",
+     "target": "#i3",
+     "placement": "before",
+     "sibling": "#i1",
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#i3",
+      "prop": "order",
+      "desktop": "0",
+      "tablet": "-1",
+      "phone": "0"
+     }
+    ],
+    "legit": "reorder"
+   }
+  },
+  {
+   "id": "M20",
+   "title": "The page's own phone breakpoint is 768: a Tablet edit is REFUSED (tablet-covered-by-phone)",
+   "fixture": "bp768.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "REFUSED",
+    "refusal": "tablet-covered-by-phone",
+    "reasonCheck": {
+     "phoneBreakpoint": 768
+    }
+   }
+  },
+  {
+   "id": "M21",
+   "title": "On the 768 page a Phone edit covers the Tablet frame's width 768",
+   "fixture": "bp768.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "32px",
+      "phone": "18px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M22",
+   "title": "A page with its own 900 breakpoint: T = 900, a Tablet edit covers 641 to 900 and not 901",
+   "fixture": "tab900.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "40px",
+      "phone": "20px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M23",
+   "title": "A page with a 1024 breakpoint: T = 1024, a Tablet edit covers 641 to 1024 and not 1025",
+   "fixture": "tab1024.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "32px",
+      "tablet": "40px",
+      "phone": "20px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M24",
+   "title": "A heading size declared only inside media rules: a Desktop edit 32 to 48 scales both (Phone 30)",
+   "fixture": "mediaonly.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "48px",
+      "phone": "30px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M25",
+   "title": "Flex row: a Desktop font-size edit on one item reaches Tablet and Phone in proportion, a Tablet custom padding on another stays in its range",
+   "fixture": "flex.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#i1",
+     "properties": {
+      "font-size": "24px"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "set",
+     "target": "#i2",
+     "properties": {
+      "padding": "20px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#i1",
+      "prop": "font-size",
+      "desktop": "24px",
+      "tablet": "24px",
+      "phone": "21px"
+     },
+     {
+      "sel": "#i2",
+      "prop": "padding-top",
+      "desktop": "12px",
+      "tablet": "20px",
+      "phone": "8px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M26",
+   "title": "Grid: a Tablet custom width on one cell changes only the tablet range",
+   "fixture": "grid.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#g1",
+     "properties": {
+      "width": "200px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#g1",
+      "prop": "width",
+      "desktop": "original",
+      "tablet": "200px",
+      "phone": "original"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M27",
+   "title": "SVG has no views: an edit tagged Tablet applies everywhere, as today",
+   "fixture": "chart.svg",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#bar-wed",
+     "properties": {
+      "fill": "#ff0000"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#bar-wed",
+      "prop": "fill",
+      "desktop": "rgb(255, 0, 0)",
+      "tablet": "rgb(255, 0, 0)",
+      "phone": "rgb(255, 0, 0)"
+     }
+    ],
+    "legit": "svg-ancestors"
+   }
+  },
+  {
+   "id": "M28",
+   "title": "Insert, a Tablet edit on the new element, Reset Tablet, remove: the original bytes",
+   "fixture": "landing.html",
+   "steps": [
+    {
+     "op": "insert",
+     "kind": "rect",
+     "anchor": "#card-plan",
+     "placement": "after"
+    },
+    {
+     "op": "set",
+     "target": ".new-box-1",
+     "properties": {
+      "padding": "20px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "reset",
+     "env": "tablet"
+    },
+    {
+     "op": "remove",
+     "target": ".new-box-1"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "bytes": "equals-original"
+   }
+  },
+  {
+   "id": "M29",
+   "title": "Pins across insert, reorder and remove with three views: the Tablet pin follows its element and survives a later Desktop edit",
+   "fixture": "pins.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#t4",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "insert",
+     "kind": "text",
+     "anchor": "#t1",
+     "placement": "before"
+    },
+    {
+     "op": "reorder",
+     "target": "#t4",
+     "placement": "before",
+     "sibling": "#t2"
+    },
+    {
+     "op": "remove",
+     "target": "#t1"
+    },
+    {
+     "op": "set",
+     "target": "#t4",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#t4",
+      "prop": "font-size",
+      "desktop": "40px",
+      "tablet": "20px",
+      "phone": "35px"
+     }
+    ],
+    "unlinked": [
+     {
+      "selector": "/html[1]/body[1]/div[1]/p[2]",
+      "property": "font-size",
+      "environment": "tablet",
+      "value": "20px"
+     }
+    ],
+    "legit": "none"
+   }
+  },
+  {
+   "id": "M30",
+   "title": "Undo by replay: a list with Phone, Tablet and Desktop edits replays to the same bytes at every step",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "set",
+     "target": "#card",
+     "properties": {
+      "padding": "30px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "40px",
+      "phone": "18px"
+     }
+    ],
+    "undo": true,
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M31",
+   "title": "Phone custom 18, then Desktop 48: Phone keeps 18, Tablet and Desktop 48",
+   "fixture": "bp640.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "48px",
+      "tablet": "48px",
+      "phone": "18px"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "M32",
+   "title": "Email sample (phone breakpoint 480): a Desktop edit reaches all views, a Tablet custom edit stays in 481 to 1024",
+   "fixture": "email.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#pick-one",
+     "properties": {
+      "font-size": "18px"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "set",
+     "target": "#pick-two",
+     "properties": {
+      "font-size": "20px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#pick-one",
+      "prop": "font-size",
+      "desktop": "18px",
+      "tablet": "18px",
+      "phone": "18px"
+     },
+     {
+      "sel": "#pick-two",
+      "prop": "font-size",
+      "desktop": "15px",
+      "tablet": "20px",
+      "phone": "15px"
+     }
+    ],
+    "legit": "flow"
+   }
+  }
+ ]
+}

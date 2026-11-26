@@ -23,6 +23,8 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 
 ## Next
 
+- [ ] Max: ship branch `feat/small-views-engine` (run m1 PASS) and decide the choices in the session note. The page work (drop Link, dots and Review list; Tablet as an editable view; Reset with confirmation) comes later in `portfolio-site`.
+
 - [ ] Max: ship branch `feat/engine-hardening` (run h2 PASS; h1 FAIL on the verdict script only) and confirm the one edited unit-test fixture. Max runs git.
 
 - [ ] Max: ship branch `feat/insert-comments-engine` (run i2 PASS; i1 FAIL on the verdict script only). Max runs git.
@@ -34,6 +36,8 @@ the checkmark itself. Add new items as they come up; don't wait for a session's 
 - [ ] Max: ship branch `feat/size-scaling` (size1 FAIL on record, iteration 2 PASS).
 
 ## Completed (most recent first)
+
+- [x] Small views engine spike (2026-11-25): Tablet as a third environment, custom Phone and Tablet edits, Desktop cascade over pins, `resetView`; 32 specs locked (`647ff3b`), run m1 PASS.
 
 <!-- Move items here when done, newest first, with a one-line note on what happened. -->
 

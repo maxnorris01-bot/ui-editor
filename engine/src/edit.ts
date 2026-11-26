@@ -9,7 +9,7 @@ import {
   escapeForAttr,
   replaceDeclValue,
 } from './patch';
-import { emptyState, htmlSetResponsive, htmlUnlinkedOffset, htmlUnlinkedReorder } from './responsive';
+import { emptyState, htmlSetResponsive, htmlUnlinkedOffset, htmlUnlinkedReorder, isCustomEdit } from './responsive';
 import { specificity } from './specificity';
 import { applyContentEdit, blockWithNote, reorderPins } from './structure';
 import type { Attr, Decl, DomOp, Edit, EditResult, EditState, ElementEdit, ElementNode, Model, Patch, Probe, RuleNode } from './types';
@@ -81,8 +81,9 @@ function dispatch(model: Model, edit: ElementEdit, el: ElementNode, probe: Probe
     if (edit.op === 'reorder') return reorder(model, edit, el, warnings, state);
     return edit.op === 'set' ? svgSet(model, el, edit.properties, probe, warnings) : svgOffset(model, el, edit.dx, edit.dy, probe, warnings);
   }
-  if (edit.op === 'reorder') return unlinked ? htmlUnlinkedReorder(model, edit, el, probe, state, warnings) : reorder(model, edit, el, warnings, state);
-  if (edit.op === 'offset') return unlinked ? htmlUnlinkedOffset(model, edit, el, probe, state, warnings) : htmlOffset(model, el, edit.dx, edit.dy, probe, warnings);
+  const custom = isCustomEdit(edit);
+  if (edit.op === 'reorder') return custom ? htmlUnlinkedReorder(model, edit, el, probe, state, warnings) : reorder(model, edit, el, warnings, state);
+  if (edit.op === 'offset') return custom ? htmlUnlinkedOffset(model, edit, el, probe, state, warnings) : htmlOffset(model, el, edit.dx, edit.dy, probe, warnings);
   return htmlSetResponsive(model, edit, el, probe, state, warnings);
 }
 

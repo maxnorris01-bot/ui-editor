@@ -1,0 +1,51 @@
+Scorer check for docs/small-views-rules.md, run before any engine change (harness/controls-views.ts).
+No correct engine output exists yet, so each export below is built by hand from the fixture and given to the same scorer that scores the engine.
+
+OK   [M08] good M08 (Tablet custom 40px inside 641 to 1024): must pass every check; failing checks: none
+OK   [M08] (1) a Tablet custom edit that also applies above T (no upper bound): must fail M; failing checks: M
+       M: @1280 (desktop) #title font-size got 40px want 32px | @1025 (desktop) #title font-size got 40px want 32px
+OK   [M08] (2) a Tablet custom edit that also applies at phone widths (no lower bound): must fail M; failing checks: M
+       M: @640 (phone) #title font-size got 40px want 20px | @390 (phone) #title font-size got 40px want 20px
+OK   [M09] good M09 (Phone custom 18px): must pass every check; failing checks: none
+OK   [M09] (3) a Phone edit that still scales Desktop (the old other-way-round): must fail M; failing checks: M
+       M: @1280 (desktop) #title font-size got 28px want 32px | @1025 (desktop) #title font-size got 28px want 32px | @1024 (tablet) #title font-size got 28px w
+OK   [M10] (11) a Phone edit sent with link true that honours it (Desktop scaled): must fail M; failing checks: M
+       M: @1280 (desktop) #title font-size got 28px want 32px | @1025 (desktop) #title font-size got 28px want 32px | @1024 (tablet) #title font-size got 28px w
+OK   [M11] good M11 (Tablet 40 kept after a Desktop 48; Phone 30): must pass every check; failing checks: none
+OK   [M11] (4) a Desktop edit that overrides a Tablet custom value (cascade order): must fail M; failing checks: M
+       M: @1024 (tablet) #title font-size got 48px want 40px | @768 (tablet) #title font-size got 48px want 40px | @641 (tablet) #title font-size got 48px want 
+OK   [M01] good M01 (Desktop 48 reaches Tablet, Phone 30): must pass every check; failing checks: none
+OK   [M01] (5) a Desktop edit that does not reach Tablet for an unpinned property: must fail M; failing checks: M
+       M: @1024 (tablet) #title font-size got 32px want 48px | @768 (tablet) #title font-size got 32px want 48px | @641 (tablet) #title font-size got 32px want 
+OK   [M01] (12) an export containing a view marker: must fail K; failing checks: K
+       K: the export gained "tablet"
+OK   [M22] good M22 (900 page: Tablet custom inside 641 to 900): must pass every check; failing checks: none
+OK   [M22] (8) a Tablet upper bound off by one (901): must fail M; failing checks: M
+       M: @901 (desktop) #title font-size got 40px want 32px
+OK   [M15] good M15 (everything reset: the original bytes): must pass every check; failing checks: none
+OK   [M15] (6) a Reset that leaves a rule behind: must fail B and R; failing checks: M, B, R
+       M: @1024 (tablet) #title font-size got 40px want 32px | @768 (tablet) #title font-size got 40px want 32px | @641 (tablet) #title font-size got 40px want 
+       B: bp640.html not byte-identical to the original
+OK   [M16] good M16 (Reset with nothing custom equals the export without it): must pass every check; failing checks: none
+OK   [M16] (6b) a Reset that is one byte off: must fail Q; failing checks: Q, R
+       Q: bp640.html differs from the export of the list without the dropped edits
+       R: bp640.html differs from the list the harness filtered itself
+OK   [M17] good M17 (the later Desktop edit stays after Reset Tablet): must pass every check; failing checks: none
+OK   [M17] (7) a Reset that also drops the Desktop edit: must fail M and Q; failing checks: M, Q, R
+       M: @1280 (desktop) #title font-size got 32px want 48px | @1025 (desktop) #title font-size got 32px want 48px | @1024 (tablet) #title font-size got 32px w
+       Q: bp640.html differs from the export of the list without the dropped edits
+OK   [M29] good M29 pins (the Tablet pin names the moved element): must pass every check; failing checks: none
+OK   [M29] (10) a pin that names the wrong element after an insert: must fail U; failing checks: U
+       U: listUnlinked [{"selector":"/html[1]/body[1]/div[1]/p[4]","property":"font-size","environment":"tablet","value":"20px"}] expected [{"selector":"/html[1
+OK   [M20] (9) the 768 page accepting a Tablet edit: the spec declares REFUSED (tablet-covered-by-phone), so the runner scores an export as FAIL (run-views.ts: "declared REFUSED but the engine produced an export")
+
+RESULT: all 22 controls behaved (every good export passed, every broken export failed the stated check; 12 fault switches).
+
+Step 1, current engine (main at a5f954a), run m0 in views-check/results/views-results.csv: 9 of the 32 specs PASS and 23 FAIL, which proves the specs can fail. The Desktop-origin specs
+M01 to M07 (and M24, M27) already work; every Tablet or Phone custom case fails because the engine has no Tablet: `environment: 'tablet'` is treated as "not phone" (an edit made there
+applies from B+1 up and scales Phone: the old behaviour), a Phone edit with link true still scales Desktop, and `resetView` does not exist (M14 to M17, M28: "resetView is not exported").
+The B = 768 page accepts a Tablet edit (M20: "declared REFUSED but the engine produced an export").
+Baseline: 182 hashes (111 existing exports + 45 insert + 26 hardening exports) in results/views/baseline-hashes.json, the first 156 identical to the hardening baseline.
+Earlier suites' faults re-run on the current engine: real-page, responsive, size, size-flex (noop, collateral, reformat, lastline, twonl, samewidth, overflow) all fail where they did before (counts in
+/tmp only; unchanged from the insert and hardening rounds), and the 25 insert and 20 hardening scorer controls all behave. Their scorer-check.txt files are rewritten by those scripts without their
+appended notes; they were put back to the committed text by `git show HEAD:<file> > <file>` (not a git checkout).

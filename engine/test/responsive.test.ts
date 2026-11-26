@@ -77,7 +77,8 @@ describe('linked ratio edits', () => {
     const out = e.out(e.run({ op: 'set', target: e.at('#a'), properties: { 'font-size': '48px' } }));
     expect(out).toBe(src.replace('\n</style>', '\n#a { font-size: 48px; }\n@media (max-width: 640px) { #a { font-size: 19.2px; } }\n</style>'));
   });
-  it('gives the same ratio whichever environment the edit was made in', () => {
+  // RETIRED (docs/small-views-rules.md section 5): a Phone edit is now always custom and no longer scales Desktop; replaced by M09 and M10.
+  it.skip('gives the same ratio whichever environment the edit was made in', () => {
     const src = page(CSS, '<h1 id="a">T</h1>');
     const e = env(src, 'html', {}, fs);
     const out = e.out(e.run({ op: 'set', target: e.at('#a'), environment: 'phone', properties: { 'font-size': '20px' } }));

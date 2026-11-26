@@ -158,6 +158,14 @@ new behaviour (inline style for a linked colour edit).
   ending = nearest existing break; no line break in the file = LF.
 - **Open:** one existing unit test's fixture rule was changed (see the session note); Max confirms.
 
+## Small views (2026-11-25)
+
+- **Decision (Max, 2026-11-25):** three views; Desktop edits reach Phone and Tablet in proportion; Phone and Tablet edits are custom to their view (Link ignored) and survive later Desktop edits; a view can be
+  reset. Engine side proven in `feat/small-views-engine`: rules and 32 specs locked in `647ff3b`, run `m1` PASS (`docs/adr/0006-small-views.md`, `docs/sessions/2026-11-25-small-views-engine.md`).
+- **Choices (mine):** Tablet = `floor(B)+1` to T (T = largest `max-width` in 769 to 1100, else 1024); a Tablet edit on a page whose own phone breakpoint is 768 is refused (`tablet-covered-by-phone`); the Desktop
+  cascade over a pinned view is done by writing the view's own rule again after the Desktop rules; Reset of Desktop is not offered.
+- **Retired:** S09, Z09 and one unit test (a Phone edit with link on no longer scales Desktop).
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.
