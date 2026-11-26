@@ -11,7 +11,7 @@ const problems: string[] = [];
 const bad = (id: string, m: string) => problems.push(`${id}: ${m}`);
 for (const s of VSPECS) {
   const inp = viewsInput(s.fixture);
-  const B = phoneMax(inp), T = tabletTop(inp), widths = testWidths(inp);
+  const B = phoneMax(inp), T = tabletTop(inp);
   const ex = s.expect;
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await ctx.newPage();
@@ -27,20 +27,29 @@ for (const s of VSPECS) {
   if (ex.outcome === 'REFUSED') { if (ex.reasonCheck?.phoneBreakpoint !== B) bad(s.id, `B is ${B}, spec says ${ex.reasonCheck?.phoneBreakpoint}`); await ctx.close(); console.log(s.id, 'refused-spec ok B', B); continue; }
   if (ex.measured) {
     const tMin = tabletMin(inp);
-    const ref = (ex.measured as any[]).map((m) => {
-      const r = (region: string, v: string, cond: string) => (v === 'original' ? '' : `@media ${cond} { ${m.sel} { ${m.prop}: ${v} !important; } }\n`);
-      return r('desktop', m.desktop, `(min-width: ${Math.floor(T) + 1}px)`) + r('tablet', m.tablet, `(min-width: ${tMin}px) and (max-width: ${T}px)`) + r('phone', m.phone, `(max-width: ${B}px)`);
-    }).join('');
+    const ws = testWidths(inp, (ex.extraWidths ?? []) as number[]);
+    const ms = ex.measured as any[];
+    const at = async (q: string, p: string) => page.evaluate(([qq, pp]) => getComputedStyle(document.querySelector(qq as string)!).getPropertyValue(pp as string), [q, p]);
+    // originals first (for `scaled` and `original`), then the reference stylesheet
+    const orig: Record<string, string> = {};
+    for (const w of ws) { await page.setViewportSize({ width: w, height: 800 }); for (const m of ms) orig[`${m.sel}|${m.prop}|${w}`] = await at(m.sel, m.prop); }
+    const wantAt = (m: any, w: number): string | null => {
+      if (m.scaled !== undefined) return `${+(parseFloat(orig[`${m.sel}|${m.prop}|${w}`]!) * m.scaled).toFixed(4)}px`;
+      const v = m.byWidth?.[String(w)] ?? m[regionOf(inp, w)];
+      return v === 'original' ? null : v;
+    };
+    let ref = '';
+    for (const m of ms) for (const w of ws) { const v = wantAt(m, w); if (v !== null) ref += `@media (min-width: ${w}px) and (max-width: ${w}px) { ${m.sel} { ${m.prop}: ${v} !important; } }\n`; }
     await page.evaluate((css) => { const el = document.createElementNS(document.documentElement.namespaceURI, 'style'); el.textContent = css; (document.head ?? document.documentElement).appendChild(el); }, ref);
-    for (const w of widths) {
+    // the reference is written per exact width; the region columns must also describe the same numbers (checked against the per-width values)
+    for (const w of ws) {
       await page.setViewportSize({ width: w, height: 800 });
-      const region = regionOf(inp, w);
-      for (const m of ex.measured as any[]) {
-        const want = m[region];
-        if (want === 'original') continue;
-        const got = await page.evaluate(([q, p]) => { const e = document.querySelector(q as string)!; return getComputedStyle(e).getPropertyValue(p as string); }, [m.sel, m.prop]);
+      for (const m of ms) {
+        const want = wantAt(m, w);
+        if (want === null) continue;
+        const got = await at(m.sel, m.prop);
         const ok = /px$/.test(want) && /px$/.test(got) ? Math.abs(parseFloat(got) - parseFloat(want)) <= 0.5 : got === want;
-        if (!ok) bad(s.id, `@${w} (${region}) ${m.sel} ${m.prop}: reference page gives ${got}, spec says ${want}`);
+        if (!ok) bad(s.id, `@${w} (${regionOf(inp, w)}) ${m.sel} ${m.prop}: reference page gives ${got}, spec says ${want}`);
       }
     }
   }

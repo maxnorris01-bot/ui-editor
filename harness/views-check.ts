@@ -31,8 +31,8 @@ export async function evaluateViews(browser: Browser, spec: VSpec, inp: VInput, 
   const orig = filesOf(inp);
   const dirO = join(tmp, spec.id, 'original'), dirX = join(tmp, spec.id, 'exported');
   writeSet(dirO, orig); writeSet(dirX, files);
-  const widths = testWidths(inp);
-  const measured = (e.measured ?? []) as { sel: string; prop: string; desktop: string; tablet: string; phone: string }[];
+  const widths = testWidths(inp, (e.extraWidths ?? []) as number[]);
+  const measured = (e.measured ?? []) as import('./views-lib').Measured[];
   const base = { header: '', measured: measured.map((m) => ({ selector: m.sel, prop: m.prop })) };
   const O: Record<number, Awaited<ReturnType<typeof loadAt>>> = {}, X: Record<number, Awaited<ReturnType<typeof loadAt>>> = {};
   for (const w of widths) { O[w] = await loadAt(browser, dirO, inp.file, w, base, true); X[w] = await loadAt(browser, dirX, inp.file, w, base, true); }
@@ -43,9 +43,10 @@ export async function evaluateViews(browser: Browser, spec: VSpec, inp: VInput, 
   // truth
   const pm: string[] = [];
   for (const w of widths) for (const [i, m] of measured.entries()) {
-    const want = m[regionOf(inp, w)];
+    const want = m.byWidth?.[String(w)] ?? m[regionOf(inp, w)];
     const got = X[w]!.info.measured[i] as string | null;
-    const ref = want === 'original' ? (O[w]!.info.measured[i] as string | null) : want;
+    const origV = O[w]!.info.measured[i] as string | null;
+    const ref = m.scaled !== undefined ? (origV !== null ? `${+(parseFloat(origV) * m.scaled).toFixed(4)}px` : null) : want === 'original' ? origV : (want ?? null);
     const ok = got !== null && ref !== null && (/px$/.test(ref) && /px$/.test(got) ? Math.abs(parseFloat(got) - parseFloat(ref)) <= 0.5 : got === ref);
     if (!ok) pm.push(`@${w} (${regionOf(inp, w)}) ${m.sel} ${m.prop} got ${got} want ${ref}`);
   }

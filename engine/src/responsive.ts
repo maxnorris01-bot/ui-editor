@@ -429,28 +429,33 @@ export function appendCssLF(model: Model, lines: string[]): { patch: Patch; dom:
  * win over a view's pinned value (a later rule of the same specificity matching a width inside that view), the view's own rule, as the engine wrote it, is
  * written again after them. Nothing is added when the lines already keep the pinned value in force.
  */
-function restatePins(ctx: Ctx): void {
-  if (!ctx.linked) return;
-  const written = new Set(ctx.lines.map((l) => l.prop));
+/** The view's own earlier rule for a pinned property, as a line to write again (all its declarations: a flex-basis or the max-width guard come along). */
+function viewRuleLine(ctx: Ctx, pin: Pin, important: boolean): RuleLine {
   const id = attrOf(ctx.el, 'id')?.value;
   const hook = attrOf(ctx.el, 'data-ue')?.value;
   const hookRe = [id && /^[A-Za-z_][\w-]*$/.test(id) ? new RegExp(`^(#${id})+$`) : null, hook && /^\d+$/.test(hook) ? new RegExp(`^(\\[data-ue="${hook}"\\])+$`) : null].filter((x): x is RegExp => !!x);
+  const cond = envCondition(pin.environment, ctx.b, ctx.t);
+  let decls: Decl[] | null = null;
+  for (const sheet of ctx.model.sheets) for (const r of sheet.rules) {
+    if (r.conditions.length === 1 && r.conditions[0] === cond && r.selectors.every((x) => hookRe.some((re) => re.test(x.trim()))) && lastDecl(r.decls, pin.property)) decls = r.decls;
+  }
+  if (decls && decls.length) {
+    const [first, ...rest] = decls;
+    return { chain: [cond], prop: first!.lprop, value: first!.value, important: important || first!.important, extra: rest.length ? rest.map((d) => ({ prop: d.lprop, value: d.value, important: important || d.important })) : undefined };
+  }
+  return { chain: [cond], prop: pin.property, value: pin.value, important };
+}
+
+function restatePins(ctx: Ctx): void {
+  if (!ctx.linked) return;
+  const written = new Set(ctx.lines.map((l) => l.prop));
   for (const pin of ctx.pins) {
     if (pin.selector !== ctx.path || pin.environment === 'desktop' || !written.has(pin.property)) continue;
     const wE = envWidth(pin.environment);
     let last: RuleLine | undefined;
     for (const l of ctx.lines) if (l.prop === pin.property && chainMatches(l.chain, wE)) last = l;
     if (!last || last.value === pin.value) continue;
-    const cond = envCondition(pin.environment, ctx.b, ctx.t);
-    // the view's own earlier rule (it may carry more than one declaration, for example a flex-basis or the max-width guard)
-    let decls: Decl[] | null = null;
-    for (const sheet of ctx.model.sheets) for (const r of sheet.rules) {
-      if (r.conditions.length === 1 && r.conditions[0] === cond && r.selectors.every((x) => hookRe.some((re) => re.test(x.trim()))) && lastDecl(r.decls, pin.property)) decls = r.decls;
-    }
-    if (decls && decls.length) {
-      const [first, ...rest] = decls;
-      ctx.lines.push({ chain: [cond], prop: first!.lprop, value: first!.value, important: first!.important, extra: rest.length ? rest.map((d) => ({ prop: d.lprop, value: d.value, important: d.important })) : undefined });
-    } else ctx.lines.push({ chain: [cond], prop: pin.property, value: pin.value, important: last.important });
+    ctx.lines.push(viewRuleLine(ctx, pin, last.important));
   }
 }
 
@@ -697,6 +702,16 @@ function linkedSize(ctx: Ctx, p: string, V: string): boolean {
     ctx.notes.push({ property: p, condition: chainO[0]!, value: aloneValue ?? '(not declared)', reason: `left alone: ${alone}; the new ${p} applies only inside ${chainE[0]}` });
     ctx.placements.push(`${p} inside ${chainE[0]} only`);
   }
+  // A fixed length the page declares ONLY for the tablet range (a chain that matches no phone and no desktop width) is scaled by the same ratio, inside its own condition.
+  if (E === 'desktop' && !flexE && !flexO && !ctx.pins.some((q) => q.selector === ctx.path && q.property === p && q.environment === 'tablet')) {
+    for (const g of chainGroups(all.filter((x) => x.chain.length && chainEnv(x.chain, ctx.b, ctx.t) === 'tablet'))) {
+      if (!FIXED_LEN.test(g.win.d.value.trim())) continue;
+      const wT = [tabletMin(ctx.b), TABLET_WIDTH, ctx.t].find((w) => chainMatches(g.chain, w));
+      if (wT === undefined) continue;
+      ctx.lines.push(mk(g.chain, [[p, scaleValue(g.win.d.value.trim(), [r]).value]], guardOn(wT)));
+      ctx.placements.push(`${p} scaled inside ${g.chain.join(' ')} (declared only for the tablet range)`);
+    }
+  }
   const pin = ctx.pins.find((q) => q.selector === ctx.path && q.property === p && q.environment === E);
   if (pin) addPin(ctx, p, E, Vt);
   return true;
@@ -707,12 +722,13 @@ function linkedPlain(ctx: Ctx, p: string, V: string, warnings: string[]): { hand
   const all = collect(ctx.matched, p);
   if (!all.some((x) => x.chain.length)) return { handled: false };
   for (const x of all) ctx.maxSpec = Math.max(ctx.maxSpec, x.spec);
-  const b = ctx.pins.find((q) => q.selector === ctx.path && q.property === p && q.environment !== ctx.env);
-  if (b) no('pinned-conflict', `"${p}" is pinned in the ${b.environment} environment; a linked edit written as an inline style would override that pinned value`);
   const base = placeHtml(ctx.model, ctx.el, [[p, V]], ctx.probe, warnings, { forceInline: true, allowConditional: true });
   for (const g of chainGroups(all)) {
     if (g.win.d.important) ctx.lines.push({ chain: g.chain, prop: p, value: V, important: true });
   }
+  // The new value is written as an inline style, which beats every rule that is not !important, so a view where this property is custom gets its own rule again,
+  // inside its own media condition and with !important, after it (a Desktop edit changes nothing in a view where the property is custom).
+  for (const pin of ctx.pins) if (pin.selector === ctx.path && pin.property === p && pin.environment !== 'desktop') ctx.lines.push(viewRuleLine(ctx, pin, true));
   if (p === 'width' || p === 'height') {
     ctx.notes.push({ property: p, condition: '(all widths)', value: V, reason: `${p} could not be scaled (the new value is not in px, or there is no usable old value): it applies at every width` });
   }

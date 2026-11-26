@@ -1,0 +1,497 @@
+{
+ "version": 1,
+ "tolerance": {
+  "px": 0.5
+ },
+ "widthsBase": [
+  1280,
+  1024,
+  768,
+  390
+ ],
+ "stillRefused": "none was needed: every case in this round is written safely",
+ "specs": [
+  {
+   "id": "N01",
+   "title": "Phone custom colour, then a Desktop colour: Desktop and Tablet follow the Desktop edit, Phone keeps its own",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#008000"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(170, 0, 0)",
+      "phone": "rgb(0, 128, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N02",
+   "title": "Tablet custom colour, then a Desktop colour: Desktop and Phone follow, Tablet keeps its own",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#008000"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(0, 128, 0)",
+      "phone": "rgb(170, 0, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N03",
+   "title": "A Desktop colour first, then a Phone custom colour (the reverse order)",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#008000"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(170, 0, 0)",
+      "phone": "rgb(0, 128, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N04",
+   "title": "Font-family and text-align customised in Tablet, then Desktop edits of both: Tablet keeps its own, every other view follows",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#para",
+     "properties": {
+      "font-family": "Georgia, serif"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#para",
+     "properties": {
+      "text-align": "center"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#para",
+     "properties": {
+      "font-family": "Verdana, sans-serif"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "set",
+     "target": "#para",
+     "properties": {
+      "text-align": "right"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#para",
+      "prop": "font-family",
+      "desktop": "Verdana, sans-serif",
+      "tablet": "Georgia, serif",
+      "phone": "Verdana, sans-serif"
+     },
+     {
+      "sel": "#para",
+      "prop": "text-align",
+      "desktop": "right",
+      "tablet": "center",
+      "phone": "right"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N05",
+   "title": "Both views custom, then one Desktop colour: only Desktop changes",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#008000"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#0000ff"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(0, 0, 255)",
+      "phone": "rgb(0, 128, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N06",
+   "title": "Tablet custom colour, a later Desktop colour, then Reset Tablet: the Desktop colour stays everywhere and the export equals the list without the dropped edit",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#008000"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    },
+    {
+     "op": "reset",
+     "env": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "equalsSteps": [
+     2
+    ],
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(170, 0, 0)",
+      "phone": "rgb(170, 0, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N07",
+   "title": "A colour custom on one element and a Desktop colour on a different element: the first is unaffected",
+   "fixture": "colours.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "color": "#008000"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "#para",
+     "properties": {
+      "color": "#aa0000"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "color",
+      "desktop": "original",
+      "tablet": "original",
+      "phone": "rgb(0, 128, 0)"
+     },
+     {
+      "sel": "#para",
+      "prop": "color",
+      "desktop": "rgb(170, 0, 0)",
+      "tablet": "rgb(170, 0, 0)",
+      "phone": "rgb(170, 0, 0)"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N08",
+   "title": "A width declared only for the tablet range (769 to 1024): a Desktop width edit scales every value, including the tablet-range one, by the same ratio",
+   "fixture": "tabonly.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#box",
+     "properties": {
+      "width": "450px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#box",
+      "prop": "width",
+      "scaled": 0.75
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N09",
+   "title": "A font-size declared only for the tablet range: a Desktop edit 32 to 48 scales the tablet-range value (28 to 42) and the Phone value (20 to 30)",
+   "fixture": "tabonly.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "scaled": 1.5
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N10",
+   "title": "A custom Tablet font-size 36 on a page with a tablet-only 28: 36 across the whole tablet range (641 to 1024), the other views unchanged",
+   "fixture": "tabonly.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "36px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "original",
+      "tablet": "36px",
+      "phone": "original"
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N11",
+   "title": "A padding declared only for the tablet range: a Desktop padding edit 24 to 36 scales the tablet-range value (18 to 27) and the Phone value (12 to 18)",
+   "fixture": "tabonly.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#box",
+     "properties": {
+      "padding": "36px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#box",
+      "prop": "padding-top",
+      "scaled": 1.5
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "N12",
+   "title": "Bootstrap-style page (B = 575.98, T = 991.98): a Desktop font-size edit 40 to 48 scales every region's own value (ratio 1.2) at 575, 576, 767, 768, 991, 992 and the default widths",
+   "fixture": "bootstrap.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "48px"
+     },
+     "environment": "desktop"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "scaled": 1.2
+     },
+     {
+      "sel": "#box",
+      "prop": "padding-top",
+      "scaled": 1.0
+     }
+    ],
+    "extraWidths": [
+     575,
+     576,
+     767,
+     768,
+     991,
+     992
+    ],
+    "legit": "flow",
+    "phoneBreakpoint": 575.98,
+    "tabletTop": 991.98
+   }
+  },
+  {
+   "id": "N13",
+   "title": "Bootstrap-style page: a custom Tablet font-size 36 applies from 576 to 991 (and not at 575 or 992)",
+   "fixture": "bootstrap.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#title",
+     "properties": {
+      "font-size": "36px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#title",
+      "prop": "font-size",
+      "desktop": "original",
+      "tablet": "36px",
+      "phone": "original"
+     }
+    ],
+    "extraWidths": [
+     575,
+     576,
+     767,
+     768,
+     991,
+     992
+    ],
+    "legit": "flow",
+    "phoneBreakpoint": 575.98,
+    "tabletTop": 991.98
+   }
+  }
+ ]
+}

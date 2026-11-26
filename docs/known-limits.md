@@ -89,9 +89,13 @@ takes effect at every screen width.
 - **Reset a view** (`resetView`) drops every custom edit of that view and nothing else; the file then equals one that never had them. Desktop cannot be reset. Insert, text, remove and note edits are never dropped.
 - **A page whose own phone breakpoint is 768 has no Tablet range** (the Tablet frame's 768 px is already a phone width): a Tablet edit is refused (`tablet-covered-by-phone`), a Phone edit covers 768. Of the engine's
   14 fixture pages one is like this; none of the five real pages is.
-- **Width and height** scale the declared Phone value and the Desktop value only; a width or height declared only for the tablet range is left alone with a note.
-- **A Desktop edit of a non-ratio property** (for example a colour) that is also custom in a view is refused (`pinned-conflict`) because it would be written inline and override the view; font size, padding, margin,
-  width and height are handled.
+- **Width and height** scale the declared Phone value, the Desktop value and a length declared only for the tablet range (inside its own media condition) by the same ratio. A tablet-range length declared as
+  anything but a fixed px, rem or em length is left alone with a note.
+- **A Desktop edit of a non-ratio property** (colour, font-family, font-weight, text-align, ...) that is also custom in a view works: the Desktop value is written as before and the view's own rule is
+  written again after it, inside its own media condition and with `!important` (the Desktop value is an inline style, which beats ordinary rules), so the view keeps its value and every other view follows.
+  The `pinned-conflict` refusal no longer exists. After a Reset of that view the later Desktop edit stays and the file equals one built without the dropped edits.
+- **Fractional breakpoints** (a Bootstrap-style page with 575.98, 767.98 and 991.98) work: B and T are read as written, the Tablet range starts at the first whole width above B (576) and ends at T (991.98).
+  A `max-width: 767.98px` condition would make B = 767.98 (as for the freelancer page); the follow-up fixture uses 767.98 only as a `min-width`.
 - **Tablet and Phone offsets and reorders** keep the unlinked rules and limits (a reorder in a small view only places an element first or last among siblings whose `order` values are all equal, in a flex or grid parent).
 
 ## Selectors, ids and shared styles
