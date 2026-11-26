@@ -63,8 +63,8 @@ for (const spec of VSPECS) {
   else {
     const files = out!.files!;
     const extras: Parameters<typeof evaluateViews>[5] = { unlinked: out!.unlinked ?? null, stepFiles: out!.stepFiles };
-    if (ex.equalsSteps) { const keep = new Set<number>(ex.equalsSteps); const non = spec.steps.filter((s) => s.op !== 'reset'); extras.equalsRun = (await run(spec, non.filter((_, i) => keep.has(i + 1)))).files ?? null; }
-    if (spec.steps.some((s) => s.op === 'reset')) extras.filteredRun = (await run(spec, filtered(spec.steps))).files ?? null;
+    if (ex.equalsSteps) { const keep = new Set<number>(ex.equalsSteps); const non = spec.steps.filter((s) => s.op !== 'reset'); const r = await run(spec, non.filter((_, i) => keep.has(i + 1))); extras.equalsRun = r.files ?? (r.threw ? null : filesOf(inp)); }
+    if (spec.steps.some((s) => s.op === 'reset')) { const f = filtered(spec.steps); const r = await run(spec, f); extras.filteredRun = r.files ?? (f.length === 0 && !r.threw ? filesOf(inp) : null); }
     if (ex.undo) { extras.replays = []; for (let n = 1; n < spec.steps.length; n++) extras.replays.push((await run(spec, spec.steps.slice(0, n))).files ?? {}); extras.stepFiles = out!.stepFiles.slice(0, spec.steps.length - 1); }
     writeSet(join(RAW, spec.id), files);
     for (const r of await evaluateViews(browser, spec, inp, files, TMP, extras)) rows.push({ ...r, fixture: spec.fixture, outcome: '' });

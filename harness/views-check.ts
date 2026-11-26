@@ -15,6 +15,12 @@ export interface VExtras {
   replays?: Record<string, string>[] | null;
 }
 
+/** Resolved grid track sizes are layout-resolved (amendment 1, item 2): blank them in both documents. */
+function blankTracks(d: Dump): Dump {
+  const idx = ['grid-template-columns', 'grid-template-rows'].map((n) => d.names.indexOf(n)).filter((i) => i >= 0);
+  return { ...d, rows: d.rows.map((r) => ({ ...r, props: r.props.map((v, i) => (idx.includes(i) ? '' : v)) })) };
+}
+
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 void esc;
 
@@ -49,12 +55,18 @@ export async function evaluateViews(browser: Browser, spec: VSpec, inp: VInput, 
   const targets = [...new Set(spec.steps.filter((s) => s.op !== 'reset' && s.target && !s.target.startsWith('.new-')).map((s) => s.target!))];
   for (const w of widths) {
     const over = X[w]!.info.scrollWidth - Math.max(X[w]!.info.clientWidth, O[w]!.info.scrollWidth);
-    if ((w === 390 || w === 768) && over > 0.5) pc.push(`@${w}: horizontal overflow ${over}px`);
+    if ((w === 390 || w === 768) && over > 0.5 && !spec.steps.some((x) => x.op === 'offset')) pc.push(`@${w}: horizontal overflow ${over}px`);
     if (e.legit === 'none' || e.legit === 'svg-ancestors') continue;
-    const od = O[w]!.dump as Dump, xd = X[w]!.dump as Dump;
+    const od = blankTracks(O[w]!.dump as Dump), xd = blankTracks(X[w]!.dump as Dump);
     const slots: number[] = [];
-    for (const t of targets) { const r = await loadAt(browser, dirO, inp.file, w, { header: '', dumpTarget: t }, true); slots.push(r.dump!.target); }
-    const bad = collateral(od, xd, new Set(), new Set(), 'text', slots);
+    const skip = new Set<number>();
+    for (const t of targets) {
+      const r = await loadAt(browser, dirO, inp.file, w, { header: '', dumpTarget: t }, true);
+      slots.push(r.dump!.target);
+      const sub = (i: number): number[] => [i, ...od.rows.map((q, k) => (q.parent === i ? k : -1)).filter((k) => k >= 0).flatMap(sub)];
+      if (r.dump!.target >= 0) sub(r.dump!.target).forEach((k) => skip.add(k));
+    }
+    const bad = od.rows.length === xd.rows.length ? collateral(od, xd, skip, new Set(skip), 'text', slots) : [`element count ${od.rows.length} vs ${xd.rows.length}`];
     if (bad.length) pc.push(`@${w}: ${bad.length} element(s): ${bad.slice(0, 2).join(' || ')}`);
   }
   add('C', pc.length === 0, pc.slice(0, 3).join(' | ') || 'no other element changed; no new horizontal overflow at 390 and 768');

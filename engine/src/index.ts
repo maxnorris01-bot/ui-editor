@@ -1,5 +1,6 @@
 export { applyEdit, blockOf } from './edit';
 export { listNotes, neutralise } from './structure';
+export { customEdits, resetView } from './views';
 export { applyDomOps, applyEditSteps, commit, createPreview, domProbe, previewSource, retag, tagDocument } from './dom';
 export { breakpointOf, chainEnv, chainMatches, emptyState, envCondition, listUnlinked, scaleValue, tabletMax, tabletMin } from './responsive';
 export type { UnlinkedItem } from './responsive';
