@@ -4,8 +4,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT } from './fixtures';
 
-export const VDIR = join(ROOT, 'fixtures/views');
-export interface Measured { sel: string; prop: string; desktop: string; tablet: string; phone: string }
+/** VIEWS_SET=followup runs the follow-up round's fixtures and specs (fixtures/views-followup) with the same checks. */
+export const VSET = process.env.VIEWS_SET === 'followup' ? 'followup' : 'views';
+export const VDIR = join(ROOT, VSET === 'followup' ? 'fixtures/views-followup' : 'fixtures/views');
+export interface Measured { sel: string; prop: string; desktop?: string; tablet?: string; phone?: string; /** every width: the original value times this ratio */ scaled?: number; /** exact widths: value */ byWidth?: Record<string, string> }
 export interface VStep { op: string; target?: string; properties?: Record<string, string>; environment?: string; link?: boolean; env?: string; dx?: number; dy?: number; placement?: string; sibling?: string; kind?: string; anchor?: string }
 export interface VSpec { id: string; title: string; fixture: string; steps: VStep[]; expect: Record<string, any> }
 export const VSPECS = (JSON.parse(readFileSync(join(VDIR, 'edits.json'), 'utf8')) as { specs: VSpec[] }).specs;
@@ -34,9 +36,9 @@ export const tabletTop = (i: VInput): number => { const v = maxWidths(i).filter(
 export const tabletMin = (i: VInput): number => Math.floor(phoneMax(i)) + 1;
 export const hasTablet = (i: VInput): boolean => tabletMin(i) <= 768;
 
-export function testWidths(i: VInput): number[] {
+export function testWidths(i: VInput, extra: number[] = []): number[] {
   const B = phoneMax(i), T = tabletTop(i);
-  return [...new Set([1280, 1024, 768, 390, Math.floor(B), Math.floor(B) + 1, Math.floor(T), Math.floor(T) + 1])].sort((a, b) => b - a);
+  return [...new Set([1280, 1024, 768, 390, Math.floor(B), Math.floor(B) + 1, Math.floor(T), Math.floor(T) + 1, ...extra])].sort((a, b) => b - a);
 }
 export type Region = 'phone' | 'tablet' | 'desktop';
 export const regionOf = (i: VInput, w: number): Region => (w <= phoneMax(i) ? 'phone' : w <= tabletTop(i) ? 'tablet' : 'desktop');

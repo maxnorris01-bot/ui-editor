@@ -6,13 +6,13 @@ import { join } from 'node:path';
 import { createModel, exportFiles, sources } from '../engine/src/index';
 import { ROOT } from './fixtures';
 import { serve } from './serve';
-import { VSPECS, filesOf, viewsInput, type VSpec, type VStep } from './views-lib';
+import { VSET, VSPECS, filesOf, viewsInput, type VSpec, type VStep } from './views-lib';
 import { evaluateViews, type Row } from './views-check';
 import { writeSet } from './insert-lib';
 
 const RUN = process.env.GATE_RUN ?? 'm1';
-const OUT = join(ROOT, 'views-check/results'), CSV = join(OUT, 'views-results.csv');
-const TMP = join(ROOT, 'views-check/tmp', `run-${RUN}`), RAW = join(ROOT, 'views-check/raw', `run-${RUN}`);
+const OUT = join(ROOT, 'views-check/results'), CSV = join(OUT, VSET === 'followup' ? 'followup-results.csv' : 'views-results.csv');
+const TMP = join(ROOT, 'views-check/tmp', `${VSET}-run-${RUN}`), RAW = join(ROOT, 'views-check/raw', `${VSET}-run-${RUN}`);
 if (existsSync(CSV) && readFileSync(CSV, 'utf8').split('\n').some((l) => l.startsWith(`${RUN},`))) throw new Error(`run ${RUN} already exists in ${CSV}`);
 rmSync(TMP, { recursive: true, force: true }); mkdirSync(TMP, { recursive: true }); mkdirSync(RAW, { recursive: true }); mkdirSync(OUT, { recursive: true });
 execSync('node harness/bundle.mjs', { cwd: ROOT, stdio: 'inherit' });
@@ -38,7 +38,7 @@ function filtered(steps: VStep[]): VStep[] {
 }
 const rows: (Row & { fixture: string; outcome: string })[] = [];
 const outcomes = new Map<string, string>();
-const fixtures = [...new Set([...VSPECS.map((s) => s.fixture), 'bp480.html', 'bp767.html', 'nobp.html'])];
+const fixtures = [...new Set([...VSPECS.map((s) => s.fixture), ...(VSET === 'views' ? ['bp480.html', 'bp767.html', 'nobp.html'] : [])])];
 for (const [n, f] of fixtures.entries()) {
   const inp = viewsInput(f);
   let ok = false, detail = '';

@@ -1,0 +1,33 @@
+Scorer check for docs/small-views-followup-rules.md, run before any engine change (harness/controls-followup.ts): 6 fault switches.
+Each export below is built by hand from the fixture and given to the same scorer that scores the engine.
+
+OK   [N01] good N01 (Desktop red after a Phone custom green: the phone rule is written again with !important after the Desktop rule): must pass every check; failing checks: none
+OK   [N01] (1) a Desktop non-ratio edit that overwrites a custom view's value: must fail M; failing checks: M
+       M: @640 (phone) #title color got rgb(170, 0, 0) want rgb(0, 128, 0) | @390 (phone) #title color got rgb(170, 0, 0) want rgb(0, 128, 0)
+OK   [N02] good N02 (Desktop red after a Tablet custom green): must pass every check; failing checks: none
+OK   [N02] (2) a Desktop non-ratio edit that does not reach an uncustomised view (Phone stays navy): must fail M; failing checks: M
+       M: @640 (phone) #title color got rgb(18, 52, 86) want rgb(170, 0, 0) | @390 (phone) #title color got rgb(18, 52, 86) want rgb(170, 0, 0)
+OK   [N01] (3) the pinned rule re-emitted without its media condition (it leaks to every view): must fail M; failing checks: M
+       M: @1280 (desktop) #title color got rgb(0, 128, 0) want rgb(170, 0, 0) | @1025 (desktop) #title color got rgb(0, 128, 0) want rgb(170, 0, 0) | @1024 (tab
+OK   [N06] good N06 (Reset Tablet after a later Desktop colour: the Desktop edit stays): must pass every check; failing checks: none
+OK   [N06] (4) a Reset that leaves the view's rule behind (inert here: the Desktop rule comes later, so only the byte checks can see it): must fail Q and R; failing checks: Q, R
+       Q: colours.html differs from the export of the list without the dropped edits
+       R: colours.html differs from the list the harness filtered itself
+OK   [N13] good N13 (custom Tablet font-size 36 from 576 to 991.98): must pass every check; failing checks: none
+OK   [N13] (5) the tablet upper bound off by one at T = 991.98 (992.98): must fail M; failing checks: M
+       M: @992 (desktop) #title font-size got 36px want 40px
+OK   [N13] (6) the fractional breakpoint rounded wrongly (the Tablet range starts at 575, not 576): must fail M; failing checks: M
+       M: @575 (phone) #title font-size got 36px want 20px
+
+RESULT: all 10 controls behaved (every good export passed, every broken export failed the stated check; 6 fault switches).
+
+Note on control (4): it was first written to require M and Q. The leftover Tablet rule there sits before the Desktop rule, so it is inert and only the byte checks (Q, R) can see it, which is exactly
+what "Reset leaving the rule behind" means; the expectation was corrected to Q and R before anything else ran (the scorer itself was not changed).
+
+Step 1, current engine (main at 949b3b8), run n0 in views-check/results/followup-results.csv: 8 of the 13 N-specs PASS, 5 FAIL.
+- N01, N02, N04, N05, N06 FAIL with `pinned-conflict` ("color is pinned in the phone/tablet environment; a linked edit written as an inline style would override that pinned value", step 2 or 3), as the brief expected.
+- N08 FAILS on a measurement, not a refusal: the Desktop width edit leaves the tablet-only declared width (500 px in 769 to 1024) at 450 px at 1024 instead of 375 px (the size scaling only scales the declared
+  values at 390 and 1280).
+- N03, N07, N09, N10, N11, N12, N13 already PASS (the reverse order, a different element, tablet-only font-size and padding, the Bootstrap-style page at all six widths and a custom Tablet edit on it).
+Baseline hashes reused from results/views/baseline-hashes.json (182 files). The earlier suites' faults (real-page, responsive, size, size-flex) and the 25 insert and 20 hardening scorer controls were re-run on the
+current engine: all behave. Those scripts rewrote two scorer-check.txt files without their appended notes; both were put back with `git show HEAD:<file> > <file>`.
