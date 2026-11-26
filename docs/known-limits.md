@@ -80,6 +80,21 @@ takes effect at every screen width.
   different `order` values (`order-values-differ`).
 - **SVG:** phone-only or desktop-only edits are refused (`svg-unlinked`); SVG has no media-scoped attribute.
 
+## Three views: Desktop, Tablet, Phone (2026-11-25)
+
+- **Desktop edits reach the small views in proportion.** Changing a size on Desktop scales the page's own Phone (and Tablet-range) values by the same ratio; colours, fonts, order and text apply as they are.
+- **Edits made in Phone or Tablet are custom to that view.** They apply only inside that view's own width range (Phone: up to the page's phone breakpoint B; Tablet: from B+1 up to T, the page's own largest
+  `max-width` between 769 and 1100 px, else 1024) and are never carried to Desktop or the other small view. The old behaviour "an edit made in Phone with Link on also scales Desktop" is gone for Phone and
+  Tablet; the Link flag is ignored there. A later Desktop edit does not change a view's custom value, and still reaches everything else.
+- **Reset a view** (`resetView`) drops every custom edit of that view and nothing else; the file then equals one that never had them. Desktop cannot be reset. Insert, text, remove and note edits are never dropped.
+- **A page whose own phone breakpoint is 768 has no Tablet range** (the Tablet frame's 768 px is already a phone width): a Tablet edit is refused (`tablet-covered-by-phone`), a Phone edit covers 768. Of the engine's
+  14 fixture pages one is like this; none of the five real pages is.
+- **Width and height** scale the declared Phone value and the Desktop value only; a width or height declared only for the tablet range is left alone with a note.
+- **A Desktop edit of a non-ratio property** (for example a colour) that is also custom in a view is refused (`pinned-conflict`) because it would be written inline and override the view; font size, padding, margin,
+  width and height are handled.
+- **Tablet and Phone offsets and reorders** keep the unlinked rules and limits (a reorder in a small view only places an element first or last among siblings whose `order` values are all equal, in a flex or grid parent).
+- **Rules the engine wrote stay after a Reset of an original element only if a later edit needed them**; a reset replays the list, so nothing of the dropped edits is left.
+
 ## Selectors, ids and shared styles
 
 - **Element-scoped rules:** the engine writes override rules with the element's `id`, or adds a

@@ -38,7 +38,7 @@ function filtered(steps: VStep[]): VStep[] {
 }
 const rows: (Row & { fixture: string; outcome: string })[] = [];
 const outcomes = new Map<string, string>();
-const fixtures = [...new Set(VSPECS.map((s) => s.fixture))];
+const fixtures = [...new Set([...VSPECS.map((s) => s.fixture), 'bp480.html', 'bp767.html', 'nobp.html'])];
 for (const [n, f] of fixtures.entries()) {
   const inp = viewsInput(f);
   let ok = false, detail = '';
