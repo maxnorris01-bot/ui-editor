@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Views</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    .h { font-size: 32px; margin: 0 0 16px; color: #123456; }
+    .t { font-size: 16px; line-height: 1.4; margin: 0 0 12px; }
+    .box { width: 600px; height: 200px; background: #cde; padding: 24px; box-sizing: border-box; }
+    .card { padding: 24px; margin: 0 0 12px; background: #eee; }
+    @media (max-width: 767px) {
+      .h { font-size: 20px; }
+      .t { font-size: 14px; }
+      .box { width: 300px; height: 120px; padding: 12px; }
+      .card { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title" class="h">Title</h1>
+  <p id="para" class="t">A paragraph of text.</p>
+  <div id="box" class="box">Box</div>
+  <div id="card" class="card">Card</div>
+</body>
+</html>

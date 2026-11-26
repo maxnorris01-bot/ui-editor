@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Views</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .cell { padding: 12px; background: #efe; }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="grid" class="grid">
+    <div id="g1" class="cell">One</div>
+    <div id="g2" class="cell">Two</div>
+    <div id="g3" class="cell">Three</div>
+  </div>
+</body>
+</html>
