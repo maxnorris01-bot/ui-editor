@@ -93,7 +93,6 @@ takes effect at every screen width.
 - **A Desktop edit of a non-ratio property** (for example a colour) that is also custom in a view is refused (`pinned-conflict`) because it would be written inline and override the view; font size, padding, margin,
   width and height are handled.
 - **Tablet and Phone offsets and reorders** keep the unlinked rules and limits (a reorder in a small view only places an element first or last among siblings whose `order` values are all equal, in a flex or grid parent).
-- **Rules the engine wrote stay after a Reset of an original element only if a later edit needed them**; a reset replays the list, so nothing of the dropped edits is left.
 
 ## Selectors, ids and shared styles
 
