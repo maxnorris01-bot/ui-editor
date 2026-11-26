@@ -139,8 +139,8 @@ export interface Model {
   missingStylesheets: string[];
 }
 
-/** The view an edit was made in. Tablet is view-only and not an environment. */
-export type Environment = 'desktop' | 'phone';
+/** The view an edit was made in. Desktop edits are linked (scaled across widths); Phone and Tablet edits are always custom to their own range. */
+export type Environment = 'desktop' | 'tablet' | 'phone';
 
 /** Fields every edit may carry. `environment` defaults to 'desktop', `link` to true. */
 export interface EditScope {

@@ -1,7 +1,7 @@
 export { applyEdit, blockOf } from './edit';
 export { listNotes, neutralise } from './structure';
 export { applyDomOps, applyEditSteps, commit, createPreview, domProbe, previewSource, retag, tagDocument } from './dom';
-export { breakpointOf, chainEnv, chainMatches, emptyState, envCondition, listUnlinked, scaleValue } from './responsive';
+export { breakpointOf, chainEnv, chainMatches, emptyState, envCondition, listUnlinked, scaleValue, tabletMax, tabletMin } from './responsive';
 export type { UnlinkedItem } from './responsive';
 export type { Preview, PreviewOptions } from './dom';
 export { createModel, describe, parse, select, sources } from './model';

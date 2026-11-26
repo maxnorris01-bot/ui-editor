@@ -39,13 +39,15 @@ import type { Decl, DomOp, Edit, EditResult, EditState, ElementNode, Environment
 export const DESKTOP_WIDTH = 1280;
 export const PHONE_WIDTH = 390;
 export const DEFAULT_BREAKPOINT = 767;
+export const TABLET_WIDTH = 768;
+export const DEFAULT_TABLET_MAX = 1024;
 
 export const emptyState = (): EditState => ({ pins: [] });
 
 const SIDES = ['top', 'right', 'bottom', 'left'] as const;
 const RATIO_PROPS = new Set(['font-size', 'padding', 'margin', ...SIDES.map((s) => `padding-${s}`), ...SIDES.map((s) => `margin-${s}`)]);
 const SHORTHAND_SIDES = new Set(['padding', 'margin']);
-const envWidth = (e: Environment) => (e === 'phone' ? PHONE_WIDTH : DESKTOP_WIDTH);
+const envWidth = (e: Environment) => (e === 'phone' ? PHONE_WIDTH : e === 'tablet' ? TABLET_WIDTH : DESKTOP_WIDTH);
 const other = (e: Environment): Environment => (e === 'phone' ? 'desktop' : 'phone');
 
 // ---------------------------------------------------------------------------------------------
@@ -98,13 +100,49 @@ export function breakpointOf(model: Model): number {
   return best < 0 ? DEFAULT_BREAKPOINT : best;
 }
 
-export const envCondition = (env: Environment, b: number): string => (env === 'phone' ? `@media (max-width: ${fmt(b)}px)` : `@media (min-width: ${fmt(b + 1)}px)`);
+/** The first whole width above the phone breakpoint: where the Tablet range starts. */
+export const tabletMin = (b: number): number => Math.floor(b) + 1;
 
-/** Which environment a condition chain belongs to: only phone widths, only desktop widths, both, or neither. */
-export function chainEnv(chain: string[], b: number): Environment | 'both' | 'none' {
+/**
+ * The page's own tablet top T: the largest `max-width` condition above 768 px and at most 1100 px, else 1024. The Tablet range is the widths from
+ * `tabletMin(B)` to T; widths above T are Desktop for the purpose of custom ranges (docs/small-views-rules.md section 2).
+ */
+export function tabletMax(model: Model): number {
+  let best = -1;
+  for (const sheet of model.sheets) {
+    for (const rule of sheet.rules) {
+      for (const c of rule.conditions) {
+        for (const m of c.matchAll(/max-width\s*:\s*(\d+(?:\.\d+)?)\s*(px|em|rem)?/gi)) {
+          const v = toPx(parseFloat(m[1]!), m[2]?.toLowerCase());
+          if (v > 768 && v <= 1100 && v > best) best = v;
+        }
+      }
+    }
+  }
+  return best < 0 ? DEFAULT_TABLET_MAX : best;
+}
+
+export const envCondition = (env: Environment, b: number, t: number = DEFAULT_TABLET_MAX): string =>
+  env === 'phone' ? `@media (max-width: ${fmt(b)}px)` : env === 'tablet' ? `@media (min-width: ${fmt(tabletMin(b))}px) and (max-width: ${fmt(t)}px)` : `@media (min-width: ${fmt(b + 1)}px)`;
+
+/**
+ * Which environment a condition chain belongs to: only phone widths, only desktop widths, both, or neither. With `t` (the tablet top) three views are told apart and a
+ * chain that matches only the tablet range is `'tablet'`; without it the old two-view answer is given (a tablet-only chain is then `'desktop'`).
+ */
+export function chainEnv(chain: string[], b: number, t?: number): Environment | 'both' | 'none' {
+  if (t === undefined) {
+    const phone = [b, PHONE_WIDTH, Math.min(320, b)].some((w) => chainMatches(chain, w));
+    const desk = [b + 1, 1024, DESKTOP_WIDTH].some((w) => chainMatches(chain, w));
+    return phone && desk ? 'both' : phone ? 'phone' : desk ? 'desktop' : 'none';
+  }
   const phone = [b, PHONE_WIDTH, Math.min(320, b)].some((w) => chainMatches(chain, w));
-  const desk = [b + 1, 1024, DESKTOP_WIDTH].some((w) => chainMatches(chain, w));
-  return phone && desk ? 'both' : phone ? 'phone' : desk ? 'desktop' : 'none';
+  const tablet = tabletMin(b) <= t && [tabletMin(b), TABLET_WIDTH, t].some((w) => chainMatches(chain, w));
+  const desk = [t + 1, DESKTOP_WIDTH].some((w) => chainMatches(chain, w));
+  if (phone && (tablet || desk)) return 'both';
+  if (phone) return 'phone';
+  if (tablet && desk) return 'desktop';
+  if (tablet) return 'tablet';
+  return desk ? 'desktop' : 'none';
 }
 
 // ---------------------------------------------------------------------------------------------
