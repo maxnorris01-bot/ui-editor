@@ -27,6 +27,6 @@ const different = keys.filter((k) => k in now && base[k] !== now[k]);
 const extra = Object.keys(now).filter((k) => !(k in base));
 const retired = Object.keys(base).filter(isRetired).map((k) => ({ file: k, changed: now[k] !== base[k] }));
 const result = { baselineFiles: Object.keys(base).length, comparedFiles: keys.length, byteIdentical: keys.length - missing.length - different.length, different, missing, extra, retired };
-if (process.env.WRITE) writeFileSync(join(ROOT, 'views-check/results/regression.json'), JSON.stringify(result, null, 2) + '\n');
+if (process.env.WRITE) writeFileSync(join(ROOT, process.env.REG_OUT ?? 'views-check/results/regression.json'), JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify(result, null, 2));
 process.exit(different.length || missing.length || extra.length ? 1 : 0);
