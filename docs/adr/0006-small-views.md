@@ -41,3 +41,14 @@ the Desktop setup scaled in proportion; an edit made in Phone or Tablet is custo
 - Width and height edits scale the declared phone value and the Desktop value only (the existing size-scaling reference widths 390 and 1280); a width or height declared only for the tablet range is left alone with a note.
 - A Desktop edit that would be written inline (a non-ratio property with media rules) after a custom value in a small view is still refused (`pinned-conflict`).
 - Real pages whose own CSS has a tablet-only band (for example Bootstrap's `min-width: 768px and max-width: 991.98px`) get T = 991.98 and the Tablet range is B+1 to T; widths above T count as Desktop for custom ranges.
+
+## Addendum (2026-11-25, follow-up round): Desktop edits of non-ratio properties and tablet-only declarations
+
+Rules: `docs/small-views-followup-rules.md`. Decision (chosen by measurement, specs N01 to N13):
+- **The `pinned-conflict` refusal is removed.** A Desktop edit of a non-ratio property is still written as before (in place, or an inline style when the page has media rules for it: same bytes when
+  nothing is custom). Because an inline style beats every ordinary rule, each view where that element and property is custom gets its own rule written again after it, inside its own media condition and with
+  `!important` (`viewRuleLine`, read from the model so all its declarations come along). Alternatives rejected: replacing the inline write by a scoped base rule (changes the bytes when nothing is custom) and
+  scoping the Desktop value away from the custom view (loses the views that need it). Nothing needed to stay refused.
+- **A length declared only for the tablet range** is scaled by a Desktop width or height edit (`linkedSize`): a chain that matches no phone and no desktop width (`chainEnv(chain, b, t) === 'tablet'`) with a fixed
+  px, rem or em value gets a line with the scaled value inside the same condition (plus the width guard when the element has no max-width). Font-size and padding already scaled it; Phone is untouched by it.
+- **Fractional breakpoints** (B = 575.98, T = 991.98) needed no change: the Tablet range starts at `floor(B)+1`.

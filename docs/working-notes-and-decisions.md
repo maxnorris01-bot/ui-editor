@@ -166,6 +166,12 @@ new behaviour (inline style for a linked colour edit).
   cascade over a pinned view is done by writing the view's own rule again after the Desktop rules; Reset of Desktop is not offered.
 - **Retired:** S09, Z09 and one unit test (a Phone edit with link on no longer scales Desktop).
 
+## Small views follow-up (2026-11-25)
+
+- **Done:** a Desktop edit of a colour, font or other non-ratio property after a view is customised works (the view's rule is written again after it with `!important`; no `pinned-conflict` any more); a
+  Desktop width or height edit scales a length declared only for the tablet range; a Bootstrap-style page (B 575.98, T 991.98) works as it was. 13 specs N01 to N13 locked in `537f306`; ADR 0006 addendum.
+- **Choice (mine):** `!important` on the re-emitted view rule, because the Desktop value is written as an inline style; nothing is still refused.
+
 ## See also
 
 - `docs/sessions/*.md` - what changed and why, per work session.
