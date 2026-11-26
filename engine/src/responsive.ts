@@ -702,6 +702,16 @@ function linkedSize(ctx: Ctx, p: string, V: string): boolean {
     ctx.notes.push({ property: p, condition: chainO[0]!, value: aloneValue ?? '(not declared)', reason: `left alone: ${alone}; the new ${p} applies only inside ${chainE[0]}` });
     ctx.placements.push(`${p} inside ${chainE[0]} only`);
   }
+  // A fixed length the page declares ONLY for the tablet range (a chain that matches no phone and no desktop width) is scaled by the same ratio, inside its own condition.
+  if (E === 'desktop' && !flexE && !flexO && !ctx.pins.some((q) => q.selector === ctx.path && q.property === p && q.environment === 'tablet')) {
+    for (const g of chainGroups(all.filter((x) => x.chain.length && chainEnv(x.chain, ctx.b, ctx.t) === 'tablet'))) {
+      if (!FIXED_LEN.test(g.win.d.value.trim())) continue;
+      const wT = [tabletMin(ctx.b), TABLET_WIDTH, ctx.t].find((w) => chainMatches(g.chain, w));
+      if (wT === undefined) continue;
+      ctx.lines.push(mk(g.chain, [[p, scaleValue(g.win.d.value.trim(), [r]).value]], guardOn(wT)));
+      ctx.placements.push(`${p} scaled inside ${g.chain.join(' ')} (declared only for the tablet range)`);
+    }
+  }
   const pin = ctx.pins.find((q) => q.selector === ctx.path && q.property === p && q.environment === E);
   if (pin) addPin(ctx, p, E, Vt);
   return true;
