@@ -632,6 +632,51 @@ Refusals detected: 0.
 
 ### Verdict, run vh1: **PASS**
 
+## Run m1
+
+### Per edit type
+
+| type | passed | of | line | met |
+|---|---|---|---|---|
+| T1 | 10 | 10 | >= 9 | yes |
+| T2 | 10 | 10 | >= 9 | yes |
+| T3 | 10 | 10 | >= 9 | yes |
+| T4 | 10 | 10 | >= 9 | yes |
+| total | 40 | 40 | >= 36 | yes |
+
+### Per rule (edits passing the rule)
+
+| rule | passed | of |
+|---|---|---|
+| E1 | 40 | 40 |
+| E2 | 40 | 40 |
+| E3 | 40 | 40 |
+| E4 | 40 | 40 |
+| E5 | 40 | 40 |
+
+### Per file
+
+| file | edits passed | of | no-op round trip |
+|---|---|---|---|
+| flex-layout.html | 4 | 4 | byte-identical, loads |
+| grid-table.html | 4 | 4 | byte-identical, loads |
+| grouped-transforms.svg | 4 | 4 | byte-identical, loads |
+| inline-styles.html | 4 | 4 | byte-identical, loads |
+| large-page.html | 4 | 4 | byte-identical, loads |
+| linked-css.html | 4 | 4 | byte-identical, loads |
+| messy.html | 4 | 4 | byte-identical, loads |
+| shapes-text.svg | 4 | 4 | byte-identical, loads |
+| shared-classes.html | 4 | 4 | byte-identical, loads |
+| style-block.html | 4 | 4 | byte-identical, loads |
+
+### Failed edits (0)
+
+None.
+
+Refusals detected: 0.
+
+### Verdict, run m1: **PASS**
+
 ## Speed (one build, `results/timing.json`)
 
 | metric | measured | threshold | met |
@@ -646,4 +691,4 @@ Refusals detected: 0.
 | 100x large-page apply + export, median | 7.711 ms | report only | n/a |
 | largest fixture | large-page.html, 14712 B | report only | n/a |
 
-Verdicts: run 1: PASS; run resp: PASS; run iter2: PASS; run rescore: PASS; run sbase: PASS; run size1: PASS; run sflex1: PASS; run ibase: PASS; run i1: PASS; run i2: PASS; run hbase: PASS; run h2: PASS; run vbase: PASS; run vh1: PASS
+Verdicts: run 1: PASS; run resp: PASS; run iter2: PASS; run rescore: PASS; run sbase: PASS; run size1: PASS; run sflex1: PASS; run ibase: PASS; run i1: PASS; run i2: PASS; run hbase: PASS; run h2: PASS; run vbase: PASS; run vh1: PASS; run m1: PASS
