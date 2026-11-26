@@ -300,13 +300,25 @@ interface Ctx {
   placements: string[];
   pins: Pin[];
   path: string;
+  /** The page's tablet top T (see `tabletMax`). */
+  t: number;
+  /** True for a Desktop (linked) edit: pins of the small views are then kept in force after the new rules. */
+  linked: boolean;
 }
 
+/** A Phone or Tablet edit is always custom (the `link` flag is ignored there); a Desktop edit is custom only when it says `link: false`. */
+export const isCustomEdit = (edit: { environment?: Environment; link?: boolean }): boolean => edit.link === false || (edit.environment ?? 'desktop') !== 'desktop';
+
 function makeCtx(model: Model, el: ElementNode, edit: Edit, probe: Probe, state: EditState): Ctx {
+  const env = edit.environment ?? 'desktop';
+  const b = breakpointOf(model);
+  if (env === 'tablet' && tabletMin(b) > TABLET_WIDTH) {
+    no('tablet-covered-by-phone', `this page's own phone breakpoint is ${fmt(b)}px, so the Tablet width (${TABLET_WIDTH}px) is already a phone width and there is no Tablet range; make the edit in Phone instead`);
+  }
   return {
-    model, el, probe, state,
-    env: edit.environment ?? 'desktop',
-    b: breakpointOf(model),
+    model, el, probe, state, t: tabletMax(model), linked: false,
+    env,
+    b,
     matched: matchedRules(model, el, probe),
     inline: inlineStyle(model, el),
     maxSpec: 0, notes: [], patches: [], dom: [], lines: [], placements: [], pins: [...state.pins],
@@ -412,7 +424,38 @@ export function appendCssLF(model: Model, lines: string[]): { patch: Patch; dom:
   return { patch: { file: sheet.file, start: src.length, end: src.length, text }, dom: { type: 'css', index: sheet.elementIndex, text: `${lines.join('\n')}\n` } };
 }
 
+/**
+ * A Desktop edit after a Phone or Tablet custom value for the same element and property must not override it. Where the lines this edit writes would
+ * win over a view's pinned value (a later rule of the same specificity matching a width inside that view), the view's own rule, as the engine wrote it, is
+ * written again after them. Nothing is added when the lines already keep the pinned value in force.
+ */
+function restatePins(ctx: Ctx): void {
+  if (!ctx.linked) return;
+  const written = new Set(ctx.lines.map((l) => l.prop));
+  const id = attrOf(ctx.el, 'id')?.value;
+  const hook = attrOf(ctx.el, 'data-ue')?.value;
+  const hookRe = [id && /^[A-Za-z_][\w-]*$/.test(id) ? new RegExp(`^(#${id})+$`) : null, hook && /^\d+$/.test(hook) ? new RegExp(`^(\\[data-ue="${hook}"\\])+$`) : null].filter((x): x is RegExp => !!x);
+  for (const pin of ctx.pins) {
+    if (pin.selector !== ctx.path || pin.environment === 'desktop' || !written.has(pin.property)) continue;
+    const wE = envWidth(pin.environment);
+    let last: RuleLine | undefined;
+    for (const l of ctx.lines) if (l.prop === pin.property && chainMatches(l.chain, wE)) last = l;
+    if (!last || last.value === pin.value) continue;
+    const cond = envCondition(pin.environment, ctx.b, ctx.t);
+    // the view's own earlier rule (it may carry more than one declaration, for example a flex-basis or the max-width guard)
+    let decls: Decl[] | null = null;
+    for (const sheet of ctx.model.sheets) for (const r of sheet.rules) {
+      if (r.conditions.length === 1 && r.conditions[0] === cond && r.selectors.every((x) => hookRe.some((re) => re.test(x.trim()))) && lastDecl(r.decls, pin.property)) decls = r.decls;
+    }
+    if (decls && decls.length) {
+      const [first, ...rest] = decls;
+      ctx.lines.push({ chain: [cond], prop: first!.lprop, value: first!.value, important: first!.important, extra: rest.length ? rest.map((d) => ({ prop: d.lprop, value: d.value, important: d.important })) : undefined });
+    } else ctx.lines.push({ chain: [cond], prop: pin.property, value: pin.value, important: last.important });
+  }
+}
+
 function flush(ctx: Ctx): void {
+  restatePins(ctx);
   if (ctx.lines.length === 0) return;
   const sel = scopedSelector(ctx);
   const text = ctx.lines.map((l) => lineText(sel, l));
@@ -478,7 +521,7 @@ function linkedRatio(ctx: Ctx, p: string, V: string): boolean {
     ctx.placements.push(`inline ${p} (scaled)`);
     for (const g of groups) {
       if (!g.win.d.important) continue;
-      const pinned = pinnedOther(chainEnv(g.chain, ctx.b));
+      const pinned = pinnedOther(chainEnv(g.chain, ctx.b, ctx.t));
       ctx.lines.push({ chain: g.chain, prop: p, value: pinned ? g.win.d.value : valueFor(g.win, g.win === win), important: true });
     }
   } else {
@@ -490,7 +533,7 @@ function linkedRatio(ctx: Ctx, p: string, V: string): boolean {
       }
     }
     for (const g of groups) {
-      const pinned = pinnedOther(chainEnv(g.chain, ctx.b));
+      const pinned = pinnedOther(chainEnv(g.chain, ctx.b, ctx.t));
       const value = pinned ? g.win.d.value : valueFor(g.win, g.win === win);
       if (baseEmitted || (!pinned && value !== g.win.d.value)) ctx.lines.push({ chain: g.chain, prop: p, value, important: g.win.d.important });
     }
@@ -619,8 +662,8 @@ function linkedSize(ctx: Ctx, p: string, V: string): boolean {
     if (guard) extra.push({ prop: 'max-width', value: '100%', important: guardIm });
     return { chain, prop: first[0], value: first[1], important: first[0] === 'flex-basis' ? bImportant : important, extra: extra.length ? extra : undefined };
   };
-  const chainE = [envCondition(E, ctx.b)];
-  const chainO = [envCondition(O, ctx.b)];
+  const chainE = [envCondition(E, ctx.b, ctx.t)];
+  const chainO = [envCondition(O, ctx.b, ctx.t)];
   const declsE: Pair[] = flexE ? [[p, Vt], ['flex-basis', Vt]] : [[p, Vt]];
   const same = (a: Pair[], b: Pair[]) => a.length === b.length && a.every((x, i) => x[0] === b[i]![0] && x[1] === b[i]![1]);
 
@@ -679,7 +722,8 @@ function linkedPlain(ctx: Ctx, p: string, V: string, warnings: string[]): { hand
 export function htmlSetResponsive(model: Model, edit: Extract<Edit, { op: 'set' }>, el: ElementNode, probe: Probe, state: EditState, warnings: string[]): EditResult {
   const props: [string, string][] = Object.entries(edit.properties).map(([p, v]) => [p.toLowerCase(), v]);
   const ctx = makeCtx(model, el, edit, probe, state);
-  if (edit.link === false) return unlinkedSet(ctx, props, warnings);
+  if (isCustomEdit(edit)) return unlinkedSet(ctx, props, warnings);
+  ctx.linked = true;
   const rest: Record<string, string> = {};
   let base: EditResult | null = null;
   let any = false;
@@ -717,11 +761,12 @@ function mergeBase(a: EditResult | null, b: EditResult): EditResult {
 
 function importantNeeded(ctx: Ctx, all: D2[], p: string): boolean {
   if (ctx.inline && lastDecl(ctx.inline.decls, p)) return true; // must beat the element's own inline declaration
-  return all.some((x) => x.d.important && (!x.chain.length || chainEnv(x.chain, ctx.b) === ctx.env || chainEnv(x.chain, ctx.b) === 'both'));
+  if (ctx.env !== 'tablet') return all.some((x) => x.d.important && (!x.chain.length || chainEnv(x.chain, ctx.b) === ctx.env || chainEnv(x.chain, ctx.b) === 'both'));
+  return all.some((x) => x.d.important && (!x.chain.length || ['tablet', 'desktop', 'both'].includes(chainEnv(x.chain, ctx.b, ctx.t))));
 }
 
 function unlinkedSet(ctx: Ctx, props: [string, string][], warnings: string[]): EditResult {
-  const chain = [envCondition(ctx.env, ctx.b)];
+  const chain = [envCondition(ctx.env, ctx.b, ctx.t)];
   for (const [p, v] of props) {
     const all = collect(ctx.matched, p);
     for (const x of all) ctx.maxSpec = Math.max(ctx.maxSpec, x.spec);
@@ -754,7 +799,7 @@ export function htmlUnlinkedOffset(model: Model, edit: Extract<Edit, { op: 'offs
   const win = best(all.filter((x) => chainMatches(x.chain, w)));
   const baseT = win ? win.d.value.trim() : '';
   const t = `translate(${fmt(edit.dx)}px, ${fmt(edit.dy)}px)` + (baseT && baseT !== 'none' ? ` ${baseT}` : '');
-  const chain = [envCondition(ctx.env, ctx.b)];
+  const chain = [envCondition(ctx.env, ctx.b, ctx.t)];
   ctx.lines.push({ chain, prop: 'transform', value: t, important: importantNeeded(ctx, all, 'transform') });
   addPin(ctx, 'transform', ctx.env, t);
   ctx.placements.push(`transform inside ${chain[0]}`);
@@ -786,7 +831,7 @@ export function htmlUnlinkedReorder(model: Model, edit: Extract<Edit, { op: 'reo
   if ((first && ei === 0) || (last && ei === kids.length - 1)) return { ok: true, patches: [], dom: [], warnings, placement: 'already in place', state };
   const all = collect(ctx.matched, 'order');
   for (const x of all) ctx.maxSpec = Math.max(ctx.maxSpec, x.spec);
-  const chain = [envCondition(ctx.env, ctx.b)];
+  const chain = [envCondition(ctx.env, ctx.b, ctx.t)];
   const value = String(first ? o - 1 : o + 1);
   ctx.lines.push({ chain, prop: 'order', value, important: importantNeeded(ctx, all, 'order') });
   addPin(ctx, 'order', ctx.env, value);
