@@ -41,3 +41,7 @@ insert-check/raw/
 # Engine hardening: temp and raw output (exports are never committed)
 harden-check/tmp/
 harden-check/raw/
+
+# Small views: temp and raw output (exports are never committed)
+views-check/tmp/
+views-check/raw/
