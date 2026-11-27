@@ -189,3 +189,8 @@ new behaviour (inline style for a linked colour edit).
 - Replaced the template README with the real one (docs only). CI is the template's Python workflow and runs nothing of the engine; the README says so beside the badge. Template leftovers (`src/app/`, `tests/`, `evals/`, Python targets) stay for now: Max decides when to remove them.
 - The follow-up session note's "8 of 13 pass, 5 fail" before the work differs from the CSV (7 and 6); the README uses the CSV.
 - Detail and the claim-to-file table: `docs/sessions/2026-11-27-readme.md`.
+
+## 2026-11-27: pre-public audit and fixes
+- Audited all history (`docs/sessions/2026-11-27-prepublic-audit.md`): no secrets, no third-party files, no AI trailers; the Gmail address is the author of every commit. Decision (Max): keep history exactly as it is, no rewrite.
+- Changed: README wording and badge caveat, the CI workflow (one job `engine`: typecheck, tests, bundle, the 40-edit gate), `CLAUDE.md` (private-project lines removed), `package.json` (license, author, repository, description). The old check names `ci/checks` and `ci/eval-*` are gone.
+- Max still decides: template leftovers (and the two now-stale sentences in the README's Leftovers paragraph), whether `docs/lessons-learned.md` and `docs/collaboration-conventions.md` (which name other projects and the Cowork Project) stay, and the branch-protection answer before merging.

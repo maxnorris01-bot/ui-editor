@@ -3,7 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Engine gate: browser-side HTML/SVG edit round-trip (work in progress)",
+  "description": "A browser-side engine for a visual HTML, SVG and CSS editor: it keeps a list of edits and replays it on the visitor's original source text, so the exported file is that source with only the edited places patched.",
+  "license": "MIT",
+  "author": "Max Norris",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxnorris01-bot/ui-editor"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
