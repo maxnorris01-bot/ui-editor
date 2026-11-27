@@ -1,0 +1,18 @@
+{
+  "baselineFiles": 182,
+  "comparedFiles": 180,
+  "byteIdentical": 180,
+  "different": [],
+  "missing": [],
+  "extra": [],
+  "retired": [
+    {
+      "file": "resp/S09/text-scale.html",
+      "changed": true
+    },
+    {
+      "file": "size/Z09/size-envs.html",
+      "changed": true
+    }
+  ]
+}

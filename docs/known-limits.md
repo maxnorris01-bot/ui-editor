@@ -96,6 +96,10 @@ takes effect at every screen width.
   The `pinned-conflict` refusal no longer exists. After a Reset of that view the later Desktop edit stays and the file equals one built without the dropped edits.
 - **Fractional breakpoints** (a Bootstrap-style page with 575.98, 767.98 and 991.98) work: B and T are read as written, the Tablet range starts at the first whole width above B (576) and ends at T (991.98).
   A `max-width: 767.98px` condition would make B = 767.98 (as for the freelancer page); the follow-up fixture uses 767.98 only as a `min-width`.
+- **Checked on the real pages (2026-11-27, run v1, `views-check/results/realpage-summary.md`):** the freelancer Bootstrap page (B = 767.98, T = 991.98, Tablet 768 to 991.98), lee munroe (B 640) and mailgun (B 599)
+  pass 16 specs: Desktop size and colour edits, custom Phone and Tablet edits, a Desktop colour over a custom Phone colour, and Reset. The exact widths 767.98 and 991.98 **cannot be set in Chromium** (the
+  media-query viewport is snapped to whole pixels), so they were checked at 767, 768, 991, 992 and 993 and by reading the written condition `(min-width: 768px) and (max-width: 991.98px)`. Not tested: any other browser, a
+  real device, and widths strictly between 767.98 and 768 (they belong to no range).
 - **Tablet and Phone offsets and reorders** keep the unlinked rules and limits (a reorder in a small view only places an element first or last among siblings whose `order` values are all equal, in a flex or grid parent).
 
 ## Selectors, ids and shared styles

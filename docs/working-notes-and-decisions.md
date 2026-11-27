@@ -178,3 +178,9 @@ new behaviour (inline style for a linked colour edit).
 - `README.md`'s Known Failures section (if present) - the detailed, evidence-quoted record of real
   bugs found and their status.
 - `docs/adr/` - specific architectural decisions with fuller reasoning than fits here.
+
+## 2026-11-27: views real-page check (run v1)
+- Round changed nothing under `engine/` or `src/`. 16 V-specs (prefix V, no earlier file used it) on the three real HTML pages and the two SVGs all PASS; every earlier suite kept its results and bytes.
+- All three HTML pages have a Tablet band by the locked definitions (emails from 641 and 600 up to the default T 1024), so `tablet-covered-by-phone` was expected nowhere and occurred nowhere.
+- Decision (amendment 1, before the first scored run): Chromium cannot set a fractional viewport, so V14 uses whole widths plus a text check of the written condition; the fractional width itself is unverified in a browser.
+- Detail: `docs/sessions/2026-11-27-views-real-pages.md`.
