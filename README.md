@@ -8,7 +8,7 @@ A browser-side engine for a visual HTML, SVG and CSS editor: it keeps a list of 
 
 ## Demo
 
-The tool built on this engine is the "UI Editor" page of the portfolio site: <https://portfolio-site-max-norris.vercel.app/ui-editor>. That page is hidden until its release, so the link returns "Page not found" until then. The page's own code is in the public `portfolio-site` repository (`maxnorris01-bot/portfolio-site`, folder `src/ui-editor/`), with the engine vendored there as one built file. This repository holds the engine and the checks only; there is no UI in it and no screenshot or GIF yet.
+The tool built on this engine is the "UI Editor" page of the portfolio site: <https://portfolio-site-max-norris.vercel.app/ui-editor>. The page is released and the link works (checked 2026-11-27). The page's own code is in the public `portfolio-site` repository (`maxnorris01-bot/portfolio-site`, folder `src/ui-editor/`), with the engine vendored there as one built file. This repository holds the engine and the checks only; there is no UI in it and no screenshot or GIF yet.
 
 ## Project boundary
 

@@ -194,3 +194,8 @@ new behaviour (inline style for a linked colour edit).
 - Audited all history (`docs/sessions/2026-11-27-prepublic-audit.md`): no secrets, no third-party files, no AI trailers; the Gmail address is the author of every commit. Decision (Max): keep history exactly as it is, no rewrite.
 - Changed: README wording and badge caveat, the CI workflow (one job `engine`: typecheck, tests, bundle, the 40-edit gate), `CLAUDE.md` (private-project lines removed), `package.json` (license, author, repository, description). The old check names `ci/checks` and `ci/eval-*` are gone.
 - Max still decides: template leftovers (and the two now-stale sentences in the README's Leftovers paragraph), whether `docs/lessons-learned.md` and `docs/collaboration-conventions.md` (which name other projects and the Cowork Project) stay, and the branch-protection answer before merging.
+
+## 2026-11-27: README after release
+- The portfolio page is live and the repository is public; the README's Demo sentence saying the page was hidden is replaced. Anonymous checks: `git ls-remote` returns a hash, the CI badge returns 200. Nothing else in the README depended on the repository being private.
+- Open: the site sends `X-Robots-Tag: noindex` (Max is checking the cause); the README makes no claim about search indexing.
+- Detail: `docs/sessions/2026-11-27-readme-live.md`.
