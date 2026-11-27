@@ -184,3 +184,8 @@ new behaviour (inline style for a linked colour edit).
 - All three HTML pages have a Tablet band by the locked definitions (emails from 641 and 600 up to the default T 1024), so `tablet-covered-by-phone` was expected nowhere and occurred nowhere.
 - Decision (amendment 1, before the first scored run): Chromium cannot set a fractional viewport, so V14 uses whole widths plus a text check of the written condition; the fractional width itself is unverified in a browser.
 - Detail: `docs/sessions/2026-11-27-views-real-pages.md`.
+
+## 2026-11-27: README
+- Replaced the template README with the real one (docs only). CI is the template's Python workflow and runs nothing of the engine; the README says so beside the badge. Template leftovers (`src/app/`, `tests/`, `evals/`, Python targets) stay for now: Max decides when to remove them.
+- The follow-up session note's "8 of 13 pass, 5 fail" before the work differs from the CSV (7 and 6); the README uses the CSV.
+- Detail and the claim-to-file table: `docs/sessions/2026-11-27-readme.md`.
