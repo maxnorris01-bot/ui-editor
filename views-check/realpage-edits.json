@@ -1,0 +1,569 @@
+{
+ "version": 1,
+ "tolerance": {
+  "px": 0.5
+ },
+ "prefix": "V",
+ "inputDir": "../ui-editor-realpages",
+ "companions": {
+  "freelancer-index.html": [
+   "css/styles.css"
+  ]
+ },
+ "pages": {
+  "leemunroe-email.html": {
+   "B": 640,
+   "T": 1024,
+   "tablet": "641 to 1024"
+  },
+  "mailgun-action.html": {
+   "B": 599,
+   "T": 1024,
+   "tablet": "600 to 1024"
+  },
+  "freelancer-index.html": {
+   "B": 767.98,
+   "T": 991.98,
+   "tablet": "768 to 991.98"
+  }
+ },
+ "retired": [],
+ "stillRefused": "none expected: all three HTML pages have a Tablet band, so tablet-covered-by-phone is not the true answer for any of them",
+ "specs": [
+  {
+   "id": "V01",
+   "title": "lee munroe: a Desktop font-size edit of the most prominent text reaches Phone and Tablet by the ratio rule",
+   "fixture": "leemunroe-email.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "td.wrapper > p:nth-of-type(1)",
+     "properties": {
+      "font-size": "24px"
+     }
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "td.wrapper > p:nth-of-type(1)",
+      "prop": "font-size",
+      "scaled": 1.5
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "V02",
+   "title": "mailgun: a Desktop font-size edit of the most prominent text reaches Phone and Tablet by the ratio rule",
+   "fixture": "mailgun-action.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "td.content td.content > p:nth-of-type(1)",
+     "properties": {
+      "font-size": "22px"
+     }
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "td.content td.content > p:nth-of-type(1)",
+      "prop": "font-size",
+      "scaled": 1.375
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "V03",
+   "title": "freelancer: a Desktop font-size edit of the most prominent text reaches Phone and Tablet by the ratio rule",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "h1.masthead-heading",
+     "properties": {
+      "font-size": "80px"
+     }
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "h1.masthead-heading",
+      "prop": "font-size",
+      "scaled": 1.25
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "V04",
+   "title": "lee munroe: a Desktop colour edit (non-ratio) reaches every view",
+   "fixture": "leemunroe-email.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "td.wrapper > p:nth-of-type(1)",
+     "properties": {
+      "color": "#c0392b"
+     }
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "td.wrapper > p:nth-of-type(1)",
+      "prop": "color",
+      "desktop": "rgb(192, 57, 43)",
+      "tablet": "rgb(192, 57, 43)",
+      "phone": "rgb(192, 57, 43)"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V05",
+   "title": "freelancer: a Desktop colour edit (non-ratio) reaches every view",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "h1.masthead-heading",
+     "properties": {
+      "color": "#c0392b"
+     }
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "h1.masthead-heading",
+      "prop": "color",
+      "desktop": "rgb(192, 57, 43)",
+      "tablet": "rgb(192, 57, 43)",
+      "phone": "rgb(192, 57, 43)"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V06",
+   "title": "lee munroe: a custom Phone colour edit on another element changes only widths at or below B",
+   "fixture": "leemunroe-email.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "a[target=\"_blank\"]",
+     "properties": {
+      "color": "#2980b9"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "a[target=\"_blank\"]",
+      "prop": "color",
+      "desktop": "original",
+      "tablet": "original",
+      "phone": "rgb(41, 128, 185)"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V07",
+   "title": "mailgun: a custom Phone colour edit on another element changes only widths at or below B",
+   "fixture": "mailgun-action.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "td.content td.content",
+     "properties": {
+      "color": "#2980b9"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "td.content td.content",
+      "prop": "color",
+      "desktop": "original",
+      "tablet": "original",
+      "phone": "rgb(41, 128, 185)"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V08",
+   "title": "freelancer: a custom Phone colour edit on another element changes only widths at or below B",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "a.btn-xl",
+     "properties": {
+      "color": "#2980b9"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "a.btn-xl",
+      "prop": "color",
+      "desktop": "original",
+      "tablet": "original",
+      "phone": "rgb(41, 128, 185)"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V09",
+   "title": "lee munroe: a custom Tablet background edit changes only widths from floor(B)+1 to T",
+   "fixture": "leemunroe-email.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "table.body",
+     "properties": {
+      "background-color": "#f1c40f"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "table.body",
+      "prop": "background-color",
+      "desktop": "original",
+      "tablet": "rgb(241, 196, 15)",
+      "phone": "original"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V10",
+   "title": "mailgun: a custom Tablet background edit changes only widths from floor(B)+1 to T",
+   "fixture": "mailgun-action.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "div[role=\"article\"]",
+     "properties": {
+      "background-color": "#f1c40f"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "div[role=\"article\"]",
+      "prop": "background-color",
+      "desktop": "original",
+      "tablet": "rgb(241, 196, 15)",
+      "phone": "original"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V11",
+   "title": "freelancer: a custom Tablet background edit changes only widths from floor(B)+1 to T",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#contact",
+     "properties": {
+      "background-color": "#f1c40f"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "#contact",
+      "prop": "background-color",
+      "desktop": "original",
+      "tablet": "rgb(241, 196, 15)",
+      "phone": "original"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V12",
+   "title": "freelancer: Phone custom colour on the heading, then a Desktop colour on it: Phone keeps its own, Tablet and Desktop follow",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "h1.masthead-heading",
+     "properties": {
+      "color": "#2980b9"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "h1.masthead-heading",
+     "properties": {
+      "color": "#c0392b"
+     }
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "undo": true,
+    "measured": [
+     {
+      "sel": "h1.masthead-heading",
+      "prop": "color",
+      "desktop": "rgb(192, 57, 43)",
+      "tablet": "rgb(192, 57, 43)",
+      "phone": "rgb(41, 128, 185)"
+     }
+    ],
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V13",
+   "title": "freelancer: Phone and Tablet custom edits and a Desktop size edit, then Reset Phone: the export equals the list built without the Phone edit, and no Phone edit is left",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "a.btn-xl",
+     "properties": {
+      "color": "#2980b9"
+     },
+     "environment": "phone"
+    },
+    {
+     "op": "set",
+     "target": "#contact",
+     "properties": {
+      "background-color": "#f1c40f"
+     },
+     "environment": "tablet"
+    },
+    {
+     "op": "set",
+     "target": "h1.masthead-heading",
+     "properties": {
+      "font-size": "80px"
+     }
+    },
+    {
+     "op": "reset",
+     "env": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "undo": true,
+    "customAfter": {
+     "phone": 0,
+     "tablet": 1
+    },
+    "measured": [
+     {
+      "sel": "a.btn-xl",
+      "prop": "color",
+      "desktop": "original",
+      "tablet": "original",
+      "phone": "original"
+     },
+     {
+      "sel": "#contact",
+      "prop": "background-color",
+      "desktop": "original",
+      "tablet": "rgb(241, 196, 15)",
+      "phone": "original"
+     },
+     {
+      "sel": "h1.masthead-heading",
+      "prop": "font-size",
+      "scaled": 1.25
+     }
+    ],
+    "legit": "flow"
+   }
+  },
+  {
+   "id": "V14",
+   "title": "freelancer: fractional breakpoints. A custom Tablet background edit at 767, 767.5, 767.98, 768, 991, 991.98, 992 and 992.98",
+   "fixture": "freelancer-index.html",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#contact",
+     "properties": {
+      "background-color": "#f1c40f"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "extraWidths": [
+     800
+    ],
+    "measured": [
+     {
+      "sel": "#contact",
+      "prop": "background-color",
+      "desktop": "original",
+      "tablet": "rgb(241, 196, 15)",
+      "phone": "original"
+     }
+    ],
+    "fracWidths": {
+     "767": "original",
+     "767.5": "original",
+     "767.98": "original",
+     "768": "rgb(241, 196, 15)",
+     "991": "rgb(241, 196, 15)",
+     "991.98": "rgb(241, 196, 15)",
+     "992": "original",
+     "992.98": "original"
+    },
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V15",
+   "title": "fibonacci-spiral.svg: a Phone-tagged edit has no view effect and the bytes equal the earlier real-page export (R13)",
+   "fixture": "fibonacci-spiral.svg",
+   "steps": [
+    {
+     "op": "set",
+     "target": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+     "properties": {
+      "stroke": "#c0392b"
+     },
+     "environment": "phone"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "svg > g:nth-of-type(1) > rect:nth-of-type(9)",
+      "prop": "stroke",
+      "desktop": "rgb(192, 57, 43)",
+      "tablet": "rgb(192, 57, 43)",
+      "phone": "rgb(192, 57, 43)"
+     }
+    ],
+    "savedHash": "real/R13/fibonacci-spiral.svg",
+    "legit": "descendants"
+   }
+  },
+  {
+   "id": "V16",
+   "title": "normal-distribution.svg: a Tablet-tagged edit has no view effect and the bytes equal the earlier real-page export (R17)",
+   "fixture": "normal-distribution.svg",
+   "steps": [
+    {
+     "op": "set",
+     "target": "#text4315",
+     "properties": {
+      "font-size": "40px"
+     },
+     "environment": "tablet"
+    }
+   ],
+   "expect": {
+    "outcome": "PASS",
+    "measured": [
+     {
+      "sel": "#text4315",
+      "prop": "font-size",
+      "desktop": "40px",
+      "tablet": "40px",
+      "phone": "40px"
+     }
+    ],
+    "savedHash": "real/R17/normal-distribution.svg",
+    "legit": "descendants"
+   }
+  }
+ ]
+}

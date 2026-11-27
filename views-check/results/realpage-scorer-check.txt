@@ -1,0 +1,27 @@
+(A) unfaulted controls: a reference export of every non-SVG spec, written from its stated truth without the engine, must PASS every check
+  V01 leemunroe-email.html: PASS  [E1 M C K]
+  V02 mailgun-action.html: PASS  [E1 M C K]
+  V03 freelancer-index.html: PASS  [E1 M C K]
+  V04 leemunroe-email.html: PASS  [E1 M C K]
+  V05 freelancer-index.html: PASS  [E1 M C K]
+  V06 leemunroe-email.html: PASS  [E1 M C K]
+  V07 mailgun-action.html: PASS  [E1 M C K]
+  V08 freelancer-index.html: PASS  [E1 M C K]
+  V09 leemunroe-email.html: PASS  [E1 M C K]
+  V10 mailgun-action.html: PASS  [E1 M C K]
+  V11 freelancer-index.html: PASS  [E1 M C K]
+  V12 freelancer-index.html: PASS  [E1 M C K]
+  V13 freelancer-index.html: PASS  [E1 M C K R]
+  V14 freelancer-index.html: PASS  [E1 M C K FR FC FT]
+(B) 6 fault switches on lee munroe: each broken export must FAIL the stated check; the matching good export must PASS
+  OK   good V06 (Phone custom colour inside max-width 640): passes every check (must pass)
+  OK   fault 1: Phone edit that also changes a width above B (max-width 700 instead of 640): fails M (must fail M)
+  OK   good Phone custom then Desktop colour (Phone rule re-emitted after the Desktop rule): passes every check (must pass)
+  OK   fault 2: a Desktop edit that overwrites the custom view (no re-emitted Phone rule): fails M (must fail M)
+  OK   good Reset (no rule left): passes every check (must pass)
+  OK   fault 3: Reset that leaves the Phone rule behind: fails M, R (must fail M and R)
+  OK   fault 4: a collateral change on an unedited element (the first paragraph turns blue): fails C (must fail C)
+  OK   good V09 (Tablet custom background inside 641 to 1024): passes every check (must pass)
+  OK   fault 5: a Tablet edit that reaches Phone widths (max-width 1024 only): fails M (must fail M)
+  OK   fault 6: a no-op round trip that changes one byte: unchanged export passes; one extra space at the end fails (NOT byte-identical: leemunroe-email.html)
+SCORER CHECK PASSED: every unfaulted control passes and each of the 6 faults fails the check named.

@@ -40,7 +40,8 @@ window.runViewsSpec = async function (f, steps) {
       state = run.state; edits.push(edit);
       stepFiles.push(run.files); stepUnlinked.push(E.listUnlinked(state));
     }
-    return { refused: null, files: stepFiles[stepFiles.length - 1], stepFiles: stepFiles, stepUnlinked: stepUnlinked, unlinked: E.listUnlinked(state) };
+    var customAfter = typeof E.customEdits === 'function' ? { phone: E.customEdits(edits, 'phone').length, tablet: E.customEdits(edits, 'tablet').length } : null;
+    return { refused: null, files: stepFiles[stepFiles.length - 1], stepFiles: stepFiles, stepUnlinked: stepUnlinked, unlinked: E.listUnlinked(state), customAfter: customAfter };
   } catch (e) {
     return { threw: String(e && e.message || e), stepFiles: stepFiles };
   } finally { preview.dispose(); }

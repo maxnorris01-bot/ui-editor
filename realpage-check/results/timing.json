@@ -1851,5 +1851,114 @@
         "applyRefusal": ""
       }
     ]
+  },
+  "runv1": {
+    "informationOnly": true,
+    "measuredAt": "2026-11-27T17:36:50.509Z",
+    "runsPerFile": 20,
+    "machine": {
+      "model": "Mac17,4",
+      "cpu": "Apple M5",
+      "cores": 10,
+      "ramGiB": 32,
+      "os": "darwin 25.6.0",
+      "arch": "arm64"
+    },
+    "versions": {
+      "node": "v24.21.0",
+      "chromium": "158.0.8127.18"
+    },
+    "perFile": [
+      {
+        "file": "leemunroe-email.html",
+        "bytes": 8903,
+        "elements": 43,
+        "previewMs": {
+          "median": 1.8499999642372131,
+          "min": 1.5,
+          "max": 3.100000023841858,
+          "first": 2.799999952316284
+        },
+        "applyMs": {
+          "median": 0.029749999940395355,
+          "min": 0.02800000011920929,
+          "max": 0.04399999976158142
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "mailgun-action.html",
+        "bytes": 6780,
+        "elements": 40,
+        "previewMs": {
+          "median": 1.5,
+          "min": 1.2999999523162842,
+          "max": 2.1999999284744263,
+          "first": 2.1999999284744263
+        },
+        "applyMs": {
+          "median": 0.019499999880790708,
+          "min": 0.0175,
+          "max": 0.06100000023841858
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "freelancer-index.html",
+        "bytes": 30997,
+        "elements": 274,
+        "previewMs": {
+          "median": 12.900000035762787,
+          "min": 12.399999976158142,
+          "max": 16.399999976158142,
+          "first": 16.399999976158142
+        },
+        "applyMs": {
+          "median": 2.9060000002384188,
+          "min": 2.8864999997615812,
+          "max": 3.0289999997615813
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "fibonacci-spiral.svg",
+        "bytes": 1265,
+        "elements": 20,
+        "previewMs": {
+          "median": 2,
+          "min": 1.7000000476837158,
+          "max": 6.199999928474426,
+          "first": 6.199999928474426
+        },
+        "applyMs": {
+          "median": 0.0009999996423721313,
+          "min": 0,
+          "max": 0.0015000003576278688
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      },
+      {
+        "file": "normal-distribution.svg",
+        "bytes": 62916,
+        "elements": 316,
+        "previewMs": {
+          "median": 4.599999964237213,
+          "min": 4.399999976158142,
+          "max": 6.700000047683716,
+          "first": 6.099999904632568
+        },
+        "applyMs": {
+          "median": 0.00824999988079071,
+          "min": 0.0075,
+          "max": 0.01600000023841858
+        },
+        "applyStatus": "ok",
+        "applyRefusal": ""
+      }
+    ]
   }
 }
